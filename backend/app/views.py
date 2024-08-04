@@ -18,6 +18,8 @@ class LoginView(APIView):
         email = request.data.get('email')
         password = request.data.get('password')
 
+        if not email or not password:
+            return Response({'error': 'Email and password are required'}, status=400)
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
@@ -63,6 +65,11 @@ class RegisterView(APIView):
 class UserView(APIView):
     def get(self, request):
         token = request.headers.get('Authorization').split(' ')[1]
+        # check if token is expired
+        try:
+            jwt_decode_handler(token)
+        except:
+            return Response({'error': 'Token is expired'}, status=400)
         if not token:
             return Response({'error': 'Token is required'}, status=400)
         user = User.objects.get(id=jwt_decode_handler(token)['user_id'])

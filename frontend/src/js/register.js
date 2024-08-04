@@ -1,21 +1,25 @@
 import "./main.js";
 import axios from "axios";
-import Cookies from "js-cookie";
+import { Auth } from "./Auth.js";
+import "./customElements/CustomForm.js";
 
-if (Cookies.get("token")) {
-    console.log("Token exists");
-    axios
-        .get("http://localhost:8000/api/user", {
-            headers: {
-                Authorization: `Bearer ${Cookies.get("token")}`,
-            },
-        })
-        .then((response) => {
-            console.log(response);
-            window.location.href = "/dashboard.html";
-        })
-        .catch((error) => {
-            console.log(error);
-            // window.location.href = "/login.html";
-        });
-}
+const auth = new Auth();
+
+const form = document.querySelector("custom-form");
+
+form.submitForm = async (formData) => {
+    const response = await auth.register(
+        formData.username,
+        formData.email,
+        formData.password,
+        formData.confirmpassword
+    );
+    console.log(response);
+    if (response instanceof Error) {
+        form.errorDiv.textContent =
+            "Error submitting form: " + response.response.data.error;
+    } else {
+        console.log("Form submitted successfully", response);
+    }
+    return;
+};
