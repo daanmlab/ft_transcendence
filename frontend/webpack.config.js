@@ -4,33 +4,26 @@ const path = require("path");
 const autoprefixer = require("autoprefixer");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
-const pages = ["dashboard", "login", "register"];
-
 module.exports = {
     mode: "development",
-    entry: pages.reduce((config, page) => {
-        config[page] = `./src/js/${page}.js`;
-        return config;
-    }, {}),
+    entry: "./src/js/index.js",
     output: {
-        filename: "[name].js",
+        filename: "index.js",
         path: path.resolve(__dirname, "dist"),
+        publicPath: "/",
     },
     devServer: {
         static: path.resolve(__dirname, "dist"),
         port: 8080,
+        historyApiFallback: true,
         hot: true,
     },
     plugins: [
-        ...pages.map(
-            (file) =>
-                new HtmlWebpackPlugin({
-                    template: "./src/html/" + file + ".html",
-                    inject: true,
-                    chunks: ["index", "main"],
-                    filename: file + ".html",
-                })
-        ),
+        new HtmlWebpackPlugin({
+            template: "./src/index.html",
+            filename: "index.html",
+            chunks: ["main"],
+        }),
     ],
     module: {
         rules: [

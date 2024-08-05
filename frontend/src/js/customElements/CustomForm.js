@@ -1,6 +1,5 @@
 class CustomForm extends HTMLElement {
     constructor() {
-        console.log("CustomForm constructor");
         super().attachShadow({ mode: "open" });
 
         this.errorDiv = document.createElement("div");
@@ -132,4 +131,5 @@ class CustomForm extends HTMLElement {
     }
 }
 
-customElements.define("custom-form", CustomForm);
+if (!customElements.get("custom-form"))
+    customElements.define("custom-form", CustomForm);

@@ -2,16 +2,14 @@ import Cookies from "js-cookie";
 import axios from "axios";
 
 export class Auth {
-    constructor() {
+    constructor(isCurrentPageProtected, app) {
+        this.isCurrentPageProtected = isCurrentPageProtected;
         this.user = null;
-        this.authenticated = null;
-        (async () => {
-            this.authenticated = await this.isAuthenticated();
-            this.checkAuthtorization();
-        })();
+        this.authenticated = false;
+        this.app = app;
     }
 
-    async isAuthenticated() {
+    async authenticate() {
         const token = Cookies.get("token");
         if (token) {
             try {
@@ -20,23 +18,26 @@ export class Auth {
                         Authorization: `Bearer ${token}`,
                     },
                 });
+                this.authenticated = true;
                 return true;
             } catch (error) {
                 console.log(error);
                 Cookies.remove("token");
+                this.authenticated = false;
                 return false;
             }
+        } else {
+            this.authenticated = false;
+            return false;
         }
     }
 
     checkAuthtorization() {
-        const allowed = ["login.html", "register.html"];
-        const path = window.location.pathname.split("/").pop();
-        if (!this.authenticated && !allowed.includes(path)) {
-            window.location.href = "/login.html";
-        } else if (this.authenticated && allowed.includes(path)) {
-            window.location.href = "/dashboard.html";
+        if (!this.authenticated && this.isCurrentPageProtected) {
+            this.app.navigate("/login");
+            return false;
         }
+        return true;
     }
 
     async register(username, email, password, password_confirmation) {
@@ -51,7 +52,7 @@ export class Auth {
                 { username, email, password }
             );
             Cookies.set("token", response.data.token, { expires: 7 });
-            window.location.href = "/dashboard.html";
+            this.app.navigate("/dashboard");
             return response;
         } catch (error) {
             console.log(error);
@@ -69,7 +70,8 @@ export class Auth {
                 }
             );
             Cookies.set("token", response.data.token, { expires: 7 });
-            window.location.href = "/dashboard.html";
+            console.log(this.app);
+            this.app.navigate("/test");
             return response;
         } catch (error) {
             console.log(error);

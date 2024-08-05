@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    section {
+        display: none;
+    }
+
+    a[data-href] {
+        cursor: pointer;
+    }
+</style>
+
+<body>
+    <div id="main">
+
+    </div>
+    <section id="Test">
+        <h1>Test</h1>
+    </section>
+    <section id="Login">
+        <div class="d-flex align-items-center py-4 bg-body-tertiary">
+            <main class="form-signin w-100 m-auto">
+                <custom-form>
+                    <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+
+                    <div class="form-floating">
+                        <input type="email" class="form-control" data-id="Email" placeholder="name@example.com" />
+                        <label for="Email">Email address</label>
+                    </div>
+                    <div class="form-floating">
+                        <input type="password" class="form-control" data-id="Password" placeholder="Password" />
+                        <label for="Password">Password</label>
+                    </div>
+                    <button class="btn btn-primary w-100 py-2" type="submit">
+                        Sign in
+                    </button>
+                    <a class="d-inline-block text-center w-100" data-href="/register">no account yet?</a>
+                </custom-form>
+            </main>
+        </div>
+    </section>
+    <section id="Register">
+        <div class="d-flex align-items-center py-4 bg-body-tertiary">
+            <main class="form-signin w-100 m-auto">
+                <custom-form>
+                    <h1 class="h3 mb-3 fw-normal">Let's get you registered :)</h1>
+                    <div class="form-floating">
+                        <input type="text" class="form-control" data-id="Username" placeholder="littlefrenchboy" />
+                        <label for="Username">Username</label>
+                    </div>
+                    <div class="form-floating">
+                        <input type="email" class="form-control" data-id="Email" placeholder="name@example.com" />
+                        <label for="Email">Email address</label>
+                    </div>
+                    <div class="form-floating">
+                        <input type="password" class="form-control" data-id="Password" placeholder="Password" />
+                        <label for="Password">Password</label>
+                    </div>
+                    <div class="form-floating">
+                        <input type="password" class="form-control" data-id="ConfirmPassword" placeholder="Password" />
+                        <label for="ConfirmPassword">Confirm Password</label>
+                    </div>
+
+                    <button class="btn btn-primary w-100 py-2" type="submit">
+                        Sign in
+                    </button>
+                    <a class="d-inline-block text-center w-100" data-href="./login.html">already with us?</a>
+                    </form>
+            </main>
+        </div>
+    </section>
+    <section id="NotFound">
+        <h1>404</h1>
+    </section>
+    <script src="./index.js">
+    </script>
+</body>
+
+</html>
