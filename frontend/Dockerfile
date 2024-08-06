@@ -10,7 +10,7 @@ COPY package-lock.json /usr/src/app/
 RUN npm install
 
 # Copy project
-COPY . /usr/src/app/
+COPY . .
 
 # Expose port
 EXPOSE 8080
