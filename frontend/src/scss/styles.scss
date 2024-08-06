@@ -1,2 +1,20 @@
 // Import all of Bootstrap's CSS
 @import "bootstrap/scss/bootstrap";
+
+// data-page attribute is used to target specific pages
+[data-page="test"] {
+    background-color: red;
+}
+
+[data-page="login"],
+[data-page="register"] {
+    & > div {
+        display: flex;
+        justify-content: center;
+        min-height: 100vh;
+
+        main {
+            max-width: 400px;
+        }
+    }
+}

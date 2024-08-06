@@ -7,6 +7,7 @@ import {
 
 class App {
     constructor() {
+        this.mainElement = document.querySelector("#main");
         this.pages = {
             test: new TestPage(this),
             login: new LoginPage(this),
@@ -22,6 +23,10 @@ class App {
             (page) => page.url === path
         );
         if (page) {
+            if (this.currentPage) {
+                this.currentPage.close();
+            }
+            this.mainElement.setAttribute("data-page", page.name);
             this.currentPage = page;
             history.pushState({}, page.name, page.url);
             page.open(this);

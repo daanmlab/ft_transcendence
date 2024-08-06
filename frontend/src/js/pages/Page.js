@@ -40,6 +40,16 @@ class Page {
         this.render(app);
     }
 
+    close() {
+        this.mainElement.querySelectorAll("[data-href]").forEach((element) => {
+            element.removeEventListener("click", (event) => {
+                event.preventDefault();
+                app.navigate(element.getAttribute("data-href"));
+            });
+        });
+        this.mainElement.innerHTML = "";
+    }
+
     /**
      * Renders the page
      * @param {object} app - The app object
