@@ -19,6 +19,7 @@ class Page {
         this.pageElement = document.querySelector(pageElement);
         this.mainElement = document.querySelector("#main");
         this.auth = new Auth(isProtected, app);
+        this.handleClick = this.handleClick.bind(this);
     }
 
     async open(app) {
@@ -31,10 +32,7 @@ class Page {
         });
         this.mainElement.innerHTML = tempElement.innerHTML;
         this.mainElement.querySelectorAll("[data-href]").forEach((element) => {
-            element.addEventListener("click", (event) => {
-                event.preventDefault();
-                app.navigate(element.getAttribute("data-href"));
-            });
+            element.addEventListener("click", this.handleClick);
         });
         document.title = this.name;
         this.render(app);
@@ -42,12 +40,14 @@ class Page {
 
     close() {
         this.mainElement.querySelectorAll("[data-href]").forEach((element) => {
-            element.removeEventListener("click", (event) => {
-                event.preventDefault();
-                app.navigate(element.getAttribute("data-href"));
-            });
+            element.removeEventListener("click", this.handleClick);
         });
         this.mainElement.innerHTML = "";
+    }
+
+    handleClick(event) {
+        event.preventDefault();
+        app.navigate(event.currentTarget.getAttribute("data-href"));
     }
 
     /**

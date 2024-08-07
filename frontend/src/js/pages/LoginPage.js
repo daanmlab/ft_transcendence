@@ -17,17 +17,26 @@ class LoginPage extends Page {
 
         const form = this.mainElement.querySelector("custom-form");
         form.submitForm = async (formData) => {
-            const response = await this.auth.login(
-                formData.email,
-                formData.password
-            );
-            if (response instanceof Error) {
-                form.errorDiv.textContent =
-                    "Error submitting form: " + response.response.data.error;
-            } else {
-                console.log("Form submitted successfully", response);
+            if (!formData.email || !formData.password) {
+                form.showFormError("Email and password are required");
+                return;
             }
-            return;
+            try {
+                const response = await this.auth.login(
+                    formData.email,
+                    formData.password
+                );
+                console.log("Login response:", response);
+                return response;
+            } catch (error) {
+                if (error.response) {
+                    if (error.response.status === 401) {
+                        form.showFormError("Invalid email or password");
+                    }
+                }
+                console.error("Login: Error in form submission:", error);
+                throw error;
+            }
         };
     }
 

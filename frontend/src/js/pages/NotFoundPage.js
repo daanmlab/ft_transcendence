@@ -6,7 +6,7 @@ class NotFoundPage extends Page {
             name: "404",
             url: "/404",
             pageElement: "#NotFound",
-            isProtected: true,
+            isProtected: false,
             app: app,
         });
     }

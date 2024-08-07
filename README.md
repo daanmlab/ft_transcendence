@@ -15,3 +15,8 @@ python manage.py runserver
 cd frontend
 npm start
 ```
+## run in docker
+
+```bash
+	docker-compose up
+```
