@@ -74,3 +74,6 @@ backend/db.sqlite3
 # Ignore Python cache directories
 backend/app/__pycache__/
 backend/backend/__pycache__/
+
+.env
+notes
