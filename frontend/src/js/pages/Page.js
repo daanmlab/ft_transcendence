@@ -32,7 +32,9 @@ class Page {
         });
         this.mainElement.innerHTML = tempElement.innerHTML;
         this.mainElement.querySelectorAll("[data-href]").forEach((element) => {
-            element.addEventListener("click", this.handleClick);
+            element.addEventListener("click", (event) =>
+                this.handleClick(event, app)
+            );
         });
         document.title = this.name;
         this.render(app);
@@ -40,12 +42,14 @@ class Page {
 
     close() {
         this.mainElement.querySelectorAll("[data-href]").forEach((element) => {
-            element.removeEventListener("click", this.handleClick);
+            element.removeEventListener("click", (event) =>
+                this.handleClick(event, app)
+            );
         });
         this.mainElement.innerHTML = "";
     }
 
-    handleClick(event) {
+    handleClick(event, app) {
         event.preventDefault();
         app.navigate(event.currentTarget.getAttribute("data-href"));
     }
