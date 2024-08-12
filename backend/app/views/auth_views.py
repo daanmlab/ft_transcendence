@@ -23,14 +23,14 @@ class LoginView(APIView):
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            return Response({'error': 'Invalid username'}, status=400)
+            return Response({'error': 'Invalid username'}, status=401)
 
         if user.check_password(password):
             payload = jwt_payload_handler(user)
             token = jwt_encode_handler(payload)
             return Response({'token': token})
         else:
-            return Response({'error': 'Invalid password'}, status=400)
+            return Response({'error': 'Invalid password'}, status=401)
 
 class RegisterView(APIView):
     permission_classes = (AllowAny,)

@@ -74,8 +74,17 @@ export class Auth {
             this.app.navigate("/test");
             return response;
         } catch (error) {
-            console.log(error);
-            return error;
+            console.log("Error logging in", error);
+            if (error.response) {
+                console.error("Auth: Error response data:", error.response.data);
+                console.error("Auth: Error response status:", error.response.status);
+                console.error("Auth: Error response headers:", error.response.headers);
+            } else if (error.request) {
+                console.error("No response received:", error.request);
+            } else {
+                console.error("Axios configuration error:", error.message);
+            }
+            throw error;
         }
     }
 
