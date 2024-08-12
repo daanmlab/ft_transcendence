@@ -7,21 +7,25 @@ export class Auth {
         this.user = null;
         this.authenticated = false;
         this.app = app;
+        this.token = Cookies.get("token");
     }
 
     async authenticate() {
-        const token = Cookies.get("token");
-        if (token) {
+        this.token = Cookies.get("token");
+        if (this.token) {
             try {
-                this.user = await axios.get("http://localhost:8000/api/user", {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                this.user = (
+                    await axios.get("http://localhost:8000/api/user", {
+                        headers: {
+                            Authorization: `Bearer ${this.token}`,
+                        },
+                    })
+                ).data;
                 this.authenticated = true;
                 return true;
             } catch (error) {
                 console.log(error);
+                this.token = null;
                 Cookies.remove("token");
                 this.authenticated = false;
                 return false;

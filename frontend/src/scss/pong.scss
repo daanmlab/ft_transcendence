@@ -1,0 +1,37 @@
+pong-game {
+    width: 100%;
+    display: inline-block;
+    height: 100vh;
+    background: #31313a;
+
+    #scoreboard {
+        color: #f1f1f1;
+        font-size: 24px;
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    #leftPaddle,
+    #rightPaddle {
+        width: 10px;
+        height: 100px;
+        background: #f1f1f1;
+        position: absolute;
+        top: calc(50% - 50px);
+        transition: top 0.1s;
+    }
+    #ball {
+        width: 10px;
+        height: 10px;
+        background: #f1f1f1;
+        position: absolute;
+        left: calc(50% - 5px);
+        top: calc(50% - 5px);
+        transition: top 0.1s, left 0.1s;
+    }
+    #rightPaddle {
+        right: 0;
+    }
+}
