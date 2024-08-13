@@ -33,6 +33,9 @@ class LoginPage extends Page {
                     if (error.response.status === 401) {
                         form.showFormError("Invalid email or password");
                     }
+                    else {
+                        form.showFormError("An error ocurred");
+                    }
                 }
                 console.error("Login: Error in form submission:", error);
                 throw error;

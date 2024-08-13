@@ -77,6 +77,7 @@ export class Auth {
             console.log("Error logging in", error);
             if (error.response) {
                 console.error("Auth: Error response data:", error.response.data);
+                console.error("Auth: Error response mesaage:", error.message);
                 console.error("Auth: Error response status:", error.response.status);
                 console.error("Auth: Error response headers:", error.response.headers);
             } else if (error.request) {
