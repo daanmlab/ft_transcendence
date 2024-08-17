@@ -31,7 +31,7 @@
                     <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
 
                     <div class="form-floating">
-                        <input type="email" class="form-control" data-id="Email" placeholder="name@example.com" />
+                        <input type="email" class="form-control" data-id="Email" placeholder="name@example.com" autocomplete="email"/>
                         <label for="Email">Email address</label>
                     </div>
                     <div class="form-floating">
@@ -79,7 +79,14 @@
     <section id="NotFound">
         <h1>404</h1>
     </section>
-    <script src="./index.js">
+    <section id="VerifyEmail">
+        <div class="d-flex align-items-center py-4 bg-body-tertiary">
+            <main class=w-100 m-auto">
+                <p id="verification-message">
+                </p>
+            </main>
+        </div>
+    </section>
     </script>
 </body>
 

@@ -3,6 +3,7 @@ import {
     TestPage,
     NotFoundPage,
     RegisterPage,
+    VerifyEmailPage,
 } from "./pages/index.js";
 
 class App {
@@ -13,6 +14,7 @@ class App {
             login: new LoginPage(this),
             register: new RegisterPage(this),
             404: new NotFoundPage(this),
+            verifyEmail: new VerifyEmailPage(this),
         };
         this.currentPage = null;
         this.init();
@@ -28,7 +30,8 @@ class App {
             }
             this.mainElement.setAttribute("data-page", page.name);
             this.currentPage = page;
-            history.pushState({}, page.name, page.url);
+            const queryParams = window.location.search;
+            history.pushState({}, page.name, page.url + queryParams);
             page.open(this);
         } else {
             this.navigate("/404");
