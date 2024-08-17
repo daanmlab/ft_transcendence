@@ -22,14 +22,19 @@
     </div>
     <section id="Test">
         <h1>Test</h1>
-        <button>test</button>
+        <button class="btn btn-primary">test</button>
+        <div id="user-info" class="text-center">
+            <img id="avatar" src="" alt="User Avatar" class="rounded-circle object-fit-cover border" width="200" height="200"
+            />
+            <p id="username"></p>
+        </div>
+        <button class="btn btn-primary" id="logout">Logout</button>
     </section>
     <section id="Login">
         <div class="d-flex align-items-center py-4 bg-body-tertiary">
             <main class="form-signin w-100 m-auto">
-                <custom-form>
+                <custom-form class="pb-6" id="login-form">
                     <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
-
                     <div class="form-floating">
                         <input type="email" class="form-control" data-id="Email" placeholder="name@example.com" autocomplete="email"/>
                         <label for="Email">Email address</label>
@@ -41,8 +46,13 @@
                     <button class="btn btn-primary w-100 py-2" type="submit">
                         Sign in
                     </button>
-                    <a class="d-inline-block text-center w-100" data-href="/register">no account yet?</a>
+                    <a class="d-inline-block text-center w-100" data-href="/register">Register</a>
                 </custom-form>
+                <div class="d-flex justify-content-between">
+                    <a class="btn btn-primary w-100 text-white" href="http://localhost:8000/api/oauth/42/" style="margin-top: 60px;">
+                        <p class="text-white m-0">Sign in with 42</p>
+                    </a>
+                </div>
             </main>
         </div>
     </section>

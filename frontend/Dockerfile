@@ -1,12 +1,12 @@
-# frontend/Dockerfile
-FROM node:14
+FROM node:18
 
 # Set work directory
 WORKDIR /usr/src/app
 
 # Install dependencies
-COPY package.json /usr/src/app/
-COPY package-lock.json /usr/src/app/
+COPY package.json /
+
+RUN npm cache clean --force
 RUN npm install --unsafe-perm
 
 # Copy project

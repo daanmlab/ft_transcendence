@@ -2,11 +2,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework_jwt.settings import api_settings
+
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
-from django.urls import reverse
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
 from django.core.signing import Signer, BadSignature
 from django.conf import settings
 
@@ -70,7 +68,7 @@ class RegisterView(APIView):
         user.save()
 
         token = signer.sign(user.pk)
-        verification_url = f"http://localhost:8080/verify-email?token={token}"
+        verification_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
         send_mail(
             'Verify your email',
             f'Click the link to verify your email: {verification_url}',
@@ -104,4 +102,8 @@ class UserView(APIView):
         if not token:
             return Response({'error': 'Token is required'}, status=400)
         user = User.objects.get(id=jwt_decode_handler(token)['user_id'])
-        return Response({'username': user.username, 'email': user.email})
+        return Response({
+            'username': user.username,
+            'email': user.email,
+            'avatar': user.avatar
+        })

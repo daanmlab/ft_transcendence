@@ -38,20 +38,25 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'user',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
+FRONTEND_URL = "http://localhost:8080"
+
+CORS_ALLOWED_ORIGINS = [
+    FRONTEND_URL,
+]
 
 ROOT_URLCONF = 'backend.urls'
 
@@ -132,6 +137,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Email settings
 EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
 EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
@@ -150,3 +156,8 @@ if all([ADMIN_USER_NAME, ADMIN_EMAIL]):
     ADMINS = [(ADMIN_USER_NAME, ADMIN_EMAIL)]
 
 MANAGERS = ADMINS
+
+#OAuth
+OAUTH_42_CLIENT_ID = 'u-s4t2ud-8bc35db2468a3edd5e459610efcde18361265b884e64cbf815474467680424de'
+OAUTH_42_CLIENT_SECRET = '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'
+OAUTH_42_REDIRECT_URI = 'http://localhost:8000/api/oauth/42/callback/'

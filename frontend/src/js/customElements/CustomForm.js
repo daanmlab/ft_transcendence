@@ -21,7 +21,7 @@ class CustomForm extends HTMLElement {
                     color: red;
                     text-align: center;
                     position: absolute;
-                    bottom: -3rem;
+                    bottom: -2.5rem;
                     width: 100%;
                 }
                 .success {

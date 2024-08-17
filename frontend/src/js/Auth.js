@@ -21,7 +21,7 @@ export class Auth {
                 this.authenticated = true;
                 return true;
             } catch (error) {
-                console.log(error);
+                console.error(error);
                 Cookies.remove("token");
                 this.authenticated = false;
                 return false;
@@ -57,7 +57,7 @@ export class Auth {
             );
             return response;
         } catch (error) {
-            console.log(error);
+            console.error("Auth: Error response data:", error.response.data);
             throw error;
         }
     }
@@ -93,7 +93,7 @@ export class Auth {
     logout() {
         Cookies.remove("token");
         if (window.location.pathname !== "/login") {
-            window.location.href = "/login.html";
+            window.location.href = "/login";
         }
     }
 }

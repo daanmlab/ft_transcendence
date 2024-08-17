@@ -30,8 +30,12 @@ class App {
             }
             this.mainElement.setAttribute("data-page", page.name);
             this.currentPage = page;
-            const queryParams = window.location.search;
-            history.pushState({}, page.name, page.url + queryParams);
+            if (this.currentPage.preserveParams) {
+                const queryParams = window.location.search
+                history.pushState({}, page.name, page.url + queryParams);
+            } else {
+                history.pushState({}, page.name, page.url);
+            }
             page.open(this);
         } else {
             this.navigate("/404");
