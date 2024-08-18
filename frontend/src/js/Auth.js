@@ -7,6 +7,7 @@ export class Auth {
         this.user = null;
         this.authenticated = false;
         this.app = app;
+        this.oauthPopup = null;
     }
 
     async authenticate() {
@@ -90,10 +91,54 @@ export class Auth {
         }
     }
 
+    async oAuthLogin() {
+        if (this.oauthPopup) {
+            try {
+                this.oauthPopup.focus();
+                return;
+            } catch (e) {
+                this.oauthPopup = null;
+            }
+        }
+
+        this.oauthPopup = window.open("http://localhost:8000/api/oauth/42/", "OAuth Login", "width=600,height=600");
+
+        if (!this.oauthPopup) {
+            throw new Error("Popup blocked by browser, please unblock.");
+        }
+
+        console.log('Checking for token cookie');
+        let attempts = 0;
+        const maxAttempts = 10;
+
+        const checkForTokenCookie = () => {
+            const token = Cookies.get('token');
+            if (token) {
+                console.log('Token received:', token);
+                this.app.navigate('/test');
+                if (this.oauthPopup && !this.oauthPopup.closed) {
+                    this.oauthPopup.close();
+                }
+                this.oauthPopup = null;
+            } else {
+                attempts++;
+                if (attempts < maxAttempts) {
+                    console.log("Token not received");
+                    setTimeout(checkForTokenCookie, 1000);
+                } else {
+                    console.log('Token not received. Max attempts reached');
+                }
+            }
+        };
+        checkForTokenCookie();
+    }
+
+
     logout() {
+        console.log("Logging out");
         Cookies.remove("token");
         if (window.location.pathname !== "/login") {
-            window.location.href = "/login";
+            this.app.navigate("/login");
         }
     }
 }

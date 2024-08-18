@@ -4,6 +4,7 @@ import {
     NotFoundPage,
     RegisterPage,
     VerifyEmailPage,
+    OAuthResult,
 } from "./pages/index.js";
 
 class App {
@@ -15,6 +16,7 @@ class App {
             register: new RegisterPage(this),
             404: new NotFoundPage(this),
             verifyEmail: new VerifyEmailPage(this),
+            OAuthResult: new OAuthResult(this),
         };
         this.currentPage = null;
         this.init();

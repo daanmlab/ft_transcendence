@@ -49,9 +49,13 @@
                     <a class="d-inline-block text-center w-100" data-href="/register">Register</a>
                 </custom-form>
                 <div class="d-flex justify-content-between">
-                    <a class="btn btn-primary w-100 text-white" href="http://localhost:8000/api/oauth/42/" style="margin-top: 60px;">
+                    <button 
+                        class="btn btn-primary w-100 text-white"
+                        style="margin-top: 60px;"
+                        id="oauth"
+                        >
                         <p class="text-white m-0">Sign in with 42</p>
-                    </a>
+                </button>
                 </div>
             </main>
         </div>
@@ -93,6 +97,14 @@
         <div class="d-flex align-items-center py-4 bg-body-tertiary">
             <main class=w-100 m-auto">
                 <p id="verification-message">
+                </p>
+            </main>
+        </div>
+    </section>
+    <section id="OAuthResult">
+        <div class="d-flex align-items-center py-4 bg-body-tertiary">
+            <main class="w-100 m-auto text-center d-flex align-items-center justify-content-center" style="height: 100vh;">
+                <p id="oauth-message">
                 </p>
             </main>
         </div>
