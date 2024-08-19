@@ -5,6 +5,8 @@ import {
     RegisterPage,
     VerifyEmailPage,
 } from "./pages/index.js";
+import "../scss/styles.scss";
+import * as bootstrap from "bootstrap";
 
 class App {
     constructor() {
@@ -21,6 +23,9 @@ class App {
     }
 
     navigate(path) {
+        if (path === "/") {
+            path = "/test";
+        }
         const page = Object.values(this.pages).find(
             (page) => page.url === path
         );
