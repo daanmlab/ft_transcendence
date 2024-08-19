@@ -15,23 +15,23 @@ services:
     restart: always
     env_file:
       - .env
-  daphne:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    volumes:
-      - ./backend:/usr/src/app
-    ports:
-      - "8001:8001"
-    networks:
-      - backend-network
-    depends_on:
-      - backend
-    working_dir: /usr/src/app
-    command: daphne -b 0.0.0.0 -p 8001 backend.asgi:application
-    restart: always
-    env_file:
-      - .env
+  # daphne:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - ./backend:/usr/src/app
+  #   ports:
+  #     - "8001:8001"
+  #   networks:
+  #     - backend-network
+  #   depends_on:
+  #     - backend
+  #   working_dir: /usr/src/app
+  #   command: daphne -b 0.0.0.0 -p 8001 backend.asgi:application
+  #   restart: always
+  #   env_file:
+  #     - .env
 
   frontend:
     build:

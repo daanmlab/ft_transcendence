@@ -10,13 +10,18 @@ https://docs.djangoproject.com/en/4.2/howto/deployment/asgi/
 import os
 
 from django.core.asgi import get_asgi_application
-from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.routing import ProtocolTypeRouter, URLRouter, ChannelNameRouter
 import app.routing
+from tasks.consumers import testConsumer
+
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 
 
 application = ProtocolTypeRouter({
     'http': get_asgi_application(),
-    'websocket': URLRouter(app.routing.websocket_urlpatterns)
+    'websocket': URLRouter(app.routing.websocket_urlpatterns),
+    'channel': ChannelNameRouter({
+        'pong': testConsumer.as_asgi()
+    })
 })

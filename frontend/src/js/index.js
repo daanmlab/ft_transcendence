@@ -16,6 +16,8 @@ class App {
         };
         this.currentPage = null;
         this.init();
+        if (document.getElementById("noScript"))
+            document.getElementById("noScript").remove();
     }
 
     navigate(path) {
