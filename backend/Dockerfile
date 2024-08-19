@@ -21,4 +21,4 @@ COPY . /usr/src/app/
 EXPOSE 8000
 
 # Run server
-CMD ["sh", "./entrypoint.sh"]
+CMD ["sh", "/usr/src/app/entrypoint.sh"]

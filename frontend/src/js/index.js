@@ -3,7 +3,10 @@ import {
     TestPage,
     NotFoundPage,
     RegisterPage,
+    VerifyEmailPage,
 } from "./pages/index.js";
+import "../scss/styles.scss";
+import * as bootstrap from "bootstrap";
 
 class App {
     constructor() {
@@ -13,6 +16,7 @@ class App {
             login: new LoginPage(this),
             register: new RegisterPage(this),
             404: new NotFoundPage(this),
+            verifyEmail: new VerifyEmailPage(this),
         };
         this.currentPage = null;
         this.init();
@@ -21,6 +25,9 @@ class App {
     }
 
     navigate(path) {
+        if (path === "/") {
+            path = "/test";
+        }
         const page = Object.values(this.pages).find(
             (page) => page.url === path
         );
@@ -30,7 +37,8 @@ class App {
             }
             this.mainElement.setAttribute("data-page", page.name);
             this.currentPage = page;
-            history.pushState({}, page.name, page.url);
+            const queryParams = window.location.search;
+            history.pushState({}, page.name, page.url + queryParams);
             page.open(this);
         } else {
             this.navigate("/404");

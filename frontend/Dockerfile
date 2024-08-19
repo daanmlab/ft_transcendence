@@ -7,7 +7,7 @@ WORKDIR /usr/src/app
 # Install dependencies
 COPY package.json /usr/src/app/
 COPY package-lock.json /usr/src/app/
-RUN npm install
+RUN npm install --unsafe-perm
 
 # Copy project
 COPY . .

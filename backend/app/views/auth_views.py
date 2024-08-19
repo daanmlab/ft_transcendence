@@ -2,12 +2,19 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework_jwt.settings import api_settings
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
+from django.urls import reverse
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.core.signing import Signer, BadSignature
+from django.conf import settings
 
-
+User = get_user_model()
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
+signer = Signer()
 
 class LoginView(APIView):
     permission_classes = (AllowAny,)
@@ -23,6 +30,8 @@ class LoginView(APIView):
             return Response({'error': 'Email and password are required'}, status=400)
         try:
             user = User.objects.get(email=email)
+            if not user.email_is_verified:
+                return Response({'error': 'Email is not verified'}, status=401)
         except User.DoesNotExist:
             return Response({'error': 'Invalid username'}, status=401)
 
@@ -44,8 +53,8 @@ class RegisterView(APIView):
         username = request.data.get('username')
         password = request.data.get('password')
 
-        if User.objects.filter(email=email).exists():
-            return Response({'error': 'Email already exists'}, status=400)
+        if User.objects.filter(email=email).exists() or User.objects.filter(username=username).exists():
+            return Response({'error': 'Email or username already in use'}, status=409)
 
         if not username or not password:
             return Response({'error': 'Username and password are required'}, status=400)
@@ -57,11 +66,32 @@ class RegisterView(APIView):
             return Response({'error': 'Username must be at most 20 characters long'}, status=400)
 
         user = User.objects.create_user(email=email, username=username, password=password)
-        payload = jwt_payload_handler(user)
-        token = jwt_encode_handler(payload)
-        return Response({'token': token}, headers={
-            'Access-Control-Allow-Origin': '*'
-        })
+        user.email_is_verified = False
+        user.save()
+
+        token = signer.sign(user.pk)
+        verification_url = f"http://localhost:8080/verify-email?token={token}"
+        send_mail(
+            'Verify your email',
+            f'Click the link to verify your email: {verification_url}',
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+        )
+
+        return Response({'message': 'User registered successfully. Please verify your email.'}, status=201)
+
+class VerifyEmailView(APIView):
+    permission_classes = (AllowAny,)
+
+    def get(self, request, token):
+        try:
+            user_id = signer.unsign(token)
+            user = User.objects.get(pk=user_id)
+            user.email_is_verified = True
+            user.save()
+            return Response({'message': 'Email verified successfully.'}, status=200)
+        except (BadSignature, User.DoesNotExist):
+            return Response({'error': 'Invalid or expired token'}, status=400)
 
 class UserView(APIView):
     def get(self, request):

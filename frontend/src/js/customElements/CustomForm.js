@@ -24,6 +24,13 @@ class CustomForm extends HTMLElement {
                     bottom: -3rem;
                     width: 100%;
                 }
+                .success {
+                    color: green;
+                    text-align: center;
+                    position: absolute;
+                    bottom: -3rem;
+                    width: 100%;
+                }
                 .spinner-border {
                     width: 1rem;
                     height: 1rem;
@@ -36,8 +43,9 @@ class CustomForm extends HTMLElement {
             <form class="needs-validation" novalidate>
                 <slot></slot>
                 <div id="form-error" class="error"></div>
+                <div id="form-success" class="success"></div>
             </form>
-        `;
+            `;
     }
 
     connectedCallback() {
@@ -88,7 +96,7 @@ class CustomForm extends HTMLElement {
                 console.log("Form submitted successfully", response);
             } catch (error) {
                 // handle error in form submission
-                console.error("CustomForm: Error in form submission:", error);
+                console.error("CustomForm: Error in form submission");
                 // this.errorDiv.textContent = "Error submitting form: " + error.message;
             } finally {
                 this.loading = false;
@@ -99,7 +107,16 @@ class CustomForm extends HTMLElement {
 
     showFormError(message) {
         const errorDiv = this.shadowRoot.querySelector("#form-error");
+        const successDiv = this.shadowRoot.querySelector("#form-success");
+        successDiv.textContent = ""; // Clear success message
         errorDiv.textContent = message;
+    }
+    
+    showFormSuccess(message) {
+        const errorDiv = this.shadowRoot.querySelector("#form-error");
+        const successDiv = this.shadowRoot.querySelector("#form-success");
+        errorDiv.textContent = ""; // Clear error message
+        successDiv.textContent = message;
     }
 
     get formData() {

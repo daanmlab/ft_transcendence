@@ -17,19 +17,18 @@ class RegisterPage extends Page {
 
         const form = this.mainElement.querySelector("custom-form");
         form.submitForm = async (formData) => {
-            const response = await this.auth.register(
-                formData.username,
-                formData.email,
-                formData.password,
-                formData.confirmpassword
-            );
-            if (response instanceof Error) {
-                form.errorDiv.textContent =
-                    "Error submitting form: " + response.response.data.error;
-            } else {
-                console.log("Form submitted successfully", response);
+            try {
+                const response = await this.auth.register(
+                    formData.username,
+                    formData.email,
+                    formData.password,
+                    formData.confirmpassword
+                );
+                form.showFormSuccess("User registered successfully. Please verify your email.");
+            } catch (error) {
+                const errorMessage = error.response?.data?.error || error.message || "An unknown error occurred";
+                form.showFormError(errorMessage);
             }
-            return;
         };
     }
 }

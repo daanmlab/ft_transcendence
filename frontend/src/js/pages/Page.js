@@ -19,6 +19,7 @@ class Page {
         this.pageElement = document.querySelector(pageElement);
         this.mainElement = document.querySelector("#main");
         this.auth = new Auth(isProtected, app);
+        this.app = app;
         this.handleClick = this.handleClick.bind(this);
     }
 
@@ -51,7 +52,7 @@ class Page {
 
     handleClick(event, app) {
         event.preventDefault();
-        app.navigate(event.currentTarget.getAttribute("data-href"));
+        this.app.navigate(event.currentTarget.getAttribute("data-href"));
     }
 
     /**

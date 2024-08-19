@@ -7,21 +7,25 @@ export class Auth {
         this.user = null;
         this.authenticated = false;
         this.app = app;
+        this.token = Cookies.get("token");
     }
 
     async authenticate() {
-        const token = Cookies.get("token");
-        if (token) {
+        this.token = Cookies.get("token");
+        if (this.token) {
             try {
-                this.user = await axios.get("http://localhost:8000/api/user", {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                this.user = (
+                    await axios.get("http://localhost:8000/api/user", {
+                        headers: {
+                            Authorization: `Bearer ${this.token}`,
+                        },
+                    })
+                ).data;
                 this.authenticated = true;
                 return true;
             } catch (error) {
                 console.log(error);
+                this.token = null;
                 Cookies.remove("token");
                 this.authenticated = false;
                 return false;
@@ -41,26 +45,31 @@ export class Auth {
     }
 
     async register(username, email, password, password_confirmation) {
+        if (!username || !email || !password || !password_confirmation) {
+            throw new Error("All fields are required");
+        }
+        if (password !== password_confirmation) {
+            throw new Error("Passwords do not match");
+        }
+        if (email.indexOf("@") === -1) {
+            throw new Error("Invalid email address");
+        }
         try {
-            if (password !== password_confirmation) {
-                return {
-                    response: { data: { error: "Passwords do not match" } },
-                };
-            }
             const response = await axios.post(
                 "http://localhost:8000/api/register",
                 { username, email, password }
             );
-            Cookies.set("token", response.data.token, { expires: 7 });
-            this.app.navigate("/dashboard");
             return response;
         } catch (error) {
             console.log(error);
-            return error;
+            throw error;
         }
     }
 
     async login(email, password) {
+        if (!email || !password) {
+            throw new Error("Email and password are required");
+        }
         try {
             const response = await axios.post(
                 "http://localhost:8000/api/login",
@@ -70,15 +79,12 @@ export class Auth {
                 }
             );
             Cookies.set("token", response.data.token, { expires: 7 });
-            console.log(this.app);
             this.app.navigate("/test");
             return response;
         } catch (error) {
-            console.log("Error logging in", error);
             if (error.response) {
                 console.error("Auth: Error response data:", error.response.data);
-                console.error("Auth: Error response status:", error.response.status);
-                console.error("Auth: Error response headers:", error.response.headers);
+                console.error("Auth: Error response message:", error.message);
             } else if (error.request) {
                 console.error("No response received:", error.request);
             } else {
@@ -90,6 +96,8 @@ export class Auth {
 
     logout() {
         Cookies.remove("token");
-        window.location.href = "/login.html";
+        if (window.location.pathname !== "/login") {
+            window.location.href = "/login.html";
+        }
     }
 }

@@ -15,26 +15,26 @@ class LoginPage extends Page {
         require("../main.js");
         require("../customElements/CustomForm.js");
 
+        this.auth.logout();
+
         const form = this.mainElement.querySelector("custom-form");
         form.submitForm = async (formData) => {
-            if (!formData.email || !formData.password) {
-                form.showFormError("Email and password are required");
-                return;
-            }
             try {
                 const response = await this.auth.login(
                     formData.email,
                     formData.password
                 );
-                console.log("Login response:", response);
                 return response;
             } catch (error) {
                 if (error.response) {
                     if (error.response.status === 401) {
                         form.showFormError("Invalid email or password");
                     }
+                    else {
+                        form.showFormError("An error ocurred");
+                    }
                 }
-                console.error("Login: Error in form submission:", error);
+                console.error("Login: Error in form submission");
                 throw error;
             }
         };
