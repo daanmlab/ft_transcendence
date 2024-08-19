@@ -92,47 +92,37 @@ export class Auth {
     }
 
     async oAuthLogin() {
+        await this.authenticate();
+        if (this.authenticated) {
+            return this.app.navigate('/test');
+        }
+        
         if (this.oauthPopup) {
-            try {
-                this.oauthPopup.focus();
-                return;
-            } catch (e) {
-                this.oauthPopup = null;
-            }
+            return this.oauthPopup.focus(); // Workaround. CORS policy prevents checking if popup is open
         }
 
         this.oauthPopup = window.open("http://localhost:8000/api/oauth/42/", "OAuth Login", "width=600,height=600");
-
         if (!this.oauthPopup) {
             throw new Error("Popup blocked by browser, please unblock.");
         }
 
-        console.log('Checking for token cookie');
         let attempts = 0;
         const maxAttempts = 10;
 
-        const checkForTokenCookie = () => {
+        const checkForTokenCookie = () => { // Automatically login if token is received
             const token = Cookies.get('token');
             if (token) {
-                console.log('Token received:', token);
-                this.app.navigate('/test');
-                if (this.oauthPopup && !this.oauthPopup.closed) {
-                    this.oauthPopup.close();
-                }
                 this.oauthPopup = null;
-            } else {
-                attempts++;
-                if (attempts < maxAttempts) {
-                    console.log("Token not received");
-                    setTimeout(checkForTokenCookie, 1000);
-                } else {
-                    console.log('Token not received. Max attempts reached');
-                }
+                return this.app.navigate('/test');
             }
+            if (++attempts < maxAttempts) {
+                return setTimeout(checkForTokenCookie, 1000);
+            }
+            console.log('Token not received. Max attempts reached');
+            this.oauthPopup = null;
         };
         checkForTokenCookie();
     }
-
 
     logout() {
         console.log("Logging out");
