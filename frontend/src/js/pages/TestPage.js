@@ -14,11 +14,9 @@ class TestPage extends Page {
     render(app) {
         require("../customElements/Pong.js");
 
-<<<<<<< HEAD
 
         const pongElement = this.mainElement.querySelector("pong-game");
         pongElement.startGame();
-=======
         // then whenever we needs to change something in the page
         // we can do it here by selecting the elements from the mainElement
         const { mainElement } = this;
@@ -55,7 +53,6 @@ class TestPage extends Page {
         // it can also be done by using the data-href attribute
         // on the element
         // <a href="#" data-href="/login">Login</a>
->>>>>>> feature/2fa
     }
 }
 

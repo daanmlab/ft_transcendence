@@ -12,13 +12,9 @@ a[data-href] {
 
 // data-page attribute is used to target specific pages
 [data-page="test"] {
-<<<<<<< HEAD
     overflow: hidden;
     height: 100vh;
     // background-color: red;
-=======
-	background-color: #edf8cc;
->>>>>>> feature/2fa
 }
 
 [data-page="login"],
