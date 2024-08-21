@@ -16,17 +16,8 @@ class LoginPage extends Page {
         require("../main.js");
         require("../customElements/CustomForm.js");
 
-<<<<<<< HEAD
         if (this.auth.authenticated) { return this.app.navigate("/test") }
 
-=======
-        // Prevent the user from accessing the login page if they are already authenticated
-        if (this.auth.authenticated) {
-            this.app.navigate("/test");
-            return;
-        }
-        
->>>>>>> feature/oauth2
         const form = this.mainElement.querySelector("custom-form");
         form.submitForm = async (formData) => {
             try {
