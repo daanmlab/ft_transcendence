@@ -58,6 +58,8 @@ CORS_ALLOWED_ORIGINS = [
     FRONTEND_URL,
 ]
 
+CORS_ALLOW_CREDENTIALS = True
+
 ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
@@ -161,3 +163,26 @@ MANAGERS = ADMINS
 OAUTH_42_CLIENT_ID = config('OAUTH_42_CLIENT_ID')
 OAUTH_42_CLIENT_SECRET = config('OAUTH_42_CLIENT_SECRET')
 OAUTH_42_REDIRECT_URI = config('OAUTH_42_REDIRECT_URI')
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        '': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}

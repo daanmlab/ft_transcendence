@@ -4,6 +4,8 @@ import {
     NotFoundPage,
     RegisterPage,
     VerifyEmailPage,
+    OAuthResult,
+    TwoFactorAuthPage,
 } from "./pages/index.js";
 
 class App {
@@ -15,6 +17,8 @@ class App {
             register: new RegisterPage(this),
             404: new NotFoundPage(this),
             verifyEmail: new VerifyEmailPage(this),
+            OAuthResult: new OAuthResult(this),
+            twoFactorAuth: new TwoFactorAuthPage(this),
         };
         this.currentPage = null;
         this.init();
@@ -36,6 +40,7 @@ class App {
             } else {
                 history.pushState({}, page.name, page.url);
             }
+            console.log("Navigating to", page.name);
             page.open(this);
         } else {
             this.navigate("/404");

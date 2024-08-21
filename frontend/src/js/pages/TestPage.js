@@ -31,9 +31,8 @@ class TestPage extends Page {
         // we can also access the auth object
         const { auth } = this;
         console.log(auth.user);
-
         // Insert user data into the DOM
-        const userInfo = auth.user.data;
+        const userInfo = auth.user;
 
         const avatarElement = mainElement.querySelector("#avatar");
         const usernameElement = mainElement.querySelector("#username");

@@ -3,18 +3,19 @@
 
 // data-page attribute is used to target specific pages
 [data-page="test"] {
-    background-color: #edf8cc;
+	background-color: #edf8cc;
 }
 
 [data-page="login"],
-[data-page="register"] {
-    & > div {
-        display: flex;
-        justify-content: center;
-        min-height: 100vh;
+[data-page="register"],
+[data-page="two-factor-auth"] {
+	& > div {
+		display: flex;
+		justify-content: center;
+		min-height: 100vh;
 
-        main {
-            max-width: 400px;
-        }
-    }
+		main {
+			max-width: 400px;
+		}
+	}
 }

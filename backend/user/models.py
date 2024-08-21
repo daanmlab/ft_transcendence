@@ -33,7 +33,7 @@ class CustomUser(AbstractUser):
     avatar = models.URLField(blank=True, null=True)
     oauth_provider = models.CharField(max_length=50, blank=True, null=True)
     oauth_uid = models.CharField(max_length=255, blank=True, null=True)
-
+    is_2fa_enabled = models.BooleanField(default=False)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
