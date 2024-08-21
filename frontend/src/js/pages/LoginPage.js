@@ -16,8 +16,17 @@ class LoginPage extends Page {
         require("../main.js");
         require("../customElements/CustomForm.js");
 
+<<<<<<< HEAD
         if (this.auth.authenticated) { return this.app.navigate("/test") }
 
+=======
+        // Prevent the user from accessing the login page if they are already authenticated
+        if (this.auth.authenticated) {
+            this.app.navigate("/test");
+            return;
+        }
+        
+>>>>>>> feature/oauth2
         const form = this.mainElement.querySelector("custom-form");
         form.submitForm = async (formData) => {
             try {
@@ -41,18 +50,13 @@ class LoginPage extends Page {
                 throw error;
             }
         };
-    }
 
-    displayOauthErrorMessages() {
-        try {
-            const queryParams = new URLSearchParams(window.location.search);
-            if (queryParams.get('error')) {
-                const form = this.mainElement.querySelector("custom-form");
-                form.showFormError("An error occurred trying to get your 42 account.");
-            }
-        } catch (error) {
-            console.error("Error processing error messages", error);
-        }
+        const oAuthButton = this.mainElement.querySelector("#oauth");
+        oAuthButton.addEventListener("click", () => {
+            this.auth.oAuthLogin().catch((error) => {
+                form.showFormError(error.message);
+            });
+        });
     }
 }
 

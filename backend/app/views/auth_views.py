@@ -103,7 +103,7 @@ class VerifyEmailView(APIView):
             user.save()
             return Response({'message': 'Email verified successfully.'}, status=200)
         except (BadSignature, User.DoesNotExist):
-            return Response({'error': 'Invalid or expired token'}, status=400)
+            return Response({'error': 'Invalid or expired token'}, status=401)
 
 class UserView(APIView):
     def get(self, request):
@@ -112,6 +112,7 @@ class UserView(APIView):
             return Response({'error': 'Token is required'}, status=status.HTTP_401_UNAUTHORIZED)
 
         try:
+<<<<<<< HEAD
             token = auth_header.split(' ')[1]
             payload = jwt_decode_handler(token)
         except IndexError:
@@ -124,6 +125,14 @@ class UserView(APIView):
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
+=======
+            jwt_decode_handler(token)
+        except:
+            return Response({'error': 'Token is expired'}, status=401)
+        if not token:
+            return Response({'error': 'Token is required'}, status=401)
+        user = User.objects.get(id=jwt_decode_handler(token)['user_id'])
+>>>>>>> feature/oauth2
         return Response({
             'username': user.username,
             'email': user.email,

@@ -7,7 +7,11 @@ export class Auth {
         this.user = null;
         this.authenticated = false;
         this.app = app;
+<<<<<<< HEAD
         this.token = Cookies.get("token");
+=======
+        this.oauthPopup = null;
+>>>>>>> feature/oauth2
     }
 
     async authenticate() {
@@ -115,8 +119,15 @@ export class Auth {
         if (this.authenticated) {
             return this.app.navigate('/test');
         }
+<<<<<<< HEAD
 
         if (this.oauthPopup) return; // CORS policy prevents checking if popup is open
+=======
+        
+        if (this.oauthPopup) {
+            return this.oauthPopup.focus(); // Workaround. CORS policy prevents checking if popup is open
+        }
+>>>>>>> feature/oauth2
 
         this.oauthPopup = window.open("http://localhost:8000/api/oauth/42/", "OAuth Login", "width=600,height=600");
         if (!this.oauthPopup) {
@@ -142,9 +153,10 @@ export class Auth {
     }
 
     logout() {
+        console.log("Logging out");
         Cookies.remove("token");
         if (window.location.pathname !== "/login") {
-            window.location.href = "/login";
+            this.app.navigate("/login");
         }
     }
 

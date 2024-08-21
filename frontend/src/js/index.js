@@ -5,7 +5,10 @@ import {
     RegisterPage,
     VerifyEmailPage,
     OAuthResult,
+<<<<<<< HEAD
     TwoFactorAuthPage,
+=======
+>>>>>>> feature/oauth2
 } from "./pages/index.js";
 import "../scss/styles.scss";
 import * as bootstrap from "bootstrap";
@@ -20,7 +23,10 @@ class App {
             404: new NotFoundPage(this),
             verifyEmail: new VerifyEmailPage(this),
             OAuthResult: new OAuthResult(this),
+<<<<<<< HEAD
             twoFactorAuth: new TwoFactorAuthPage(this),
+=======
+>>>>>>> feature/oauth2
         };
         this.currentPage = null;
         this.init();
