@@ -12,16 +12,27 @@
         <!-- code will be injected by app -->
     </div>
     <section id="Test">
+<<<<<<< HEAD
         <pong-game />
+=======
+        <h1>Test</h1>
+        <button class="btn btn-primary">test</button>
+        <div id="user-info" class="text-center">
+            <img id="avatar" src="" alt="User Avatar" class="rounded-circle object-fit-cover border" width="200"
+                height="200" />
+            <p id="username"></p>
+        </div>
+        <button class="btn btn-primary" id="logout">Logout</button>
+>>>>>>> feature/2fa
     </section>
     <section id="Login">
         <div class="d-flex align-items-center py-4 bg-body-tertiary">
             <main class="form-signin w-100 m-auto">
-                <custom-form>
+                <custom-form class="pb-6" id="login-form">
                     <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
-
                     <div class="form-floating">
-                        <input type="email" class="form-control" data-id="Email" placeholder="name@example.com" autocomplete="email"/>
+                        <input type="email" class="form-control" data-id="Email" placeholder="name@example.com"
+                            autocomplete="email" />
                         <label for="Email">Email address</label>
                     </div>
                     <div class="form-floating">
@@ -31,8 +42,13 @@
                     <button class="btn btn-primary w-100 py-2" type="submit">
                         Sign in
                     </button>
-                    <a class="d-inline-block text-center w-100" data-href="/register">no account yet?</a>
+                    <a class="d-inline-block text-center w-100" data-href="/register">Register</a>
                 </custom-form>
+                <div class="d-flex justify-content-between">
+                    <button class="btn btn-primary w-100 text-white" style="margin-top: 60px;" id="oauth">
+                        <p class="text-white m-0">Sign in with 42</p>
+                    </button>
+                </div>
             </main>
         </div>
     </section>
@@ -61,7 +77,7 @@
                     <button class="btn btn-primary w-100 py-2" type="submit">
                         Sign in
                     </button>
-                    <a class="d-inline-block text-center w-100" data-href="./login.html">already with us?</a>
+                    <a class="d-inline-block text-center w-100" data-href="/login">already with us?</a>
                     </form>
             </main>
         </div>
@@ -77,7 +93,32 @@
             </main>
         </div>
     </section>
-    </script>
+    <section id="OAuthResult">
+        <div class="d-flex align-items-center py-4 bg-body-tertiary">
+            <main class="w-100 m-auto text-center d-flex align-items-center justify-content-center"
+                style="height: 100vh;">
+                <p id="oauth-message">
+                </p>
+            </main>
+        </div>
+    </section>
+    <section id="TwoFactorAuth">
+        <div class="d-flex align-items-center py-4 bg-body-tertiary">
+            <main class="form-signin w-100 m-auto">
+                <custom-form class="form-signin w-100 m-auto" id="otp-form">
+                    <p class="h6 text-center mb-3 fw-normal">Please enter the one-time password sent to your email</p>
+                    <div class="form-floating">
+                        <input type="otp" class="form-control p-2 fs-4 text-center" data-id="Otp" placeholder="123456"
+                            autocomplete="otp" />
+                    </div>
+                    <button class="btn btn-primary w-100 py-2 mt-2" type="submit">
+                        Submit
+                    </button>
+                </custom-form>
+                <a class="d-inline-block text-center w-100 mt-5" data-href="/login">Login page</a>
+            </main>
+        </div>
+    </section>
 </body>
 
 </html>

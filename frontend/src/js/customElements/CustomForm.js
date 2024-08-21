@@ -21,7 +21,7 @@ class CustomForm extends HTMLElement {
                     color: red;
                     text-align: center;
                     position: absolute;
-                    bottom: -3rem;
+                    bottom: -2.5rem;
                     width: 100%;
                 }
                 .success {
@@ -96,7 +96,7 @@ class CustomForm extends HTMLElement {
                 console.log("Form submitted successfully", response);
             } catch (error) {
                 // handle error in form submission
-                console.error("CustomForm: Error in form submission");
+                console.error("Form submission error", error);
                 // this.errorDiv.textContent = "Error submitting form: " + error.message;
             } finally {
                 this.loading = false;

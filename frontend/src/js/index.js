@@ -4,6 +4,8 @@ import {
     NotFoundPage,
     RegisterPage,
     VerifyEmailPage,
+    OAuthResult,
+    TwoFactorAuthPage,
 } from "./pages/index.js";
 import "../scss/styles.scss";
 import * as bootstrap from "bootstrap";
@@ -17,6 +19,8 @@ class App {
             register: new RegisterPage(this),
             404: new NotFoundPage(this),
             verifyEmail: new VerifyEmailPage(this),
+            OAuthResult: new OAuthResult(this),
+            twoFactorAuth: new TwoFactorAuthPage(this),
         };
         this.currentPage = null;
         this.init();
@@ -35,8 +39,13 @@ class App {
             }
             this.mainElement.setAttribute("data-page", page.name);
             this.currentPage = page;
-            const queryParams = window.location.search;
-            history.pushState({}, page.name, page.url + queryParams);
+            if (this.currentPage.preserveParams) {
+                const queryParams = window.location.search
+                history.pushState({}, page.name, page.url + queryParams);
+            } else {
+                history.pushState({}, page.name, page.url);
+            }
+            console.log("Navigating to", page.name);
             page.open(this);
         } else {
             this.navigate("/404");

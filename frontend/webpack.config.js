@@ -12,8 +12,14 @@ module.exports = {
         path: path.resolve(__dirname, "dist"),
         publicPath: "/",
     },
+    devtool: "source-map",
     devServer: {
-        static: path.resolve(__dirname, "dist"),
+        static: [
+            {
+                directory: path.resolve(__dirname, "src/static"),
+                publicPath: "/static",
+            },
+        ],
         port: 8080,
         historyApiFallback: true,
         hot: true,
@@ -22,24 +28,23 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: "./src/index.html",
             filename: "index.html",
-            chunks: ["main"],
         }),
     ],
     module: {
         rules: [
             {
+                test: /\.(png|jpe?g|gif|svg|webp)$/,
+                type: "asset/resource",
+                generator: {
+                    filename: "static/images/[name][ext]",
+                },
+            },
+            {
                 test: /\.(scss)$/,
                 use: [
+                    "style-loader",
+                    "css-loader",
                     {
-                        // Adds CSS to the DOM by injecting a `<style>` tag
-                        loader: "style-loader",
-                    },
-                    {
-                        // Interprets `@import` and `url()` like `import/require()` and will resolve them
-                        loader: "css-loader",
-                    },
-                    {
-                        // Loader for webpack to process CSS with PostCSS
                         loader: "postcss-loader",
                         options: {
                             postcssOptions: {
@@ -47,14 +52,14 @@ module.exports = {
                             },
                         },
                     },
-                    {
-                        // Loads a SASS/SCSS file and compiles it to CSS
-                        loader: "sass-loader",
-                        options: {
-                            implementation: require("sass"),
-                        },
-                    },
+                    "sass-loader",
                 ],
+            },
+            {
+                test: /\.js$/,
+                enforce: "pre",
+                use: ["source-map-loader"],
+                exclude: /node_modules/,
             },
         ],
     },

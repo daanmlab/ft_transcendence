@@ -12,20 +12,25 @@ a[data-href] {
 
 // data-page attribute is used to target specific pages
 [data-page="test"] {
+<<<<<<< HEAD
     overflow: hidden;
     height: 100vh;
     // background-color: red;
+=======
+	background-color: #edf8cc;
+>>>>>>> feature/2fa
 }
 
 [data-page="login"],
-[data-page="register"] {
-    & > div {
-        display: flex;
-        justify-content: center;
-        min-height: 100vh;
+[data-page="register"],
+[data-page="two-factor-auth"] {
+	& > div {
+		display: flex;
+		justify-content: center;
+		min-height: 100vh;
 
-        main {
-            max-width: 400px;
-        }
-    }
+		main {
+			max-width: 400px;
+		}
+	}
 }
