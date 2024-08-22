@@ -22,6 +22,7 @@
         </div>
         <button class="btn btn-primary" id="logout">Logout</button>
     </section>
+
     <section id="Login">
         <div class="d-flex align-items-center py-4 bg-body-tertiary">
             <main class="form-signin w-100 m-auto">
@@ -49,6 +50,7 @@
             </main>
         </div>
     </section>
+
     <section id="Register">
         <div class="d-flex align-items-center py-4 bg-body-tertiary">
             <main class="form-signin w-100 m-auto">
@@ -79,9 +81,11 @@
             </main>
         </div>
     </section>
+
     <section id="NotFound">
         <h1>404</h1>
     </section>
+
     <section id="VerifyEmail">
         <div class="d-flex align-items-center py-4 bg-body-tertiary">
             <main class="w-100 m-auto">
@@ -91,14 +95,17 @@
             </main>
         </div>
     </section>
+
     <section id="OAuthResult">
         <div class="d-flex align-items-center py-4 bg-body-tertiary">
-            <main class="w-100 m-auto text-center d-flex align-items-center justify-content-center" style="height: 100vh;">
+            <main class="w-100 m-auto text-center d-flex align-items-center justify-content-center"
+                style="height: 100vh;">
                 <p id="oauth-message">
                 </p>
             </main>
         </div>
     </section>
+
     <section id="TwoFactorAuth">
         <div class="d-flex align-items-center py-4 bg-body-tertiary">
             <main class="form-signin w-100 m-auto">
@@ -114,6 +121,100 @@
                 </custom-form>
                 <a class="d-inline-block text-center w-100 mt-5" data-href="/login">Login page</a>
             </main>
+        </div>
+    </section>
+
+    <section id="UserSettings" class="container-fluid mt-5">
+        <div class="row">
+            <!-- Left Menu -->
+            <div class="col-md-3">
+                <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action active" data-bs-toggle="list"
+                        data-bs-target="#two-factor">Two-Factor Authentication</a>
+                    <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="list"
+                        data-bs-target="#change-username">Change Username</a>
+                    <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="list"
+                        data-bs-target="#change-email">Change Email</a>
+                    <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="list"
+                        data-bs-target="#delete-account">Delete Account</a>
+                </div>
+            </div>
+
+            <!-- Right Content Area -->
+            <div class="col-md-9">
+                <div class="tab-content">
+                    <!-- Two-Factor Authentication -->
+                    <div class="tab-pane fade show active" id="two-factor">
+                        <h3>Two-Factor Authentication</h3>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="2fa-method" id="2fa-none" checked>
+                            <label class="form-check-label" for="2fa-none">
+                                None
+                            </label>
+                        </div>                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="2fa-method" id="2fa-email" checked>
+                            <label class="form-check-label" for="2fa-email">
+                                Email
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="2fa-method" id="2fa-qr">
+                            <label class="form-check-label" for="2fa-qr">
+                                QR Code
+                            </label>
+                        </div>
+                        <button class="btn btn-primary mt-3">Update 2FA Settings</button>
+                    </div>
+
+                    <!-- Change Username -->
+                    <div class="tab-pane fade" id="change-username">
+                        <h3>Change Username</h3>
+                        <div class="mb-3">
+                            <label for="new-username" class="form-label">New Username</label>
+                            <input type="text" class="form-control" id="new-username" placeholder="Enter new username">
+                        </div>
+                        <button class="btn btn-primary">Change Username</button>
+                    </div>
+
+                    <!-- Change Email -->
+                    <div class="tab-pane fade" id="change-email">
+                        <h3>Change Email</h3>
+                        <div class="mb-3">
+                            <label for="new-email" class="form-label">New Email</label>
+                            <input type="email" class="form-control" id="new-email" placeholder="Enter new email">
+                        </div>
+                        <button class="btn btn-primary">Change Email</button>
+                    </div>
+
+                    <!-- Delete Account -->
+                    <div class="tab-pane fade" id="delete-account">
+                        <h3>Delete Account</h3>
+                        <p class="text-danger">Warning: This action is irreversible.</p>
+                        <button class="btn btn-danger" data-bs-toggle="modal"
+                            data-bs-target="#deleteAccountModal">Delete My Account</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Account Confirmation Modal -->
+        <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteAccountModalLabel">Confirm Account Deletion</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete your account? This action cannot be undone.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger">Delete Account</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 </body>
