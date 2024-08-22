@@ -26,10 +26,27 @@ class RegisterPage extends Page {
                 );
                 form.showFormSuccess("User registered successfully. Please verify your email.");
             } catch (error) {
-                const errorMessage = error.response?.data?.error || error.message || "An unknown error occurred";
+                let errorMessage = "An unknown error occurred";
+                if (error.response && error.response.data) {
+                    errorMessage = this.formatErrorMessages(error.response.data);
+                } else {
+                    errorMessage = error.message || errorMessage;
+                }
                 form.showFormError(errorMessage);
             }
         };
+    }
+
+    formatErrorMessages(errorData) {
+        const errorMessages = [];
+        for (const key in errorData) {
+            if (errorData[key].length > 0) {
+                errorData[key].forEach(msg => {
+                    errorMessages.push(msg.charAt(0).toUpperCase() + msg.slice(1));
+                });
+            }
+        }
+        return errorMessages.join(' ');
     }
 }
 
