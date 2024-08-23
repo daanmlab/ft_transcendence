@@ -17,8 +17,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework import permissions
 from rest_framework import status
 
-from .serializers import LoginSerializer
-from .services import flatten_validation_error
+from .serializers import LoginSerializer, RegisterSerializer
 from .two_factor_auth import TwoFactorAuthenticationMixin
 
 User = get_user_model()
@@ -34,25 +33,26 @@ class LoginView(TwoFactorAuthenticationMixin, GenericAPIView):
     serializer_class = LoginSerializer
 
     def post(self, request, *args, **kwargs):
-        try:
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            user = serializer.validated_data['user']
+        serializer = self.get_serializer(data=request.data)
+        
+        if serializer.is_valid():
+            try:
+                user = serializer.validated_data['user']
+                if user.is_2fa_enabled:
+                    return self.handle_two_factor_authentication(request, user)
 
-            if user.is_2fa_enabled:
-                return self.handle_two_factor_authentication(request, user)
+                payload = self.get_jwt_payload(user)
+                token = self.get_jwt_token(payload)
+                logger.info(f"User {user.username} logged in successfully")
+                return Response({"success": True, "token": token}, status=status.HTTP_200_OK)
+                
+            except Exception as e:
+                logger.error(f"An unexpected error occurred during login: {e}")
+                return Response({"error": "An unexpected error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-            payload = self.get_jwt_payload(user)
-            token = self.get_jwt_token(payload)
-            return Response({"success": True, "token": token}, status=status.HTTP_200_OK)
-
-        except ValidationError as e:
-            logger.error(f"Validation error: {e}")
-            error_message = flatten_validation_error(e.detail)
-            return Response({"error": error_message}, status=status.HTTP_401_UNAUTHORIZED)
-        except Exception as e:
-            logger.error(f"An unexpected error occurred during login: {e}")
-            return Response({"error": "An unexpected error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            logger.error(f"Validation error: {serializer.errors}")
+            return Response({"error": serializer.errors}, status=status.HTTP_401_UNAUTHORIZED)
 
 class RegisterView(APIView):
     permission_classes = (AllowAny,)
@@ -61,26 +61,21 @@ class RegisterView(APIView):
     }
 
     def post(self, request):
-        email = request.data.get('email')
-        username = request.data.get('username')
-        password = request.data.get('password')
+        serializer = RegisterSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            user = serializer.save()
+            logger.info(f"User with ID {user.id} registered successfully")
+            try:
+                self.send_verification_email(user)
+                return Response({'message': 'User registered successfully'}, status=201)
+            except Exception as e:
+                logger.error(f"Error while sending verification email: {str(e)}")
+                return Response({'error': 'Error while sending verification email'}, status=500)
+        logger.error(f"Error during registration: {serializer.errors}")
+        return Response(serializer.errors, status=400)
 
-        if User.objects.filter(email=email).exists() or User.objects.filter(username=username).exists():
-            return Response({'error': 'Email or username already in use'}, status=409)
-
-        if not username or not password:
-            return Response({'error': 'Username and password are required'}, status=400)
-        if len(password) < 8:
-            return Response({'error': 'Password must be at least 8 characters long'}, status=400)
-        if len(username) < 4:
-            return Response({'error': 'Username must be at least 4 characters long'}, status=400)
-        if len(username) > 20:
-            return Response({'error': 'Username must be at most 20 characters long'}, status=400)
-
-        user = User.objects.create_user(email=email, username=username, password=password)
-        user.email_is_verified = False
-        user.save()
-
+    def send_verification_email(self, user):
         token = signer.sign(user.pk)
         verification_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
         send_mail(
@@ -89,8 +84,7 @@ class RegisterView(APIView):
             settings.DEFAULT_FROM_EMAIL,
             [user.email],
         )
-
-        return Response({'message': 'User registered successfully. Please verify your email.'}, status=201)
+        logger.info(f"Verification email sent to user ID {user.id}")
 
 class VerifyEmailView(APIView):
     permission_classes = (AllowAny,)

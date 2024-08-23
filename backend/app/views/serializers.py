@@ -26,24 +26,22 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'email', 'avatar', 'email_is_verified', 'is_2fa_enabled')
         read_only_fields = ('id', 'email', 'email_is_verified', 'is_2fa_enabled')
 
-# TODO: Refactor RegisterView to use RegisterSerializer
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
-    password2 = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
-
+    password = serializers.CharField(write_only=True, min_length=8, max_length=128)
+    
     class Meta:
         model = User
-        fields = ('username', 'email', 'password', 'password2')
-
-    def validate(self, attrs):
-        if attrs['password'] != attrs['password2']:
-            raise serializers.ValidationError({"password": "Password fields didn't match."})
-        return attrs
+        fields = ['email', 'username', 'password']
+        
+    def validate_username(self, value):
+        if len(value) < 4 or len(value) > 20:
+            raise serializers.ValidationError("Username must be between 4 and 20 characters long.")
+        return value
 
     def create(self, validated_data):
         user = User.objects.create_user(
-            username=validated_data['username'],
             email=validated_data['email'],
+            username=validated_data['username'],
             password=validated_data['password']
         )
         return user

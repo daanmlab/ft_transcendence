@@ -35,10 +35,3 @@ def get_or_create_user_from_oauth(user_info):
     token = jwt_encode_handler(payload)
     
     return token
-
-def flatten_validation_error(errors):
-    if isinstance(errors, dict):
-        for key, value in errors.items():
-            if isinstance(value, list):
-                return value[0]
-    return "An error occurred"
