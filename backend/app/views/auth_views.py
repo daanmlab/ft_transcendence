@@ -13,7 +13,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework import status
 
 from .serializers import LoginSerializer, RegisterSerializer
-from .two_factor_auth_views import TwoFactorAuthenticationMixin
+from app.mixins.two_factor_auth_mixin import TwoFactorAuthenticationMixin
 
 User = get_user_model()
 jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
