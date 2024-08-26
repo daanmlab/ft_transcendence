@@ -7,23 +7,20 @@ from django.conf import settings
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-from rest_framework_jwt.settings import api_settings
+from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework.generics import GenericAPIView
 from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from .serializers import LoginSerializer, RegisterSerializer
 from app.mixins.two_factor_auth_mixin import TwoFactorAuthenticationMixin
 
 User = get_user_model()
-jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
 signer = Signer()
 
 logger = logging.getLogger(__name__)
 
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.permissions import IsAuthenticated
 
 class LoginView(TwoFactorAuthenticationMixin, GenericAPIView):
     permission_classes = [AllowAny]
