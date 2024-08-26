@@ -6,9 +6,9 @@ import {
     VerifyEmailPage,
     OAuthResult,
     TwoFactorAuthPage,
+    UserSettingsPage,
 } from "./pages/index.js";
 import "../scss/styles.scss";
-import * as bootstrap from "bootstrap";
 
 class App {
     constructor() {
@@ -21,6 +21,7 @@ class App {
             verifyEmail: new VerifyEmailPage(this),
             OAuthResult: new OAuthResult(this),
             twoFactorAuth: new TwoFactorAuthPage(this),
+            settings: new UserSettingsPage(this),
         };
         this.currentPage = null;
         this.init();

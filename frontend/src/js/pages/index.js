@@ -5,5 +5,15 @@ import RegisterPage from "./RegisterPage.js";
 import VerifyEmailPage from "./VerifyEmailPage.js";
 import OAuthResult from "./OAuthResult.js";
 import TwoFactorAuthPage from "./TwoFactorAuthPage.js";
+import UserSettingsPage from "./UserSettingsPage.js";
 
-export { LoginPage, TestPage, NotFoundPage, RegisterPage, VerifyEmailPage, OAuthResult, TwoFactorAuthPage };
+export { 
+    LoginPage, 
+    TestPage, 
+    NotFoundPage, 
+    RegisterPage, 
+    VerifyEmailPage, 
+    OAuthResult, 
+    TwoFactorAuthPage, 
+    UserSettingsPage 
+};
