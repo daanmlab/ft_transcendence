@@ -22,12 +22,14 @@ signer = Signer()
 logger = logging.getLogger(__name__)
 
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 class LoginView(TwoFactorAuthenticationMixin, GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = LoginSerializer
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             try:
@@ -95,26 +97,17 @@ class VerifyEmailView(APIView):
             return Response({'error': 'Invalid or expired token'}, status=401)
 
 class UserView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
-        auth_header = request.headers.get('Authorization')
-        if not auth_header:
-            return Response({'error': 'Token is required'}, status=status.HTTP_401_UNAUTHORIZED)
-
-        try:
-            token = auth_header.split(' ')[1]
-            payload = jwt_decode_handler(token)
-        except IndexError:
-            return Response({'error': 'Token prefix missing'}, status=status.HTTP_401_UNAUTHORIZED)
-        except Exception:
-            return Response({'error': 'Token is invalid or expired'}, status=status.HTTP_401_UNAUTHORIZED)
-
-        try:
-            user = User.objects.get(id=payload['user_id'])
-        except User.DoesNotExist:
-            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-
+        user = request.user
+        logger.info(f"User {user.id} retrieved their profile")
         return Response({
-            'username': user.username,
-            'email': user.email,
-            'avatar': user.avatar
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'avatar': user.avatar
+            }
         }, status=status.HTTP_200_OK)

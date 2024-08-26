@@ -15,7 +15,7 @@ class TwoFactorAuthPage extends Page {
 		require("../main.js");
 		require("../customElements/CustomForm.js");
 
-		if (this.auth.authenticated){ return this.app.navigate("/test") }
+		if (this.auth.authenticated){ return this.app.navigate("/home") }
 		if (!this.auth.checkOtpToken()) return;
 
 		const form = this.mainElement.querySelector("custom-form");
@@ -24,7 +24,7 @@ class TwoFactorAuthPage extends Page {
 				const response = await this.auth.verifyOtp(
 					formData.otp,
 				);
-				this.app.navigate("/test");
+				this.app.navigate("/home");
 				return response;
 			} catch (error) {
 				if (error.response) {
