@@ -8,3 +8,4 @@ channels
 daphne
 channels-redis
 asyncio
+djangorestframework-simplejwt

@@ -4,9 +4,6 @@ from rest_framework.permissions import AllowAny
 from rest_framework_jwt.settings import api_settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
-from django.urls import reverse
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
 from django.core.signing import Signer, BadSignature
 from django.conf import settings
 
