@@ -21,7 +21,6 @@ signer = Signer()
 
 logger = logging.getLogger(__name__)
 
-
 class LoginView(TwoFactorAuthenticationMixin, GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = LoginSerializer
