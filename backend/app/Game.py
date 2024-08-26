@@ -12,7 +12,10 @@ class Paddle :
     def __init__(self, y):
         self.y = y
         self.moving = 0
-class PongGame :
+    def set_moving(self, moving):
+        self.moving = moving
+
+class Game :
     def __init__(self):
         self.ball_x = 0.5
         self.ball_y = 0.5
@@ -44,9 +47,6 @@ class PongGame :
                     # add some randomness to the ball direction
                     self.ball_speed_y = Random().randint(-5, 5) * .01
             if self.ball_x >= (1 - self.paddle_width):
-                await socket.send(text_data=json.dumps({
-                    "type": "hit"
-                }))
                 if self.ball_y >= self.paddles[1].y and self.ball_y <= self.paddles[1].y + self.paddle_height:
                     self.ball_speed_x *= -1
                     self.ball_speed_y = Random().randint(-5, 5) * .01
@@ -54,22 +54,34 @@ class PongGame :
             if self.ball_y <= 0 or self.ball_y >= 1:
                 self.ball_speed_y *= -1
             if self.ball_x <= 0 or self.ball_x >= 1:
-                await socket.send(text_data=json.dumps({
-                    "type": "gameOver"
-                }))
+                await socket.channel_layer.group_send(socket.game_group_name, {
+                    "type": "state_update",
+                    "objects": {
+                        "type": "gameOver"
+                    }
+                })
                 break
-            await socket.send(text_data=json.dumps({
-                "type": "gameState",
-                "ball": [self.ball_x, self.ball_y],
-                "paddles": [[paddle.y for paddle in self.paddles]]
-            }))
+            await socket.channel_layer.group_send(socket.game_group_name, {
+                "type": "state_update",
+                "objects": {
+                    "type": "gameState",
+                    "ball_x": self.ball_x,
+                    "ball_y": self.ball_y,
+                    "paddle1_y": self.paddles[0].y,
+                    "paddle2_y": self.paddles[1].y
+                }
+            })
             await asyncio.sleep(0.5)
         pass
 
     async def startGame(self, socket: AsyncWebsocketConsumer):
         self.socket = socket
-        await socket.send(text_data=json.dumps({"type": "gameStarted"}))
+        await socket.channel_layer.group_send(socket.game_group_name, {
+            "type": "state_update",
+            "objects": {
+                "type": "start_game"
+            }
+        })
         asyncio.create_task(self.game_loop(socket))
-        print('game started')
         pass
     pass
