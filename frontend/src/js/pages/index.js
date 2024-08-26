@@ -6,6 +6,7 @@ import VerifyEmailPage from "./VerifyEmailPage.js";
 import OAuthResult from "./OAuthResult.js";
 import TwoFactorAuthPage from "./TwoFactorAuthPage.js";
 import UserSettingsPage from "./UserSettingsPage.js";
+import HomePage from "./HomePage.js";
 
 export { 
     LoginPage, 
@@ -15,5 +16,6 @@ export {
     VerifyEmailPage, 
     OAuthResult, 
     TwoFactorAuthPage, 
-    UserSettingsPage 
+    UserSettingsPage,
+    HomePage
 };

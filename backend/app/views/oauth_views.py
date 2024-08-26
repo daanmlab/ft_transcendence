@@ -69,11 +69,12 @@ class OAuth42CallbackView(APIView):
         return response.json()
 
     def handle_successful_login(self, user_info):
-        token = get_or_create_user_from_oauth(user_info)
+        refresh = get_or_create_user_from_oauth(user_info)
         frontend_redirect_url = (f"{settings.FRONTEND_URL}/oauth-result")
 
         response = redirect(frontend_redirect_url)
-        response.set_cookie('token', token, httponly=False, secure=False, samesite='Lax')
+        response.set_cookie('refresh_token', str(refresh), httponly=False)
+        response.set_cookie('access_token', str(refresh.access_token), httponly=False)
         return response
 
     def log_and_redirect(self, message):

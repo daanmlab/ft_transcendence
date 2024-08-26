@@ -7,6 +7,7 @@ import {
     OAuthResult,
     TwoFactorAuthPage,
     UserSettingsPage,
+    HomePage
 } from "./pages/index.js";
 import "../scss/styles.scss";
 
@@ -22,6 +23,7 @@ class App {
             OAuthResult: new OAuthResult(this),
             twoFactorAuth: new TwoFactorAuthPage(this),
             settings: new UserSettingsPage(this),
+            home: new HomePage(this),
         };
         this.currentPage = null;
         this.init();
@@ -29,7 +31,7 @@ class App {
 
     navigate(path) {
         if (path === "/") {
-            path = "/test";
+            path = "/home";
         }
         const page = Object.values(this.pages).find(
             (page) => page.url === path

@@ -1,8 +1,8 @@
 Django==4.2.14
 djangorestframework
-djangorestframework-jwt
 django-cors-headers
 psycopg2-binary
 python-decouple
 requests
 pyotp
+djangorestframework-simplejwt

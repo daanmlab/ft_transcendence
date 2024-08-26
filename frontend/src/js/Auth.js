@@ -12,22 +12,21 @@ export class Auth {
     }
 
     async authenticate() {
-        this.token = Cookies.get("token");
+        this.token = Cookies.get("access_token");
         if (this.token) {
             try {
-                this.user = (
-                    await axios.get("http://localhost:8000/api/user", {
-                        headers: {
-                            Authorization: `Bearer ${this.token}`,
-                        },
-                    })
-                ).data;
+                const response = await axios.get("http://localhost:8000/api/user", {
+                    headers: {
+                        Authorization: `Bearer ${this.token}`,
+                    },
+                });
+                this.user = response.data.user;
                 this.authenticated = true;
                 return true;
             } catch (error) {
-                console.log(error);
+                console.error(error);
                 this.token = null;
-                Cookies.remove("token");
+                Cookies.remove("access_token");
                 this.authenticated = false;
                 return false;
             }
@@ -86,15 +85,16 @@ export class Auth {
                 {
                     email: email,
                     password: password,
-                }, { headers: otpToken ? { 'Authorization': `Bearer ${otpToken}` } : {}}
+                    otp_token: otpToken ? otpToken : null,
+                },
             );
             if (response.data.success) {
                 console.log("Login successful");
-                Cookies.set("token", response.data.token);
-                this.app.navigate("/test");
+                Cookies.set("access_token", response.data.access);
+                Cookies.set("refresh_token", response.data.refresh);
+                this.app.navigate("/home");
                 return response;
             } else {
-                console.log(response.data.message);
                 Cookies.set("otp_token", response.data.otp_token);
                 this.app.navigate("/two-factor-auth");
                 return response;
@@ -114,7 +114,7 @@ export class Auth {
     async oAuthLogin() {
         await this.authenticate();
         if (this.authenticated) {
-            return this.app.navigate('/test');
+            return this.app.navigate('/home');
         }
 
         if (this.oauthPopup) return; // CORS policy prevents checking if popup is open
@@ -128,10 +128,10 @@ export class Auth {
         const maxAttempts = 10;
 
         const checkForTokenCookie = () => { // Automatically login if token is received
-            const token = Cookies.get('token');
+            const token = Cookies.get('access_token');
             if (token) {
                 this.oauthPopup = null;
-                return this.app.navigate('/test');
+                return this.app.navigate('/home');
             }
             if (++attempts < maxAttempts) {
                 return setTimeout(checkForTokenCookie, 1000);
@@ -144,7 +144,8 @@ export class Auth {
 
     logout() {
         console.log("Logging out");
-        Cookies.remove("token");
+        Cookies.remove("access_token");
+        Cookies.remove("refresh_token");
         if (window.location.pathname !== "/login") {
             this.app.navigate("/login");
         }
@@ -162,10 +163,12 @@ export class Auth {
                     otp_token: Cookies.get("otp_token"),
                 }
             );
-            if (response.data.token) {
-                Cookies.set("token", response.data.token);
+            if (response.data.success) {
+                console.log("Login successful");
+                Cookies.set("access_token", response.data.access);
+                Cookies.set("refresh_token", response.data.refresh);
                 Cookies.remove("otp_token");
-                this.app.navigate("/test");
+                this.app.navigate("/home");
                 return response;
             } else {
                 throw new Error("An error occurred");
