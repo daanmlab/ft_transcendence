@@ -17,6 +17,42 @@ class TestPage extends Page {
 
         const pongElement = this.mainElement.querySelector("pong-game");
         pongElement.startGame();
+        // then whenever we needs to change something in the page
+        // we can do it here by selecting the elements from the mainElement
+        const { mainElement } = this;
+        const headerElement = mainElement.querySelector("h1");
+        //headerElement.style.color = "red";
+
+        // or we can add event listeners
+        const buttonElement = mainElement.querySelector("button");
+        buttonElement.addEventListener("click", () => {
+            headerElement.style.color = "green";
+        });
+
+        // we can also access the auth object
+        const { auth } = this;
+        console.log(auth.user);
+        // Insert user data into the DOM
+        const userInfo = auth.user;
+
+        const avatarElement = mainElement.querySelector("#avatar");
+        const usernameElement = mainElement.querySelector("#username");
+
+        const emptyAvatarUrl = '/static/images/empty-avatar.jpg'
+        avatarElement.src = userInfo.avatar ? userInfo.avatar : emptyAvatarUrl;
+        usernameElement.textContent = userInfo.username;
+
+
+        const logOutButton = mainElement.querySelector("#logout");
+
+        logOutButton.addEventListener("click", () => { this.auth.logout(); });
+        // to navigate to another page we can use the app object
+        // () => {
+        //        this.app.navigate("/login");
+        //    };
+        // it can also be done by using the data-href attribute
+        // on the element
+        // <a href="#" data-href="/login">Login</a>
     }
 }
 

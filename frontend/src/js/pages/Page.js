@@ -12,8 +12,9 @@ class Page {
      * @param {string} pageElement - The element of the where we can find the content of the page
      * @param {boolean} isProtected - The User must be authenticated to access the page
      * @param {object} app - The app object
+     * @param {boolean} [preserveParams=false] - Optional parameter to preserve URL parameters
      */
-    constructor({ name, url, pageElement, isProtected, app }) {
+    constructor({ name, url, pageElement, isProtected, app, preserveParams = false }) {
         this.name = name;
         this.url = url;
         this.pageElement = document.querySelector(pageElement);
@@ -21,11 +22,12 @@ class Page {
         this.auth = new Auth(isProtected, app);
         this.app = app;
         this.handleClick = this.handleClick.bind(this);
+        this.preserveParams = preserveParams;
     }
 
     async open(app) {
         await this.auth.authenticate();
-        if (!this.auth.checkAuthtorization()) return;
+        if (!this.auth.checkAuthorization()) return;
         const tempElement = document.createElement(this.pageElement.tagName);
         tempElement.innerHTML = this.pageElement.innerHTML;
         tempElement.querySelectorAll("[data-id]").forEach((element) => {

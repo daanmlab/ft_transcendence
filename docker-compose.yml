@@ -1,5 +1,6 @@
 services:
   backend:
+    container_name: transcendence_back
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -17,6 +18,7 @@ services:
       - .env
 
   frontend:
+    container_name: transcendence_front
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -29,6 +31,7 @@ services:
       - backend
 
   db:
+    container_name: transcendence_db
     image: postgres:13
     volumes:
       - postgres_data:/var/lib/postgresql/data/

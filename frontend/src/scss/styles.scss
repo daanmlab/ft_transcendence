@@ -18,14 +18,15 @@ a[data-href] {
 }
 
 [data-page="login"],
-[data-page="register"] {
-    & > div {
-        display: flex;
-        justify-content: center;
-        min-height: 100vh;
+[data-page="register"],
+[data-page="two-factor-auth"] {
+	& > div {
+		display: flex;
+		justify-content: center;
+		min-height: 100vh;
 
-        main {
-            max-width: 400px;
-        }
-    }
+		main {
+			max-width: 400px;
+		}
+	}
 }

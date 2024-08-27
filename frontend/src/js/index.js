@@ -4,9 +4,12 @@ import {
     NotFoundPage,
     RegisterPage,
     VerifyEmailPage,
+    OAuthResult,
+    TwoFactorAuthPage,
+    UserSettingsPage,
+    HomePage
 } from "./pages/index.js";
 import "../scss/styles.scss";
-import * as bootstrap from "bootstrap";
 
 class App {
     constructor() {
@@ -17,6 +20,10 @@ class App {
             register: new RegisterPage(this),
             404: new NotFoundPage(this),
             verifyEmail: new VerifyEmailPage(this),
+            OAuthResult: new OAuthResult(this),
+            twoFactorAuth: new TwoFactorAuthPage(this),
+            settings: new UserSettingsPage(this),
+            home: new HomePage(this),
         };
         this.currentPage = null;
         this.init();
@@ -26,7 +33,7 @@ class App {
 
     navigate(path) {
         if (path === "/") {
-            path = "/test";
+            path = "/home";
         }
         const page = Object.values(this.pages).find(
             (page) => page.url === path
@@ -37,8 +44,13 @@ class App {
             }
             this.mainElement.setAttribute("data-page", page.name);
             this.currentPage = page;
-            const queryParams = window.location.search;
-            history.pushState({}, page.name, page.url + queryParams);
+            if (this.currentPage.preserveParams) {
+                const queryParams = window.location.search
+                history.pushState({}, page.name, page.url + queryParams);
+            } else {
+                history.pushState({}, page.name, page.url);
+            }
+            console.log("Navigating to", page.name);
             page.open(this);
         } else {
             this.navigate("/404");

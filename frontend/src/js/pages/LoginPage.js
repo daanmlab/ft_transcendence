@@ -6,16 +6,17 @@ class LoginPage extends Page {
             name: "login",
             url: "/login",
             pageElement: "#Login",
-            protected: false,
+            isProtected: false,
             app: app,
+            preserveParams: true,
         });
     }
 
-    render(app) {
+    async render(app) {
         require("../main.js");
         require("../customElements/CustomForm.js");
 
-        this.auth.logout();
+        if (this.auth.authenticated) { return this.app.navigate("/home") }
 
         const form = this.mainElement.querySelector("custom-form");
         form.submitForm = async (formData) => {
@@ -31,16 +32,23 @@ class LoginPage extends Page {
                         form.showFormError("Invalid email or password");
                     }
                     else {
-                        form.showFormError("An error ocurred");
+                        form.showFormError("An error ocurred, please try again later.");
                     }
                 }
-                console.error("Login: Error in form submission");
+                else {
+                    form.showFormError(error.message);
+                }
                 throw error;
             }
         };
-    }
 
-    // Add any methods specific to the login page here
+        const oAuthButton = this.mainElement.querySelector("#oauth");
+        oAuthButton.addEventListener("click", () => {
+            this.auth.oAuthLogin().catch((error) => {
+                form.showFormError(error.message);
+            });
+        });
+    }
 }
 
 export default LoginPage;
