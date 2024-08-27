@@ -13,6 +13,10 @@ COPY requirements.txt /usr/src/app/
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
+# Copy project
+COPY . /usr/src/app/
+
+
 # Expose port
 EXPOSE 8000
 

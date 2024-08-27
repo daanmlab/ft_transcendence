@@ -8,8 +8,12 @@ services:
       - ./backend:/usr/src/app
     ports:
       - "8000:8000"
+    networks:
+      - backend-network
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    restart: always
     env_file:
       - .env
 
@@ -22,6 +26,7 @@ services:
       - ./frontend:/usr/src/app
     ports:
       - "8080:8080"
+    restart: always
     depends_on:
       - backend
 
@@ -30,12 +35,36 @@ services:
     image: postgres:13
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    networks:
+      - backend-network
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_PORT: ${POSTGRES_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  cache:
+    image: redis:6
+    expose:
+      - 6379
+    networks:
+      - backend-network
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - cache_data:/data
+
+networks:
+  backend-network:
+    driver: bridge
 
 volumes:
   postgres_data:
+    driver: local
+  cache_data:
+    driver: local
+

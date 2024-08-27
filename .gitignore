@@ -77,3 +77,6 @@ backend/backend/__pycache__/
 
 .env
 notes
+
+#migrations
+backend/app/migrations/
