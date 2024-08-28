@@ -14,6 +14,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from .serializers import LoginSerializer, RegisterSerializer
+from app.models import User as UserModel
 from app.mixins.two_factor_auth_mixin import TwoFactorAuthenticationMixin
 
 User = get_user_model()
@@ -57,7 +58,7 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         
         if serializer.is_valid():
-            user = serializer.save()
+            user: UserModel = serializer.save()
             logger.info(f"User with ID {user.id} registered successfully")
             try:
                 self.send_verification_email(user)
@@ -85,7 +86,7 @@ class VerifyEmailView(APIView):
     def get(self, request, token):
         try:
             user_id = signer.unsign(token)
-            user = User.objects.get(pk=user_id)
+            user: UserModel = User.objects.get(pk=user_id)
             user.email_is_verified = True
             user.save()
             return Response({'message': 'Email verified successfully.'}, status=200)
