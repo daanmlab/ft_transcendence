@@ -15,11 +15,15 @@ export class Auth {
         this.token = Cookies.get("access_token");
         if (this.token) {
             try {
-                const response = await axios.get("http://localhost:8000/api/user", {
-                    headers: {
-                        Authorization: `Bearer ${this.token}`,
-                    },
-                });
+                const response = await axios.get(
+                    "http://localhost:8000/api/user",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${this.token}`,
+                        },
+                    }
+                );
+                Cookies.set("access_token", this.token);
                 this.user = response.data.user;
                 this.authenticated = true;
                 return true;
@@ -86,7 +90,7 @@ export class Auth {
                     email: email,
                     password: password,
                     otp_token: otpToken ? otpToken : null,
-                },
+                }
             );
             if (response.data.success) {
                 console.log("Login successful");
@@ -101,7 +105,9 @@ export class Auth {
             }
         } catch (error) {
             if (error.response) {
-                console.error(`Login error\n${error.response.data.error}\n${error.message}`);
+                console.error(
+                    `Login error\n${error.response.data.error}\n${error.message}`
+                );
             } else if (error.request) {
                 console.error("No response received:", error.request);
             } else {
@@ -114,29 +120,34 @@ export class Auth {
     async oAuthLogin() {
         await this.authenticate();
         if (this.authenticated) {
-            return this.app.navigate('/home');
+            return this.app.navigate("/home");
         }
 
         if (this.oauthPopup) return; // CORS policy prevents checking if popup is open
 
-        this.oauthPopup = window.open("http://localhost:8000/api/oauth/42/", "OAuth Login", "width=600,height=600");
+        this.oauthPopup = window.open(
+            "http://localhost:8000/api/oauth/42/",
+            "OAuth Login",
+            "width=600,height=600"
+        );
         if (!this.oauthPopup) {
             throw new Error("Popup blocked by browser, please unblock.");
         }
 
         let attempts = 0;
-        const maxAttempts = 10;
+        const maxAttempts = 30;
 
-        const checkForTokenCookie = () => { // Automatically login if token is received
-            const token = Cookies.get('access_token');
+        const checkForTokenCookie = () => {
+            // Automatically login if token is received
+            const token = Cookies.get("access_token");
             if (token) {
                 this.oauthPopup = null;
-                return this.app.navigate('/home');
+                return this.app.navigate("/home");
             }
             if (++attempts < maxAttempts) {
                 return setTimeout(checkForTokenCookie, 1000);
             }
-            console.log('Token not received. Max attempts reached');
+            console.log("Token not received. Max attempts reached");
             this.oauthPopup = null;
         };
         checkForTokenCookie();
@@ -174,7 +185,9 @@ export class Auth {
                 throw new Error("An error occurred");
             }
         } catch (error) {
-            console.error(`OTP error\n${error.response.data.error}\n${error.message}`);
+            console.error(
+                `OTP error\n${error.response.data.error}\n${error.message}`
+            );
             throw error;
         }
     }

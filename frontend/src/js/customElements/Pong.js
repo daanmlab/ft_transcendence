@@ -1,3 +1,5 @@
+import Cookies from "js-cookie";
+
 class Pong extends HTMLElement {
     constructor({} = {}) {
         super();
@@ -5,6 +7,7 @@ class Pong extends HTMLElement {
     }
 
     init() {
+        this.ws = null;
         this.innerHTML = "";
         this.paddels = {
             left: document.createElement("span"),
@@ -30,113 +33,93 @@ class Pong extends HTMLElement {
         this.pressedKeys = [];
     }
 
-    startGame() {
+    setWebsockets() {
         this.setupEventListeners();
-        let ballDirection = {
-            x: 1,
-            y: 0,
+        // ws with headers
+        this.ws = new WebSocket(
+            `ws://localhost:8000/ws/?token=${Cookies.get("access_token")}`
+        );
+        this.ws.onopen = () => {
+            console.log("Connected to server");
         };
-        const ballSpeed = 20;
-        const gameLoop = () => {
-            const ball = this.ball.getBoundingClientRect();
-            const rightPaddle = this.paddels.right.getBoundingClientRect();
-            const leftPaddle = this.paddels.left.getBoundingClientRect();
-            const game = this.getBoundingClientRect();
-            // check for collisions with paddles
-            if (ballDirection.x > 0) {
-                if (
-                    ball.right > rightPaddle.left &&
-                    ball.top < rightPaddle.bottom &&
-                    ball.bottom > rightPaddle.top
-                ) {
-                    ballDirection.x = -1;
-                    ballDirection.y = Math.random() > 0.5 ? 1 : -1;
-                }
-
-                if (ball.right > game.width) {
-                    this.score.left++;
-                    ballDirection.x = -1;
-                    ballDirection.y = 0;
-                    this.reset(gameLoop);
-                    return;
-                }
-            } else {
-                if (
-                    ball.left < leftPaddle.right &&
-                    ball.top < leftPaddle.bottom &&
-                    ball.bottom > leftPaddle.top
-                ) {
-                    ballDirection.x = 1;
-                    ballDirection.y = Math.random() > 0.5 ? 1 : -1;
-                }
-                if (ball.left < game.left) {
-                    this.score.right++;
-                    ballDirection.x = 1;
-                    ballDirection.y = 0;
-                    this.reset(gameLoop);
-                    return;
-                }
+        this.ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            console.log(data);
+            // data = {
+            //     type: "state_update",
+            //     objects: {
+            //         type: "gameState",
+            //         ball: {
+            //             x: 0.49,
+            //             y: 0.49,
+            //             width: 0.02,
+            //             height: 0.02,
+            //             speed_x: 0.03,
+            //             speed_y: 0,
+            //         },
+            //         paddles: [
+            //             {
+            //                 x: 0.42,
+            //                 y: 0.42,
+            //                 width: 0.02,
+            //                 height: 0.15,
+            //             },
+            //             {
+            //                 x: 0.42,
+            //                 y: 0.42,
+            //                 width: 0.02,
+            //                 height: 0.15,
+            //             },
+            //         ],
+            //     },
+            // };
+            // const paddleHeight = 0.15;
+            if (data.type === "gameState") {
+                this.setPositions({
+                    leftPaddle: {
+                        top: `calc(${data.paddles[0].y * 100}%)`,
+                    },
+                    rightPaddle: {
+                        top: `calc(${data.paddles[1].y * 100}%)`,
+                    },
+                    ball: {
+                        top: `calc(${data.ball.y * 100}%)`,
+                        left: `calc(${data.ball.x * 100}%)`,
+                    },
+                });
             }
-            if (ball.top < game.top || ball.bottom > game.bottom) {
-                ballDirection.y *= -1;
-            }
-
-            this.movePaddle();
-            // move ball in x direction
-            this.ball.style.top = ball.top + ballSpeed * ballDirection.y + "px";
-            this.ball.style.left =
-                ball.left + ballSpeed * ballDirection.x + "px";
-            requestAnimationFrame(gameLoop);
         };
-        requestAnimationFrame(gameLoop);
+        this.ws.onclose = () => {
+            console.log("Disconnected from server");
+        };
+        console.log(this.ws);
     }
 
-    async reset(gameLoop) {
-        this.ball.style.top = "calc(50% - 5px)";
-        this.ball.style.left = "calc(50% - 5px)";
-        this.paddels.left.style.top = "calc(50% - 50px)";
-        this.paddels.right.style.top = "calc(50% - 50px)";
-        this.scoreboard.innerHTML = `${this.score.left} - ${this.score.right}`;
-
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        console.log("3");
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        console.log("2");
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        console.log("1");
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        gameLoop();
-    }
-
-    movePaddle() {
-        if (this.pressedKeys.includes("ArrowUp")) {
-            this.paddels.right.style.color = "red";
-            this.paddels.right.style.top =
-                this.paddels.right.getBoundingClientRect().top - 10 + "px";
-        }
-        if (this.pressedKeys.includes("ArrowDown")) {
-            this.paddels.right.style.top =
-                this.paddels.right.getBoundingClientRect().top + 10 + "px";
-        }
-        if (this.pressedKeys.includes("w")) {
-            this.paddels.left.style.top =
-                this.paddels.left.getBoundingClientRect().top - 10 + "px";
-        }
-        if (this.pressedKeys.includes("s")) {
-            this.paddels.left.style.top =
-                this.paddels.left.getBoundingClientRect().top + 10 + "px";
-        }
+    setPositions({
+        leftPaddle = { top: "calc(50% - 50px)" },
+        rightPaddle = { top: "calc(50% - 50px)" },
+        ball = { top: "calc(50% - 5px)", left: "calc(50% - 5px)" },
+    } = {}) {
+        this.paddels.left.style.top = leftPaddle.top;
+        this.paddels.right.style.top = rightPaddle.top;
+        this.ball.style.top = ball.top;
+        this.ball.style.left = ball.left;
     }
 
     setupEventListeners() {
         document.addEventListener("keydown", (event) => {
-            if (this.pressedKeys.includes(event.key)) return;
-            this.pressedKeys.push(event.key);
+            console.log("keydown", event.key);
+            if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+                console.log("keydown", event.key);
+                this.ws.send(
+                    JSON.stringify({ type: "keydown", key: event.key })
+                );
+            }
         });
         document.addEventListener("keyup", (event) => {
-            const index = this.pressedKeys.indexOf(event.key);
-            if (index > -1) {
-                this.pressedKeys.splice(index, 1);
+            if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+                console.log("keyup", event.key);
+                this.ws.send(JSON.stringify({ type: "keyup", key: event.key }));
             }
         });
     }

@@ -20,6 +20,7 @@ class PongConsumer(AsyncWebsocketConsumer):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     update_lock = asyncio.Lock()
+    side: int = 0
     
     @database_sync_to_async
     def get_player1(self, game: PongGame):
@@ -47,7 +48,7 @@ class PongConsumer(AsyncWebsocketConsumer):
                 return
             # check if the game is full
             game: PongGame = await database_sync_to_async(PongGame.objects.get)(channel_group_name=self.game_group_name)
-            if (await self.get_player2(game)) is not None:
+            if (await self.get_player2(game)) is not None and (await self.get_player2(game)) != self.scope["user"]:
                 await self.send(text_data=json.dumps({"type": "error", "message": "Game is full"}))
                 await self.close()
                 return
@@ -70,6 +71,7 @@ class PongConsumer(AsyncWebsocketConsumer):
                     }
                 }
             )
+            self.side = 1
             await self.send(text_data=json.dumps({"type": "game_id", "game_id": self.game_group_name}))
         else:
             self.game_group_name = create_group_name(int(self.scope["user"].id))
@@ -78,24 +80,17 @@ class PongConsumer(AsyncWebsocketConsumer):
             # create a new game
             game = PongGame(channel_group_name=self.game_group_name, player1=self.scope["user"])
             await database_sync_to_async(game.save)()
+
+            print(f"{self.scope['user'].id} created game {self.game_group_name}")
             # add user to the group
             await self.channel_layer.group_add(
                 self.game_group_name, self.channel_name
             )
+            self.side = 0
             # send the game id to the user
 
         # if not self.game_group_name:
-        return
-
-        self.game = Game()
-    
-        await self.channel_layer.group_add(
-            self.game_group_name, self.channel_name
-        )
-
-
-        await self.game.startGame(self)
-        pass
+    pass
 
 
     async def disconnect(self, close_code):
@@ -109,26 +104,24 @@ class PongConsumer(AsyncWebsocketConsumer):
         message_type = text_data_json.get("type", "")
 
         if message_type == "start_game":
-            await self.channel_layer.group_send(
-                self.game_group_name,
-                {
-                    "type": "state_update",
-                    "objects": {
-                        "type": "start_game",
-                    }
-                }
-            )
             await self.game.startGame(self)
         elif message_type == "keydown":
-            async with self.update_lock:
-                self.game.paddles[0].set_moving(-0.02)
+            print(text_data_json)
+            if text_data_json.get("key") == "ArrowUp":
+                async with self.update_lock:
+                    self.game.paddles[self.side].moving = -0.02
+                print(self.game.paddles[0].moving)
+            elif text_data_json.get("key") == "ArrowDown":
+                async with self.update_lock:
+                    self.game.paddles[self.side].moving = 0.02
         elif message_type == "keyup":
-            async with self.update_lock:
-                self.game.paddles[0].set_moving(0)
+            if text_data_json.get("key") == "ArrowUp" or text_data_json.get("key") == "ArrowDown":
+                async with self.update_lock:
+                    self.game.paddles[self.side].moving = 0
 
     async def state_update(self, event):
         await self.send(
             text_data=json.dumps(
-                event,
+                event.get("objects"),
             )
         )
