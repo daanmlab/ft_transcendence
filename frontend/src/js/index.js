@@ -4,7 +4,7 @@ import {
     NotFoundPage,
     RegisterPage,
     VerifyEmailPage,
-    OAuthResult,
+    OAuthResultPage,
     TwoFactorAuthPage,
     UserSettingsPage,
     HomePage
@@ -20,7 +20,7 @@ class App {
             register: new RegisterPage(this),
             404: new NotFoundPage(this),
             verifyEmail: new VerifyEmailPage(this),
-            OAuthResult: new OAuthResult(this),
+            OAuthResult: new OAuthResultPage(this),
             twoFactorAuth: new TwoFactorAuthPage(this),
             settings: new UserSettingsPage(this),
             home: new HomePage(this),
