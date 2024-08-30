@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework.exceptions import ValidationError
+from ..models import PongGame
 User = get_user_model()
 
 class LoginSerializer(serializers.Serializer):
@@ -45,3 +46,10 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+    
+
+class PongGameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PongGame
+        fields = '__all__'
+        read_only_fields = ('id', 'player1', 'player2', 'player1_score', 'player2_score', 'winner', 'created_at')

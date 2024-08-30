@@ -21,10 +21,15 @@ from app.views.two_factor_auth_views import (
     VerifyOTPView,
 )
 
+from backend.app.views.games_views import (
+    GamesView
+)
+
 
 urlpatterns = [
     path('token', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('login', LoginView.as_view(), name='login'),
     path('register', RegisterView.as_view(), name='register'),
     path('user', UserView.as_view(), name='user'),
@@ -32,6 +37,6 @@ urlpatterns = [
     path('oauth/42/', OAuth42View.as_view(), name='oauth_42'),
     path('oauth/42/callback/', OAuth42CallbackView.as_view(), name='oauth_42_callback'),
     path('verify-otp', VerifyOTPView.as_view(), name='verify-otp'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('games', GamesView.as_view(), name='games'),
 ]
 
