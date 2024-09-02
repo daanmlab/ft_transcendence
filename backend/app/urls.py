@@ -21,7 +21,7 @@ from app.views.two_factor_auth_views import (
     VerifyOTPView,
 )
 
-from backend.app.views.games_views import (
+from app.views.games_views import (
     GamesView
 )
 

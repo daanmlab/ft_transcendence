@@ -3,10 +3,15 @@ import json
 from random import Random
 from typing import Union
 from channels.generic.websocket import AsyncWebsocketConsumer
+from .models import PongGame
+from channels.db import database_sync_to_async
+
 
 def truncate(n, decimals=0) -> float:
     multiplier = 10 ** decimals
     return int(n * multiplier) / multiplier
+
+
 
 
 class Hitbox :
@@ -15,6 +20,8 @@ class Hitbox :
         self.y: float = y
         self.width: float = width
         self.height: float = height
+
+    
 
     def printState(self, name: str):
         print(f"{name}: {self.x}, {self.y}, {self.width}, {self.height}")
@@ -71,6 +78,11 @@ class Game :
             Paddle(1 - 0.02)
         ])
         self.socket: Union[AsyncWebsocketConsumer, None] = None
+
+    @database_sync_to_async
+    def set_game_active(self):
+        self.socket.db_game.started = True # type: ignore
+        self.socket.db_game.save() # type: ignore
 
     def reset(self):
         self.ball = Ball(0.5 - 0.01, 0.5 - 0.01)
@@ -157,12 +169,17 @@ class Game :
 
     async def startGame(self, socket: AsyncWebsocketConsumer):
         self.socket = socket
+        # set db game state to active
+        await self.set_game_active()
+        # send start game message to group
         await socket.channel_layer.group_send(socket.game_group_name, {
             "type": "state_update",
             "objects": {
                 "type": "startGame"
             }
         })
+
+        # start game loop
         asyncio.create_task(self.game_loop())
         pass
     pass
