@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.base_user import BaseUserManager
+from app.models import PongGame
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password, **extra_fields):
@@ -41,6 +42,9 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
+
+    def has_active_game(self):
+        return PongGame.objects.filter(player1=self, started=True, winner__isnull=True).exists()
 
     def save(self, *args, **kwargs):
         if self.email_is_verified:

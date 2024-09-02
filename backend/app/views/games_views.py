@@ -19,7 +19,7 @@ class GamesView(APIView):
         # get your created games
         created_games = PongGame.objects.filter(player1=request.user)
         # get your active games
-        active_games = PongGame.objects.filter(player1=request.user, player2__isnull=False)
+        active_games = PongGame.objects.filter(player1=request.user, started=True, winner__isnull=True)
         return Response({
             "invited_games": PongGameSerializer(invited_games, many=True).data,
             "created_games": PongGameSerializer(created_games, many=True).data,
@@ -28,7 +28,7 @@ class GamesView(APIView):
 
     def post(self, request):
         # Check if the user already has an active game
-        active_game = PongGame.objects.filter(player1=request.user, player2__isnull=True).first()
+        active_game = request.user.has_active_game()
         if active_game:
             return Response({"error": "You already have an active game"}, status=400)
 
