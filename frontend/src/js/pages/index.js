@@ -7,15 +7,17 @@ import OAuthResult from "./OAuthResult.js";
 import TwoFactorAuthPage from "./TwoFactorAuthPage.js";
 import UserSettingsPage from "./UserSettingsPage.js";
 import HomePage from "./HomePage.js";
+import GamePage from "./GamePage.js";
 
-export { 
-    LoginPage, 
-    TestPage, 
-    NotFoundPage, 
-    RegisterPage, 
-    VerifyEmailPage, 
-    OAuthResult, 
-    TwoFactorAuthPage, 
+export {
+    LoginPage,
+    TestPage,
+    NotFoundPage,
+    RegisterPage,
+    VerifyEmailPage,
+    OAuthResult,
+    TwoFactorAuthPage,
     UserSettingsPage,
-    HomePage
+    HomePage,
+    GamePage,
 };
