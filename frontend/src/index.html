@@ -128,36 +128,41 @@
         </div>
     </section>
 
-    <section id="UserSettings" class="container-fluid mt-5">
-        <div class="row">
-            <!-- Left Menu -->
-            <div class="col-md-3">
-                <div class="list-group">
-                    <a href="#" class="list-group-item list-group-item-action active" data-bs-toggle="list"
-                        data-bs-target="#two-factor">Two-Factor Authentication</a>
-                    <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="list"
-                        data-bs-target="#change-username">Change Username</a>
-                    <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="list"
-                        data-bs-target="#change-email">Change Email</a>
-                    <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="list"
-                        data-bs-target="#delete-account">Delete Account</a>
-                </div>
-            </div>
+    <section id="UserSettings" class="container mt-5">
+        <div class="row justify-content-center align-items-center min-vh-100 bg-white">
+            <div class="col-md-10 bg-light rounded p-4 d-flex flex-column" style="height: 300px;">
+                <ul class="nav nav-tabs mb-3" id="pills-tab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" href="#two-factor"
+                            role="tab" aria-controls="pills-home" aria-selected="true">Two-Factor Authentication</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" href="#change-username"
+                            role="tab" aria-controls="pills-profile" aria-selected="false">Change Username</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="pills-messages-tab" data-bs-toggle="pill" href="#change-email"
+                            role="tab" aria-controls="pills-messages" aria-selected="false">Change Email</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="pills-settings-tab" data-bs-toggle="pill" href="#delete-account"
+                            role="tab" aria-controls="pills-settings" aria-selected="false">Delete Account</a>
+                    </li>
+                </ul>
 
-            <!-- Right Content Area -->
-            <div class="col-md-9">
-                <div class="tab-content">
+                <div class="tab-content flex-fill overflow-auto" style="height: calc(100% - 56px);">
                     <!-- Two-Factor Authentication -->
-                    <div class="tab-pane fade show active" id="two-factor">
+                    <div class="tab-pane fade show active" id="two-factor" role="tabpanel"
+                        aria-labelledby="pills-home-tab">
                         <h3>Two-Factor Authentication</h3>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="2fa-method" id="2fa-none" checked>
+                            <input class="form-check-input" type="radio" name="2fa-method" id="2fa-none" checked="">
                             <label class="form-check-label" for="2fa-none">
                                 None
                             </label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="2fa-method" id="2fa-email" checked>
+                            <input class="form-check-input" type="radio" name="2fa-method" id="2fa-email" checked="">
                             <label class="form-check-label" for="2fa-email">
                                 Email
                             </label>
@@ -172,7 +177,7 @@
                     </div>
 
                     <!-- Change Username -->
-                    <div class="tab-pane fade" id="change-username">
+                    <div class="tab-pane fade" id="change-username" role="tabpanel" aria-labelledby="pills-profile-tab">
                         <h3>Change Username</h3>
                         <div class="mb-3">
                             <label for="new-username" class="form-label">New Username</label>
@@ -182,7 +187,7 @@
                     </div>
 
                     <!-- Change Email -->
-                    <div class="tab-pane fade" id="change-email">
+                    <div class="tab-pane fade" id="change-email" role="tabpanel" aria-labelledby="pills-messages-tab">
                         <h3>Change Email</h3>
                         <div class="mb-3">
                             <label for="new-email" class="form-label">New Email</label>
@@ -192,31 +197,11 @@
                     </div>
 
                     <!-- Delete Account -->
-                    <div class="tab-pane fade" id="delete-account">
+                    <div class="tab-pane fade" id="delete-account" role="tabpanel" aria-labelledby="pills-settings-tab">
                         <h3>Delete Account</h3>
                         <p class="text-danger">Warning: This action is irreversible.</p>
                         <button class="btn btn-danger" data-bs-toggle="modal"
                             data-bs-target="#deleteAccountModal">Delete My Account</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Delete Account Confirmation Modal -->
-        <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="deleteAccountModalLabel">Confirm Account Deletion</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        Are you sure you want to delete your account? This action cannot be undone.
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger">Delete Account</button>
                     </div>
                 </div>
             </div>
