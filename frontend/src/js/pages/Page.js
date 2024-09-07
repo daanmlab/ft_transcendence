@@ -28,6 +28,7 @@ class Page {
     async open(app) {
         await this.auth.authenticate();
         if (!this.auth.checkAuthorization()) return;
+        document.querySelectorAll("section").forEach((section) => { section.remove() });
         const tempElement = document.createElement(this.pageElement.tagName);
         tempElement.innerHTML = this.pageElement.innerHTML;
         tempElement.querySelectorAll("[data-id]").forEach((element) => {

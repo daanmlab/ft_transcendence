@@ -89,9 +89,9 @@ class VerifyEmailView(APIView):
             user: UserModel = User.objects.get(pk=user_id)
             user.email_is_verified = True
             user.save()
-            return Response({'message': 'Email verified successfully.'}, status=200)
+            return Response({'message': 'Email verified successfully.'}, status=status.HTTP_200_OK)
         except (BadSignature, User.DoesNotExist):
-            return Response({'error': 'Invalid or expired token'}, status=401)
+            return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class UserView(APIView):
     authentication_classes = [JWTAuthentication]
