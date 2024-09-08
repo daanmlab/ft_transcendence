@@ -28,6 +28,13 @@ export class Auth {
                 this.authenticated = true;
                 return true;
             } catch (error) {
+                if (error.response && error.response.status === 401) {
+                    console.log("Access token expired, attempting to refresh");
+                    const refreshed = await this.refreshAccessToken();
+                    if (refreshed) {
+                        return this.authenticate();
+                    }
+                }
                 console.error(error);
                 this.token = null;
                 Cookies.remove("access_token");
@@ -39,7 +46,30 @@ export class Auth {
             return false;
         }
     }
-
+    
+    async refreshAccessToken() {
+        const refreshToken = Cookies.get("refresh_token");
+        if (!refreshToken) {
+            console.error("No refresh token available");
+            return false;
+        }
+    
+        try {
+            const response = await axios.post("http://localhost:8000/api/token/refresh/", {
+                refresh: refreshToken
+            });
+            const newAccessToken = response.data.access;
+            Cookies.set("access_token", newAccessToken);
+            this.token = newAccessToken;
+            console.log("Access token successfully refreshed");
+            return true;
+        } catch (error) {
+            console.error("Error refreshing access token", error);
+            this.logout();
+            return false;
+        }
+    }
+    
     checkAuthorization() {
         if (!this.authenticated && this.isCurrentPageProtected) {
             this.app.navigate("/login");
@@ -158,7 +188,7 @@ export class Auth {
         Cookies.remove("access_token");
         Cookies.remove("refresh_token");
         if (window.location.pathname !== "/login") {
-            this.app.navigate("/login");
+        this.app.navigate("/login");
         }
     }
 
