@@ -1,5 +1,6 @@
 import Page from "./Page";
 import axios from "axios";
+import { Modal } from 'bootstrap';
 
 class UserSettingsPage extends Page {
     constructor(app) {
@@ -13,50 +14,98 @@ class UserSettingsPage extends Page {
     }
 
     render(app) {
-        console.log("this", this);
-
         require("../main.js");
         this.setupEventListeners();
+        this.setInitial2FASelection();
+    }
+
+    setInitial2FASelection() {
+        const twoFactorMethod = this.auth.user.two_factor_method;
+        const twoFactorElement = document.getElementById(`2fa-${twoFactorMethod}`);
+        if (twoFactorElement) {
+            twoFactorElement.checked = true;
+        }
     }
 
     setupEventListeners() {
         const changeUsernameButton = document.querySelector("#change-username button");
         const newUsernameInput = document.querySelector("#new-username");
+        const changeEmailButton = document.querySelector("#change-email button");
+        const newEmailInput = document.querySelector("#new-email");
+        const update2FAButton = document.querySelector("#two-factor .btn");
 
-        if (changeUsernameButton) {
-            changeUsernameButton.addEventListener("click", (e) => {
-                e.preventDefault();
-                this.handleChangeUsername(newUsernameInput.value);
+        this.handleButtonClick(changeUsernameButton, newUsernameInput, "username", "Username successfully changed.");
+        this.handleButtonClick(changeEmailButton, newEmailInput, "email", "Email successfully changed. Please verify your new email address.");
+
+        if (update2FAButton) {
+            update2FAButton.addEventListener("click", (e) => {
+                const selected2FAMethod = document.querySelector("input[name='2fa-method']:checked").id.split("-")[1];
+                this.handleChange("two_factor_method", selected2FAMethod, "Two-factor authentication settings updated.");
+            });
+        }
+
+        const deleteAccountButton = document.querySelector("#confirmDeleteAccount");
+        if (deleteAccountButton) {
+            deleteAccountButton.addEventListener("click", (e) => {
+                this.deleteAccount();
             });
         }
     }
 
-    handleChangeUsername(newUsername) {
-        if (!newUsername || newUsername.trim() === "") {
-            this.showMessage("Please enter a valid username.", "error");
+    deleteAccount() {
+        this.sendRequest(null, "Account successfully deleted.");
+        const deleteAccountModal = document.getElementById('deleteAccountModal');
+        const modalInstance = Modal.getInstance(deleteAccountModal);
+        modalInstance.hide()
+    }
+
+    handleButtonClick(button, input, field, successMessage) {
+        if (button) {
+            button.addEventListener("click", (e) => {
+                this.handleChange(field, input.value, successMessage);
+            });
+        }
+    }
+
+    handleChange(field, newValue, successMessage) {
+        if (!newValue || newValue.trim() === "") {
+            this.showMessage(`Enter a valid ${field.replace('_', ' ')}.`, "error");
             return;
         }
 
-        const requestData = {
-            username: newUsername,
-        };
+        if (newValue === this.auth.user[field]) {
+            return;
+        }
 
-        axios.put("http://localhost:8000/api/settings", requestData, {
+        const requestData = { [field]: newValue };
+        this.sendRequest(requestData, successMessage);
+    }
+
+    sendRequest(url, data, successMessage) {
+        axios({
+            method: data ? 'put' : 'delete',
+            url: "http://localhost:8000/api/user",
+            data: data || {},
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${this.auth.token}`,
             }
         })
             .then(response => {
-                this.showMessage("Username successfully changed.", "success");
+                this.showMessage(successMessage, "success");
+                setTimeout(() => {
+                    this.app.navigate("/settings");
+                }, 5000);
             })
             .catch(error => {
                 const errors = error.response.data;
-                if (errors.username) {
-                    this.showMessage(this.capitalizeFirstLetter(errors.username[0]), "error");
-                } else {
-                    this.showMessage("An error occurred while changing the username.", "error");
+                for (const key in errors) {
+                    if (errors[key]) {
+                        this.showMessage(this.capitalizeFirstLetter(errors[key][0]), "error");
+                        return;
+                    }
                 }
+                this.showMessage("An error occurred while updating the settings.", "error");
             });
     }
 
@@ -65,25 +114,25 @@ class UserSettingsPage extends Page {
     }
 
     showMessage(message, type) {
+        const existingMessageContainer = document.querySelector(".alert");
+        if (existingMessageContainer) {
+            existingMessageContainer.remove();
+        }
+
         const messageContainer = document.createElement("div");
-        messageContainer.className = `alert alert-${type === "success" ? "success" : "danger"} fade`;
+        messageContainer.className = `alert alert-${type === "success" ? "success" : "danger"} alert-dismissible fade show`;
         messageContainer.textContent = message;
 
-        const changeUsernameForm = document.querySelector("#change-username");
-        changeUsernameForm.appendChild(messageContainer);
-
-        setTimeout(() => {
-            messageContainer.classList.add("show");
-        }, 10);
+        const tabContentDiv = document.querySelector("#tab-content");
+        tabContentDiv.appendChild(messageContainer);
 
         setTimeout(() => {
             messageContainer.classList.remove("show");
             setTimeout(() => {
                 messageContainer.remove();
             }, 150);
-        }, 3000);
+        }, 5000);
     }
-
 }
 
 export default UserSettingsPage;

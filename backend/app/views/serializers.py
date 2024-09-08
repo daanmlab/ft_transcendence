@@ -3,6 +3,8 @@ from django.contrib.auth import authenticate, get_user_model
 from rest_framework.exceptions import ValidationError
 User = get_user_model()
 
+from .services import send_verification_email
+
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
@@ -30,19 +32,27 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
         return user
 
-class UserSettingsSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'email']
+        fields = ['id', 'username', 'email', 'avatar', 'two_factor_method']
+        read_only_fields = ['id', 'avatar']
 
-    def validate_email(self, value):
-        user = self.context['request'].user
-        if User.objects.filter(email=value).exclude(pk=user.pk).exists():
-            raise serializers.ValidationError("This email is already taken.")
-        return value
+    def update(self, instance, validated_data):
+        email_changed = 'email' in validated_data and validated_data['email'] != instance.email
+        old_email = instance.email
 
-    def validate_username(self, value):
-        user = self.context['request'].user
-        if User.objects.filter(username=value).exclude(pk=user.pk).exists():
-            raise serializers.ValidationError("This username is already taken.")
-        return value
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        if email_changed:
+            instance.email_is_verified = False
+            try:
+                send_verification_email(instance)
+            except Exception:
+                instance.email = old_email
+                instance.email_is_verified = True
+                raise serializers.ValidationError("Failed to send verification email. Email not updated.")
+
+        instance.save()
+        return instance

@@ -1,10 +1,14 @@
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.conf import settings
+from django.core.signing import Signer
+from django.core.mail import send_mail
+
 import logging
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
+signer = Signer()
 
 def get_or_create_user_from_oauth(user_info):
     user, created = User.objects.get_or_create(
@@ -23,3 +27,18 @@ def get_or_create_user_from_oauth(user_info):
         user.save()
     
     return RefreshToken.for_user(user)
+
+def send_verification_email(user):
+    try:
+        token = signer.sign(user.pk)
+        verification_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
+        send_mail(
+            'Verify your email',
+            f'Click the link to verify your email: {verification_url}',
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+        )
+        logger.info(f"Verification email sent to user ID {user.id}")
+    except Exception as e:
+        logger.error(f"Error while sending verification email to user ID {user.id}: {str(e)}")
+        raise Exception('Error while sending verification email')

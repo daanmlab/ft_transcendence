@@ -1,7 +1,6 @@
 import logging
 
 from django.contrib.auth import get_user_model
-from django.core.mail import send_mail
 from django.core.signing import Signer, BadSignature
 from django.conf import settings
 
@@ -13,13 +12,14 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from .serializers import LoginSerializer, RegisterSerializer
+from .serializers import LoginSerializer, RegisterSerializer, UserSerializer
+from .services import send_verification_email
+
 from app.models import User as UserModel
 from app.mixins.two_factor_auth_mixin import TwoFactorAuthenticationMixin
 
 User = get_user_model()
 signer = Signer()
-
 logger = logging.getLogger(__name__)
 
 class LoginView(TwoFactorAuthenticationMixin, GenericAPIView):
@@ -31,7 +31,7 @@ class LoginView(TwoFactorAuthenticationMixin, GenericAPIView):
         if serializer.is_valid():
             try:
                 user = serializer.validated_data['user']
-                if user.is_2fa_enabled:
+                if user.two_factor_method != 'none':
                     return self.handle_two_factor_authentication(request, user)
                 
                 refresh = RefreshToken.for_user(user)
@@ -61,24 +61,15 @@ class RegisterView(APIView):
             user: UserModel = serializer.save()
             logger.info(f"User with ID {user.id} registered successfully")
             try:
-                self.send_verification_email(user)
+                send_verification_email(user)
                 return Response({'message': 'User registered successfully'}, status=201)
             except Exception as e:
-                logger.error(f"Error while sending verification email: {str(e)}")
-                return Response({'error': 'Error while sending verification email'}, status=500)
+                user.delete()
+                error_message = {'non_field_errors': [str(e)]}
+                return Response(error_message, status=500)
         logger.error(f"Error during registration: {serializer.errors}")
         return Response(serializer.errors, status=400)
 
-    def send_verification_email(self, user):
-        token = signer.sign(user.pk)
-        verification_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
-        send_mail(
-            'Verify your email',
-            f'Click the link to verify your email: {verification_url}',
-            settings.DEFAULT_FROM_EMAIL,
-            [user.email],
-        )
-        logger.info(f"Verification email sent to user ID {user.id}")
 
 class VerifyEmailView(APIView):
     permission_classes = (AllowAny,)
@@ -94,17 +85,23 @@ class VerifyEmailView(APIView):
             return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class UserView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
     def get(self, request):
+        serializer = UserSerializer(request.user)
+        logger.info(f"User {request.user.id} retrieved their profile")
+        return Response({'user': serializer.data})
+
+    def put(self, request):
+        serializer = UserSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            logger.info(f"User {request.user.id} updated their profile")
+            return Response(serializer.data)
+        else:
+            logger.error(f"Error updating profile for user {request.user.id}: {serializer.errors}")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
         user = request.user
-        logger.info(f"User {user.id} retrieved their profile")
-        return Response({
-            'user': {
-                'id': user.id,
-                'username': user.username,
-                'email': user.email,
-                'avatar': user.avatar
-            }
-        }, status=status.HTTP_200_OK)
+        user.delete()
+        logger.info(f"User {user.id} deleted their account")
+        return Response({'success': True}, status=status.HTTP_204_NO_CONTENT)

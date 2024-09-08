@@ -21,10 +21,6 @@ from app.views.two_factor_auth_views import (
     VerifyOTPView,
 )
 
-from app.views.settings_views import (
-    UserSettingsView,
-)
-
 urlpatterns = [
     path('token', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
@@ -36,6 +32,5 @@ urlpatterns = [
     path('oauth/42/callback/', OAuth42CallbackView.as_view(), name='oauth_42_callback'),
     path('verify-otp', VerifyOTPView.as_view(), name='verify-otp'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('settings', UserSettingsView.as_view(), name='settings'),
 ]
 
