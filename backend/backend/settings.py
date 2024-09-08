@@ -83,7 +83,8 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
             'hosts': [f'redis://:{config("REDIS_PASSWORD")}@{config("REDIS_HOST")}:{config("REDIS_PORT")}/0'],
-
+            'capacity': 1500,
+            'expiry': 5,
             # 'hosts': [(config('REDIS_HOST'), config('REDIS_PORT', default=6379))],
             # 'password': config('REDIS_PASSWORD', default=None),
         },

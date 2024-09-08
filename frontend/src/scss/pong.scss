@@ -15,11 +15,14 @@ pong-game {
 
     #leftPaddle,
     #rightPaddle {
-        width: 10px;
-        height: 100px;
+        $paddleWidth: 0.02;
+        $paddleHeight: 0.15;
+        left: 0;
+        top: calc(50% - (100% * #{$paddleHeight} / 2));
+        height: calc(100% * #{$paddleHeight});
+        width: calc(100% * #{$paddleWidth});
         background: #f1f1f1;
         position: absolute;
-        top: calc(50% - 50px);
         transition: top 0.1s;
     }
     #ball {
@@ -32,6 +35,7 @@ pong-game {
         transition: top 0.1s, left 0.1s;
     }
     #rightPaddle {
+        left: unset;
         right: 0;
     }
 }
