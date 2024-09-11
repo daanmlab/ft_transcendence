@@ -7,26 +7,27 @@ from django.shortcuts import redirect
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
-from django.contrib import messages
-from django.contrib.messages import get_messages
-from django.http import JsonResponse
 
 from .services import get_or_create_user_from_oauth
 
 logger = logging.getLogger(__name__)
 
 class OAuth42View(APIView):
-    permission_classes = (AllowAny,)
+    permission_classes = [AllowAny]
 
     def get(self, request):
         state = secrets.token_urlsafe(16)
         request.session['oauth_state'] = state
-        auth_url = f"https://api.intra.42.fr/oauth/authorize?client_id={settings.OAUTH_42_CLIENT_ID}&redirect_uri={settings.OAUTH_42_REDIRECT_URI}&response_type=code&state={state}"
+        auth_url = (
+            f"https://api.intra.42.fr/oauth/authorize?"
+            f"client_id={settings.OAUTH_42_CLIENT_ID}&"
+            f"redirect_uri={settings.OAUTH_42_REDIRECT_URI}&"
+            f"response_type=code&state={state}"
+        )
         return redirect(auth_url)
 
-
 class OAuth42CallbackView(APIView):
-    permission_classes = (AllowAny,)
+    permission_classes = [AllowAny]
 
     def get(self, request):
         try:
@@ -35,10 +36,9 @@ class OAuth42CallbackView(APIView):
             access_token = self.exchange_code_for_token(code)
             user_info = self.fetch_user_info(access_token)
             return self.handle_successful_login(user_info)
-        except requests.RequestException as e:
-            return self.log_and_redirect(f"A network error occurred: {str(e)}")
         except Exception as e:
-            return self.log_and_redirect(f"An unexpected error occurred: {str(e)}")
+            error_message = f"An error occurred: {str(e)}"
+            return self.log_and_redirect(error_message)
 
     def validate_state(self, request):
         if request.GET.get('state') != request.session.get('oauth_state'):

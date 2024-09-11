@@ -37,13 +37,17 @@ class RegisterPage extends Page {
         };
     }
 
-    formatErrorMessages(errorData) {
+    formatErrorMessages(errorData) { // This is horrible and should be simplified
         const errorMessages = [];
-        for (const key in errorData) {
-            if (errorData[key].length > 0) {
-                errorData[key].forEach(msg => {
-                    errorMessages.push(msg.charAt(0).toUpperCase() + msg.slice(1));
-                });
+        if (errorData.detail) {
+            errorMessages.push(errorData.detail);
+        } else {
+            for (const key in errorData) {
+                if (errorData[key].length > 0) {
+                    errorData[key].forEach(msg => {
+                        errorMessages.push(msg.charAt(0).toUpperCase() + msg.slice(1));
+                    });
+                }
             }
         }
         return errorMessages.join(' ');

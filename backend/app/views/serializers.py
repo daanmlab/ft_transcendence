@@ -1,9 +1,10 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate, get_user_model
-from rest_framework.exceptions import ValidationError
-User = get_user_model()
-
+from django.contrib.auth.password_validation import validate_password
+from rest_framework.exceptions import ValidationError, APIException, AuthenticationFailed
 from .services import send_verification_email
+
+User = get_user_model()
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -16,21 +17,15 @@ class LoginSerializer(serializers.Serializer):
                 raise serializers.ValidationError("Email is not verified")
             data['user'] = user
             return data
-        raise serializers.ValidationError("Incorrect Credentials")
+        raise AuthenticationFailed("Incorrect Credentials")
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, min_length=8, max_length=128)
-    
+    password = serializers.CharField(write_only=True, validators=[validate_password])    
     class Meta:
         model = User
         fields = ['email', 'username', 'password']
     def create(self, validated_data):
-        user = User.objects.create_user(
-            email=validated_data['email'],
-            username=validated_data['username'],
-            password=validated_data['password']
-        )
-        return user
+        return User.objects.create_user(**validated_data)
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -39,8 +34,8 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'avatar']
 
     def update(self, instance, validated_data):
-        email_changed = 'email' in validated_data and validated_data['email'] != instance.email
-        old_email = instance.email
+        email = validated_data.get('email')
+        email_changed = email and email != instance.email
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
@@ -49,10 +44,11 @@ class UserSerializer(serializers.ModelSerializer):
             instance.email_is_verified = False
             try:
                 send_verification_email(instance)
-            except Exception:
-                instance.email = old_email
+            except Exception as e:
+                instance.email = instance.__class__.objects.get(pk=instance.pk).email
                 instance.email_is_verified = True
-                raise serializers.ValidationError("Failed to send verification email. Email not updated.")
+                logger.error("Failed to send verification email: %s", str(e))
+                raise APIException("Failed to send verification email. Email not updated.")
 
         instance.save()
         return instance

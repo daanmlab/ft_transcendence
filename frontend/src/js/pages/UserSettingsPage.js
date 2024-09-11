@@ -68,22 +68,24 @@ class UserSettingsPage extends Page {
     }
 
     handleChange(field, newValue, successMessage) {
-        if (!newValue || newValue.trim() === "") {
+        newValue = newValue.trim();
+    
+        if (!newValue) {
             this.showMessage(`Enter a valid ${field.replace('_', ' ')}.`, "error");
             return;
         }
-
+    
         if (newValue === this.auth.user[field]) {
             return;
         }
-
+    
         const requestData = { [field]: newValue };
         this.sendRequest(requestData, successMessage);
     }
 
-    sendRequest(url, data, successMessage) {
+    sendRequest(data, successMessage) {
         axios({
-            method: data ? 'put' : 'delete',
+            method: data ? 'patch' : 'delete',
             url: "http://localhost:8000/api/user",
             data: data || {},
             headers: {
