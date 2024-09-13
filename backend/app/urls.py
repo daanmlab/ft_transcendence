@@ -31,6 +31,5 @@ urlpatterns = [
     path('oauth/42/', OAuth42View.as_view(), name='oauth_42'),
     path('oauth/42/callback/', OAuth42CallbackView.as_view(), name='oauth_42_callback'),
     path('verify-otp', VerifyOTPView.as_view(), name='verify-otp'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 

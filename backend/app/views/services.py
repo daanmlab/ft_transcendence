@@ -1,10 +1,12 @@
+import logging
+
 from django.contrib.auth import get_user_model
-from rest_framework_simplejwt.tokens import RefreshToken
 from django.conf import settings
 from django.core.signing import Signer
 from django.core.mail import send_mail
-
-import logging
+from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.response import Response
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -42,3 +44,12 @@ def send_verification_email(user):
     except Exception as e:
         logger.error(f"Error while sending verification email to user ID {user.id}: {str(e)}")
         raise Exception('Error while sending verification email')
+
+def generate_jwt_response(user_id):
+    user = User.objects.get(id=user_id)
+    refresh = RefreshToken.for_user(user)
+    return Response({
+        "success": True,
+        "refresh": str(refresh),
+        "access": str(refresh.access_token)
+    }, status=status.HTTP_200_OK)

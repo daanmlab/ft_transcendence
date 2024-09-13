@@ -10,10 +10,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.generics import GenericAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView
 from rest_framework import status
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from .serializers import LoginSerializer, RegisterSerializer, UserSerializer
-from .services import send_verification_email
+from .services import send_verification_email, generate_jwt_response
 
 from app.models import User as UserModel
 from app.mixins.two_factor_auth_mixin import TwoFactorAuthenticationMixin
@@ -35,12 +34,7 @@ class LoginView(TwoFactorAuthenticationMixin, GenericAPIView):
         if user.two_factor_method != 'none':
             return self.handle_two_factor_authentication(request, user)
         
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            "success": True,
-            "refresh": str(refresh),
-            "access": str(refresh.access_token)
-        }, status=status.HTTP_200_OK)
+        return generate_jwt_response(user.id)
 
 class RegisterView(CreateAPIView):
     permission_classes = [AllowAny]

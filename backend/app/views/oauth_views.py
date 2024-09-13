@@ -37,8 +37,8 @@ class OAuth42CallbackView(APIView):
             user_info = self.fetch_user_info(access_token)
             return self.handle_successful_login(user_info)
         except Exception as e:
-            error_message = f"An error occurred: {str(e)}"
-            return self.log_and_redirect(error_message)
+            logger.error(f"An error occurred: {str(e)}")
+            return redirect(f"{settings.FRONTEND_URL}/oauth-result?error=true")
 
     def validate_state(self, request):
         if request.GET.get('state') != request.session.get('oauth_state'):
@@ -76,7 +76,3 @@ class OAuth42CallbackView(APIView):
         response.set_cookie('refresh_token', str(refresh), httponly=False)
         response.set_cookie('access_token', str(refresh.access_token), httponly=False)
         return response
-
-    def log_and_redirect(self, message):
-        logger.error(message)
-        return redirect(f"{settings.FRONTEND_URL}/oauth-result?error=true")
