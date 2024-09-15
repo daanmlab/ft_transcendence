@@ -24,7 +24,7 @@ export class Auth {
                     }
                 );
                 Cookies.set("access_token", this.token);
-                this.user = response.data.user;
+                this.user = response.data;
                 this.authenticated = true;
                 return true;
             } catch (error) {

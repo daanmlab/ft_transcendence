@@ -15,12 +15,11 @@ class TwoFactorAuthenticationMixin:
         otp_token = request.data.get('otp_token')
         try:
             otp_payload, new_token_created = self.get_or_create_otp_token(otp_token, user)
-            response_data = {
+            return Response({
                 'success': False,
                 'message': 'OTP required',
                 'otp_token': otp_token if not new_token_created else self.encode_otp_token(otp_payload)
-            }
-            return Response(response_data, status=status.HTTP_200_OK)
+            }, status=status.HTTP_200_OK)
         except Exception as e:
             logger.error(f"OTP token handling failed for user ID {user.id}: {e}")
             return Response({
@@ -37,8 +36,7 @@ class TwoFactorAuthenticationMixin:
             except TokenError:
                 logger.info(f"Expired token for user ID {user.id}. Generating new OTP token.")
         
-        new_payload = self.create_new_otp_token(user)
-        return new_payload, True
+        return self.create_new_otp_token(user), True
 
     def validate_existing_token(self, otp_token, user):
         decoded_token = OTPToken(otp_token)
@@ -48,7 +46,6 @@ class TwoFactorAuthenticationMixin:
     def create_new_otp_token(self, user):
         totp = pyotp.TOTP(pyotp.random_base32(), interval=300)
         otp = totp.now()
-        logger.info(f"New OTP sent to user ID {user.id}")
         # send_mail(
         #     'Your OTP for Login',
         #     f'Your OTP is {otp}. It will expire in 5 minutes.',

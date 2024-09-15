@@ -25,6 +25,11 @@ class RegisterPage extends Page {
                     formData.confirmpassword
                 );
                 form.showFormSuccess("User registered successfully. Please verify your email.");
+                Array.from(form.children).forEach(child => {
+                    if (!child.classList.contains('success')) {
+                        child.style.display = 'none';
+                    }
+                });
             } catch (error) {
                 let errorMessage = "An unknown error occurred";
                 if (error.response && error.response.data) {
@@ -37,13 +42,17 @@ class RegisterPage extends Page {
         };
     }
 
-    formatErrorMessages(errorData) {
+    formatErrorMessages(errorData) { // This is horrible and should be simplified
         const errorMessages = [];
-        for (const key in errorData) {
-            if (errorData[key].length > 0) {
-                errorData[key].forEach(msg => {
-                    errorMessages.push(msg.charAt(0).toUpperCase() + msg.slice(1));
-                });
+        if (errorData.detail) {
+            errorMessages.push(errorData.detail);
+        } else {
+            for (const key in errorData) {
+                if (errorData[key].length > 0) {
+                    errorData[key].forEach(msg => {
+                        errorMessages.push(msg.charAt(0).toUpperCase() + msg.slice(1));
+                    });
+                }
             }
         }
         return errorMessages.join(' ');

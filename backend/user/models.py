@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.base_user import BaseUserManager
+from django.core.validators import RegexValidator, MinLengthValidator
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password, **extra_fields):
@@ -27,13 +28,30 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, username, password, **extra_fields)
 
 class CustomUser(AbstractUser):
-    username = models.CharField(max_length=150, unique=True)
+    TWO_FACTOR_CHOICES = [
+        ('none', 'None'),
+        ('email', 'Email'),
+        ('qr', 'QR Code')
+    ]
+    username = models.CharField(
+        max_length=20,
+        unique=True,
+        validators=[
+            MinLengthValidator(4, message='Username must be at least 4 characters long.'),
+            RegexValidator(
+                regex=r'^[\w.@+-]+$', 
+                message=_('Enter a valid username.')
+            )
+        ]
+    )
     email = models.EmailField(_('email address'), max_length=255, unique=True)
     email_is_verified = models.BooleanField(default=False)
+    email_pending = models.EmailField(_('pending email address'), max_length=255, blank=True, null=True)
+    email_pending_is_verified = models.BooleanField(default=False)
     avatar = models.URLField(blank=True, null=True)
     oauth_provider = models.CharField(max_length=50, blank=True, null=True)
     oauth_uid = models.CharField(max_length=255, blank=True, null=True)
-    is_2fa_enabled = models.BooleanField(default=False)
+    two_factor_method = models.CharField(max_length=5, choices=TWO_FACTOR_CHOICES, default='none')
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
