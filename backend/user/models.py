@@ -46,6 +46,8 @@ class CustomUser(AbstractUser):
     )
     email = models.EmailField(_('email address'), max_length=255, unique=True)
     email_is_verified = models.BooleanField(default=False)
+    email_pending = models.EmailField(_('pending email address'), max_length=255, blank=True, null=True)
+    email_pending_is_verified = models.BooleanField(default=False)
     avatar = models.URLField(blank=True, null=True)
     oauth_provider = models.CharField(max_length=50, blank=True, null=True)
     oauth_uid = models.CharField(max_length=255, blank=True, null=True)

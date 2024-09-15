@@ -57,9 +57,20 @@ class VerifyEmailView(APIView):
         try:
             user_id = signer.unsign(token)
             user: UserModel = User.objects.get(pk=user_id)
-            user.email_is_verified = True
-            user.save()
-            return Response({'message': 'Email verified successfully.'}, status=status.HTTP_200_OK)
+            
+            if user.email_pending:
+                user.email = user.email_pending
+                user.email_is_verified = True
+                user.email_pending = None
+                user.email_pending_is_verified = False
+                user.save()
+                return Response({'message': 'Email verified and updated successfully.'}, status=status.HTTP_200_OK)
+            elif not user.email_is_verified:
+                user.email_is_verified = True
+                user.save()
+                return Response({'message': 'Email verified successfully.'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'message': 'Email already verified.'}, status=status.HTTP_200_OK)
         except (BadSignature, User.DoesNotExist):
             return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -68,3 +79,25 @@ class UserView(RetrieveUpdateDestroyAPIView):
 
     def get_object(self):
         return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+
+        email = serializer.validated_data.get('email')
+        if email and email != instance.email:
+            instance.email_pending = email
+            instance.email_pending_is_verified = False
+            try:
+                send_verification_email(instance)
+                serializer.validated_data.pop('email')
+            except Exception as e:
+                instance.email_pending = None
+                logger.error(f"Verification email failed: {str(e)}")
+                raise APIException(f"Failed to send verification email. User was not created.")
+
+        self.perform_update(serializer)
+
+        return Response(serializer.data)

@@ -20,25 +20,27 @@ class UserSettingsPage extends Page {
     }
 
     setInitial2FASelection() {
-        const twoFactorMethod = this.auth.user.two_factor_method;
-        const twoFactorElement = document.getElementById(`2fa-${twoFactorMethod}`);
-        if (twoFactorElement) {
-            twoFactorElement.checked = true;
-        }
+        const twoFactorElement = document.getElementById(`2fa-${this.auth.user.two_factor_method}`);
+        if (twoFactorElement) twoFactorElement.checked = true;
     }
 
     setupEventListeners() {
-        const changeUsernameButton = document.querySelector("#change-username button");
-        const newUsernameInput = document.querySelector("#new-username");
-        const changeEmailButton = document.querySelector("#change-email button");
-        const newEmailInput = document.querySelector("#new-email");
+        const elements = [
+            { button: "#change-username button", input: "#new-username", field: "username", message: "Username successfully changed." },
+            { button: "#change-email button", input: "#new-email", field: "email", message: "Email successfully changed. Please verify your new email address." },
+            { button: "#change-password button", input: "#new-password", field: "new_password", message: "Password successfully changed.", confirmInput: "#confirm-password" }
+        ];
+
+        elements.forEach(({ button, input, field, message, confirmInput }) => {
+            const btn = document.querySelector(button);
+            const inp = document.querySelector(input);
+            const confirmInp = confirmInput ? document.querySelector(confirmInput) : null;
+            if (btn) btn.addEventListener("click", () => this.handleChange(field, inp.value, message, confirmInp?.value));
+        });
+
         const update2FAButton = document.querySelector("#two-factor .btn");
-
-        this.handleButtonClick(changeUsernameButton, newUsernameInput, "username", "Username successfully changed.");
-        this.handleButtonClick(changeEmailButton, newEmailInput, "email", "Email successfully changed. Please verify your new email address.");
-
         if (update2FAButton) {
-            update2FAButton.addEventListener("click", (e) => {
+            update2FAButton.addEventListener("click", () => {
                 const selected2FAMethod = document.querySelector("input[name='2fa-method']:checked").id.split("-")[1];
                 this.handleChange("two_factor_method", selected2FAMethod, "Two-factor authentication settings updated.");
             });
@@ -46,41 +48,26 @@ class UserSettingsPage extends Page {
 
         const deleteAccountButton = document.querySelector("#confirmDeleteAccount");
         if (deleteAccountButton) {
-            deleteAccountButton.addEventListener("click", (e) => {
-                this.deleteAccount();
-            });
+            deleteAccountButton.addEventListener("click", () => this.deleteAccount());
         }
     }
 
     deleteAccount() {
         this.sendRequest(null, "Account successfully deleted.");
-        const deleteAccountModal = document.getElementById('deleteAccountModal');
-        const modalInstance = Modal.getInstance(deleteAccountModal);
-        modalInstance.hide()
+        Modal.getInstance(document.getElementById('deleteAccountModal')).hide();
     }
 
-    handleButtonClick(button, input, field, successMessage) {
-        if (button) {
-            button.addEventListener("click", (e) => {
-                this.handleChange(field, input.value, successMessage);
-            });
-        }
-    }
-
-    handleChange(field, newValue, successMessage) {
+    handleChange(field, newValue, successMessage, confirmPasswordValue = null) {
         newValue = newValue.trim();
-    
-        if (!newValue) {
+        if (field === "new_password" && newValue !== confirmPasswordValue) {
+            this.showMessage("Passwords do not match.", "error");
+            return;
+        }
+        if (!newValue || newValue === this.auth.user[field]) {
             this.showMessage(`Enter a valid ${field.replace('_', ' ')}.`, "error");
             return;
         }
-    
-        if (newValue === this.auth.user[field]) {
-            return;
-        }
-    
-        const requestData = { [field]: newValue };
-        this.sendRequest(requestData, successMessage);
+        this.sendRequest({ [field]: newValue }, successMessage);
     }
 
     sendRequest(data, successMessage) {
@@ -93,11 +80,9 @@ class UserSettingsPage extends Page {
                 "Authorization": `Bearer ${this.auth.token}`,
             }
         })
-            .then(response => {
+            .then(() => {
                 this.showMessage(successMessage, "success");
-                setTimeout(() => {
-                    this.app.navigate("/settings");
-                }, 5000);
+                setTimeout(() => this.app.navigate(this.url), 5000);
             })
             .catch(error => {
                 const errors = error.response.data;
@@ -117,22 +102,17 @@ class UserSettingsPage extends Page {
 
     showMessage(message, type) {
         const existingMessageContainer = document.querySelector(".alert");
-        if (existingMessageContainer) {
-            existingMessageContainer.remove();
-        }
+        if (existingMessageContainer) existingMessageContainer.remove();
 
         const messageContainer = document.createElement("div");
         messageContainer.className = `alert alert-${type === "success" ? "success" : "danger"} alert-dismissible fade show`;
         messageContainer.textContent = message;
 
-        const tabContentDiv = document.querySelector("#tab-content");
-        tabContentDiv.appendChild(messageContainer);
+        document.querySelector("#tab-content").appendChild(messageContainer);
 
         setTimeout(() => {
             messageContainer.classList.remove("show");
-            setTimeout(() => {
-                messageContainer.remove();
-            }, 150);
+            setTimeout(() => messageContainer.remove(), 150);
         }, 5000);
     }
 }

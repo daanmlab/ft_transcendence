@@ -38,13 +38,13 @@ def send_verification_email(user):
             'Verify your email',
             f'Click the link to verify your email: {verification_url}',
             settings.DEFAULT_FROM_EMAIL,
-            [user.email],
+            [user.email_pending or user.email],
         )
         logger.info(f"Verification email sent to user ID {user.id}")
     except Exception as e:
         logger.error(f"Error while sending verification email to user ID {user.id}: {str(e)}")
         raise Exception('Error while sending verification email')
-
+        
 def generate_jwt_response(user_id):
     user = User.objects.get(id=user_id)
     refresh = RefreshToken.for_user(user)

@@ -27,28 +27,23 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
 
+from django.core.validators import validate_email
+from django.contrib.auth.password_validation import validate_password
+
 class UserSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(validators=[validate_email])
+    new_password = serializers.CharField(write_only=True, required=False, validators=[validate_password])
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'avatar', 'two_factor_method']
-        read_only_fields = ['id', 'avatar']
+        fields = ['id', 'username', 'email', 'avatar', 'two_factor_method', 'email_pending', 'new_password']
+        read_only_fields = ['id', 'avatar', 'email_pending']
+
+    def validate_email(self, value):
+        return value.lower()
 
     def update(self, instance, validated_data):
-        email = validated_data.get('email')
-        email_changed = email and email != instance.email
-
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-
-        if email_changed:
-            instance.email_is_verified = False
-            try:
-                send_verification_email(instance)
-            except Exception as e:
-                instance.email = instance.__class__.objects.get(pk=instance.pk).email
-                instance.email_is_verified = True
-                logger.error("Failed to send verification email: %s", str(e))
-                raise APIException("Failed to send verification email. Email not updated.")
-
-        instance.save()
-        return instance
+        new_password = validated_data.pop('new_password', None)
+        if new_password:
+            instance.set_password(new_password)
+        return super().update(instance, validated_data)
