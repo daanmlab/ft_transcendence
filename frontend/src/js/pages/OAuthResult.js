@@ -1,6 +1,6 @@
 import Page from "./Page.js";
 
-class VerifyEmailPage extends Page {
+class OAuthResultPage extends Page {
     constructor(app) {
         super({
             name: "oauth-result",
@@ -25,10 +25,10 @@ class VerifyEmailPage extends Page {
             const errorElement = document.getElementById('oauth-message');
             errorElement.textContent = "An error occurred while trying to log in. Please close this window and try again.";
         } else {
-            setTimeout(window.close(), 1000);
+            setTimeout(window.close(), 3000);
         }
     }
 
 }
 
-export default VerifyEmailPage;
+export default OAuthResultPage;
