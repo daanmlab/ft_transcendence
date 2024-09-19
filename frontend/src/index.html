@@ -224,15 +224,51 @@
     </section>
 
     <section id="Home">
-        <h1>Test</h1>
-        <button class="btn btn-primary">Home</button>
-        <div id="user-info" class="text-center">
-            <img id="avatar" src="" alt="User Avatar" class="rounded-circle object-fit-cover border" width="200"
-                height="200" />
-            <p id="username"></p>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <!-- button with input in a card -->
+                    <div class="card d-none" data-id="CreateNewGame">
+                        <div class="card-body">
+                            <h5 class="card-title">Start a game with a friend</h5>
+                            <!-- input and button -->
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" placeholder="friends username" />
+                                <button class="btn btn-primary" type="button">send invite</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card d-none" data-id="JoinActiveGame">
+                        <div class="card-body">
+                            <h5 class="card-title">Join existing game against {{ friend }}</h5>
+                            <!-- input and button -->
+                            <div class="input-group mb-3">
+                                <button class="btn btn-primary w-100" type="button">Join</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card" data-id="InvitedGames">
+                        <div class="card-body">
+                            <h5 class="card-title">Invited games</h5>
+
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <div class="d-flex justify-content-between">
+                                    <p class="m-0">Game against {{ friend }}</p>
+                                    <button class="btn btn-primary">Accept</button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
-        <button class="btn btn-primary" id="logout">Logout</button>
-        <a data-href="/test">test</a>
+    </section>
+    <section id="Game">
+        <pong-game />
     </section>
 </body>
 
