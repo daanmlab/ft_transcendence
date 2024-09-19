@@ -14,13 +14,21 @@ class Page {
      * @param {object} app - The app object
      * @param {boolean} [preserveParams=false] - Optional parameter to preserve URL parameters
      */
-    constructor({ name, url, pageElement, isProtected, app, preserveParams = false }) {
+    constructor({
+        name,
+        url,
+        pageElement,
+        isProtected,
+        app,
+        preserveParams = false,
+    }) {
         this.name = name;
         this.url = url;
         this.pageElement = document.querySelector(pageElement);
         this.mainElement = document.querySelector("#main");
         this.auth = new Auth(isProtected, app);
         this.app = app;
+        this.params = app.params;
         this.handleClick = this.handleClick.bind(this);
         this.preserveParams = preserveParams;
     }

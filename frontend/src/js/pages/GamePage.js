@@ -12,8 +12,17 @@ export default class GamePage extends Page {
     }
 
     async render(app) {
+        require("../customElements/Pong.js");
         const { auth, mainElement, params } = this;
-        const gameId = params.get("id");
+        console.log(params);
+        const gameId = params["id"];
         console.log("Game ID:", gameId);
+
+        const gameElement = mainElement.querySelector("pong-game");
+        gameElement.startGame(gameId);
+        gameElement.addEventListener("gameover", () => {
+            console.log("Game over from game page");
+            app.navigate("/home");
+        });
     }
 }

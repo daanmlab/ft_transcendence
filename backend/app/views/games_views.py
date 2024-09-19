@@ -3,6 +3,9 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .serializers import PongGameSerializer
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 # get your invited games
 # get your created games
@@ -27,25 +30,19 @@ class GamesView(APIView):
         })
 
     def post(self, request):
-        # Check if the user already has an active game
-        active_game = request.user.has_active_game()
-        if active_game:
-            return Response({"error": "You already have an active game"}, status=400)
-
-        # Check if the user has reached the maximum number of created games
-        max_created_games = 5  # Set the maximum number of created games here
-        created_games_count = PongGame.objects.filter(player1=request.user).count()
-        if created_games_count >= max_created_games:
-            return Response({"error": "You have reached the maximum number of created games"}, status=400)
-
-        # Check if the user has reached the maximum number of invited games
-        max_invited_games = 10  # Set the maximum number of invited games here
-        invited_games_count = PongGame.objects.filter(player2=request.user).count()
-        if invited_games_count >= max_invited_games:
-            return Response({"error": "You have reached the maximum number of invited games"}, status=400)
-        
-        # create a new game
-        game = PongGame.objects.create(player1=request.user)
+        # create a new game with the current user as player1 and the opponent as player2
+        opponent_id = request.data.get('opponent_id')
+        # check if the opponent ID is provided
+        if not opponent_id:
+            return Response({"error": "No opponent ID provided"}, status=400)
+        # check if the opponent exists
+        try:
+            opponent = User.objects.get(id=opponent_id)
+        except User.DoesNotExist:
+            return Response({"error": "Opponent not found"}, status=404)
+        # create the game
+        game = PongGame(player1=request.user, player2=opponent)
+        game.save()
         return Response(PongGameSerializer(game).data)
     
     def put(self, request):

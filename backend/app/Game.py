@@ -78,6 +78,7 @@ class Game :
             Paddle(1 - 0.02)
         ])
         self.socket: Union[AsyncWebsocketConsumer, None] = None
+        self.score = [0, 0]
 
     @database_sync_to_async
     def set_game_active(self):
@@ -88,11 +89,40 @@ class Game :
         self.ball = Ball(0.5 - 0.01, 0.5 - 0.01)
         self.paddles[0].y = 0.5 - 0.075
         self.paddles[1].y = 0.5 - 0.075
+
+    @database_sync_to_async
+    def setWinner(self, winner: int):
+        #set player as winner
+        self.socket.db_game.winner = self.socket.db_game.player1 if winner == 0 else self.socket.db_game.player2
     
     async def game_loop(self):
         if (self.socket is None):
             return
+        counter = 0
         while True:
+            counter += 1
+
+            if (counter % 10 == 0):
+                await self.socket.channel_layer.group_send(self.socket.db_game.channel_group_name, {
+                    "type": "state_update",
+                    "objects": {
+                        "type": "score",
+                        "score": self.score
+                    }
+                })
+
+
+            if (self.score[0] >= 5 or self.score[1] >= 5):
+                print("Game Over")           
+                await self.socket.channel_layer.group_send(self.socket.db_game.channel_group_name, {
+                    "type": "state_update",
+                    "objects": {
+                        "type": "endGame",
+                        "score": self.score
+                    }
+                })
+                await self.setWinner(0 if self.score[0] >= 5 else 1)
+                return            
             # Update the ball's position
             self.ball.update()
             # Update the paddles' positions
@@ -104,9 +134,9 @@ class Game :
                 self.ball.speed_y *= -1
 
             # Check if the ball collides with the paddles
-            self.ball.printState("Ball")
-            self.paddles[0].printState("Paddle 0")
-            self.paddles[1].printState("Paddle 1")
+            # self.ball.printState("Ball")
+            # self.paddles[0].printState("Paddle 0")
+            # self.paddles[1].printState("Paddle 1")
             if self.ball.collides(self.paddles[0]) or self.ball.collides(self.paddles[1]):
                 print("Collided")
                 self.ball.speed_x *= -1
@@ -114,29 +144,33 @@ class Game :
             # Check if the ball got past left paddle
             if self.ball.x < self.paddles[0].x:
                 self.reset()
-                self.socket.channel_layer.group_send(self.socket.game_group_name, {
+                self.score[0] += 1
+                await self.socket.channel_layer.group_send(self.socket.db_game.channel_group_name, {
                     "type": "state_update",
                     "objects": {
                         "type": "score",
-                        "player": 1
+                        "score": self.score
                     }
                 })
+                print("score: ", self.score)
                 pass
 
             # Check if the ball got past right paddle
             if self.ball.x + self.ball.width > self.paddles[1].x + self.paddles[1].width:
                 self.reset()
-                self.socket.channel_layer.group_send(self.socket.game_group_name, {
+                self.score[1] += 1
+                await self.socket.channel_layer.group_send(self.socket.db_game.channel_group_name, {
                     "type": "state_update",
                     "objects": {
                         "type": "score",
-                        "player": 0
+                        "score": self.score
                     }
                 })
+                print("score: ", self.score)
                 pass
 
 
-            await self.socket.channel_layer.group_send(self.socket.game_group_name, {
+            await self.socket.channel_layer.group_send(self.socket.db_game.channel_group_name, {
                 "type": "state_update",
                 "objects": {
                     "type": "gameState",
@@ -172,7 +206,7 @@ class Game :
         # set db game state to active
         await self.set_game_active()
         # send start game message to group
-        await socket.channel_layer.group_send(socket.game_group_name, {
+        await socket.channel_layer.group_send(socket.db_game.channel_group_name, {
             "type": "state_update",
             "objects": {
                 "type": "startGame"

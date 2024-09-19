@@ -68,6 +68,7 @@ class App {
         console.log("Navigating to:", path, page, params);
 
         if (page) {
+            page.params = params; // set the params for the page
             if (this.currentPage) {
                 this.currentPage.close();
             }

@@ -25,74 +25,75 @@ class Pong extends HTMLElement {
             this.ball,
             this.scoreboard
         );
-        this.score = {
-            left: 0,
-            right: 0,
-        };
-        this.scoreboard.innerHTML = `${this.score.left} - ${this.score.right}`;
+        this.score = [0, 0];
+        this.scoreboard.innerHTML = `${this.score[0]} - ${this.score[1]}`;
         this.pressedKeys = [];
+        this.playersJoined = [];
     }
 
-    setWebsockets() {
+    setWebsockets(id) {
         this.setupEventListeners();
         // ws with headers
         this.ws = new WebSocket(
-            `ws://localhost:8000/ws/?token=${Cookies.get("access_token")}`
+            `ws://localhost:8000/ws/${id}/?token=${Cookies.get("access_token")}`
         );
         this.ws.onopen = () => {
             console.log("Connected to server");
         };
+
         this.ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
+            // {
+            //     "type": "join",
+            //     "player": self.scope["user"].username,
+            //     "side": self.side
+            // }
             console.log(data);
-            // data = {
-            //     type: "state_update",
-            //     objects: {
-            //         type: "gameState",
-            //         ball: {
-            //             x: 0.49,
-            //             y: 0.49,
-            //             width: 0.02,
-            //             height: 0.02,
-            //             speed_x: 0.03,
-            //             speed_y: 0,
-            //         },
-            //         paddles: [
-            //             {
-            //                 x: 0.42,
-            //                 y: 0.42,
-            //                 width: 0.02,
-            //                 height: 0.15,
-            //             },
-            //             {
-            //                 x: 0.42,
-            //                 y: 0.42,
-            //                 width: 0.02,
-            //                 height: 0.15,
-            //             },
-            //         ],
-            //     },
-            // };
-            // const paddleHeight = 0.15;
-            if (data.type === "gameState") {
-                this.setPositions({
-                    leftPaddle: {
-                        top: `calc(${data.paddles[0].y * 100}%)`,
-                    },
-                    rightPaddle: {
-                        top: `calc(${data.paddles[1].y * 100}%)`,
-                    },
-                    ball: {
-                        top: `calc(${data.ball.y * 100}%)`,
-                        left: `calc(${data.ball.x * 100}%)`,
-                    },
-                });
+            switch (data.type) {
+                case "join":
+                    this.playersJoined.push(data.player);
+                    console.log("Players joined:", this.playersJoined);
+                    if (this.playersJoined.length === 2) {
+                        console.log("Starting game...");
+                        this.ws.send(JSON.stringify({ type: "start_game" }));
+                    }
+                    break;
+                case "gameState":
+                    this.setPositions({
+                        leftPaddle: {
+                            top: `calc(${data.paddles[0].y * 100}%)`,
+                        },
+                        rightPaddle: {
+                            top: `calc(${data.paddles[1].y * 100}%)`,
+                        },
+                        ball: {
+                            top: `calc(${data.ball.y * 100}%)`,
+                            left: `calc(${data.ball.x * 100}%)`,
+                        },
+                    });
+                    break;
+                case "score":
+                    console.log("data", data);
+                    this.score = data.score;
+                    this.setScore();
+                    break;
+                case "endGame":
+                    console.log("Game over");
+                    this.score = data.score;
+                    this.setScore();
+                    this.ws.close();
+                    this.dispatchEvent(new CustomEvent("gameOver"));
+                    break;
             }
+            this.ws.onclose = () => {
+                console.log("Disconnected from server");
+            };
+            console.log(this.ws);
         };
-        this.ws.onclose = () => {
-            console.log("Disconnected from server");
-        };
-        console.log(this.ws);
+    }
+
+    setScore() {
+        this.scoreboard.innerHTML = `${this.score[0]} - ${this.score[1]}`;
     }
 
     setPositions({
@@ -122,6 +123,15 @@ class Pong extends HTMLElement {
                 this.ws.send(JSON.stringify({ type: "keyup", key: event.key }));
             }
         });
+    }
+
+    async startGame(gameId) {
+        this.setWebsockets(gameId);
+        while (this.ws.readyState !== WebSocket.OPEN) {
+            console.log("Waiting for connection...");
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+        // this.ws.send(JSON.stringify({ type: "start_game" }));
     }
 
     connectedCallback() {

@@ -33,6 +33,10 @@ class PongConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def get_channel_group_name(self, game: PongGame):
         return game.channel_group_name
+    
+    @database_sync_to_async
+    def game_has_winner(self, game: PongGame):
+        return game.winner is not None
 
     async def connect(self):
         if "error" in self.scope:
@@ -41,6 +45,8 @@ class PongConsumer(AsyncWebsocketConsumer):
             await self.close()
             return
         
+        print(self.scope["url_route"])
+
         # check params if the user is creating a new game or joining an existing one
         await self.accept()
         if not "game_id" in self.scope["url_route"]["kwargs"]:
@@ -60,7 +66,7 @@ class PongConsumer(AsyncWebsocketConsumer):
             await self.close()
             return
         # check if game is finished
-        if (await self.get_player1(game)).winner is not None:
+        if await self.game_has_winner(game):
             await self.send(text_data=json.dumps({"type": "error", "message": "Game is finished"}))
             await self.close()
             return
@@ -74,18 +80,24 @@ class PongConsumer(AsyncWebsocketConsumer):
         # check if game has a channel
         if not await self.get_channel_group_name(game):
             game.channel_group_name = create_group_name(self.scope["user"].id, game.id)
-            self.channel_layer.group_add(
+            print(f"Channel group name: {game.channel_group_name}")
+
+            await self.channel_layer.group_add(
                 game.channel_group_name,
                 self.channel_name
             )
             await database_sync_to_async(game.save)()
         else:
-            self.channel_layer.group_add(
+            print(f"Channel group name: {game.channel_group_name}")
+
+            await self.channel_layer.group_add(
                 game.channel_group_name,
                 self.channel_name
             )
 
-        self.channel_layer.group_send(
+        print(f"Connected to game {game.id} as {self.scope['user'].username}")
+
+        await self.channel_layer.group_send(
             game.channel_group_name,
             {
                 "type": "state_update",
@@ -96,9 +108,8 @@ class PongConsumer(AsyncWebsocketConsumer):
                 }
             }
         )
-
         self.db_game = game
-        # if not self.game_group_name:
+        self.game_group_name = game.channel_group_name
     pass
 
 
@@ -112,7 +123,15 @@ class PongConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         message_type = text_data_json.get("type", "")
 
+
+        print("Received message: ", message_type)
         if message_type == "start_game":
+            print(self.db_game.started)
+            if (self.db_game.started):
+                return
+            print("Starting game")
+            print("Game group name", self.game_group_name)
+            
             await self.game.startGame(self)
         elif message_type == "keydown":
             print(text_data_json)
