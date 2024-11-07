@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate, get_user_model
-from rest_framework.exceptions import ValidationError
+from django.contrib.auth.password_validation import validate_password
+from rest_framework.exceptions import ValidationError, APIException, AuthenticationFailed
+from .services import send_verification_email
+
 User = get_user_model()
 
 class LoginSerializer(serializers.Serializer):
@@ -14,34 +17,33 @@ class LoginSerializer(serializers.Serializer):
                 raise serializers.ValidationError("Email is not verified")
             data['user'] = user
             return data
-        raise serializers.ValidationError("Incorrect Credentials")
-
-class VerifyOTPSerializer(serializers.Serializer):
-    user_id = serializers.IntegerField()
-    otp = serializers.CharField()
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('id', 'username', 'email', 'avatar', 'email_is_verified', 'is_2fa_enabled')
-        read_only_fields = ('id', 'email', 'email_is_verified', 'is_2fa_enabled')
+        raise AuthenticationFailed("Incorrect Credentials")
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, min_length=8, max_length=128)
-    
+    password = serializers.CharField(write_only=True, validators=[validate_password])    
     class Meta:
         model = User
         fields = ['email', 'username', 'password']
-        
-    def validate_username(self, value):
-        if len(value) < 4 or len(value) > 20:
-            raise serializers.ValidationError("Username must be between 4 and 20 characters long.")
-        return value
-
     def create(self, validated_data):
-        user = User.objects.create_user(
-            email=validated_data['email'],
-            username=validated_data['username'],
-            password=validated_data['password']
-        )
-        return user
+        return User.objects.create_user(**validated_data)
+
+from django.core.validators import validate_email
+from django.contrib.auth.password_validation import validate_password
+
+class UserSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(validators=[validate_email])
+    new_password = serializers.CharField(write_only=True, required=False, validators=[validate_password])
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'avatar', 'two_factor_method', 'email_pending', 'new_password']
+        read_only_fields = ['id', 'avatar', 'email_pending']
+
+    def validate_email(self, value):
+        return value.lower()
+
+    def update(self, instance, validated_data):
+        new_password = validated_data.pop('new_password', None)
+        if new_password:
+            instance.set_password(new_password)
+        return super().update(instance, validated_data)
