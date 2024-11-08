@@ -2,31 +2,17 @@
 @import "bootstrap/scss/bootstrap";
 @import "./pong.scss";
 
-section {
-    display: none;
-}
-
-a[data-href] {
-    cursor: pointer;
+[data-href] {
+	cursor: pointer;
 }
 
 // data-page attribute is used to target specific pages
 [data-page="test"] {
-    overflow: hidden;
-    height: 100vh;
-    // background-color: red;
+	overflow: hidden;
+	height: 100vh;
+	// background-color: red;
 }
 
-[data-page="login"],
-[data-page="register"],
-[data-page="two-factor-auth"] {
-	& > div {
-		display: flex;
-		justify-content: center;
-		min-height: 100vh;
-
-		main {
-			max-width: 400px;
-		}
-	}
+.form-signin {
+    min-width: 400px;
 }

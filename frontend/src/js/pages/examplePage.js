@@ -13,7 +13,6 @@ class ExamplePage extends Page {
 
     render(app) {
         // first you require the necessary files
-        require("../main.js");
         require("../customElements/CustomForm.js");
 
         // then whenever we needs to change something in the page

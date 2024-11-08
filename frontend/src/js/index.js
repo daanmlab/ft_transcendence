@@ -29,11 +29,22 @@ class App {
         this.init();
         if (document.getElementById("noScript"))
             document.getElementById("noScript").remove();
+
+        document.addEventListener("navigate", (event) => { // Custom event dispatched from Navbar.handleClick()
+            this.navigate(event.detail);
+        });
     }
+
+
 
     navigate(path) {
         if (path === "/") {
             path = "/home";
+        } else if (path === "/logout") {
+            if (this.currentPage) {
+                this.currentPage.auth.logout();
+                return
+            }
         }
         const page = Object.values(this.pages).find(
             (page) => page.url === path
@@ -62,6 +73,9 @@ class App {
             this.navigate(window.location.pathname);
         });
         this.navigate(window.location.pathname);
+        window.addEventListener("load", () => {
+            document.body.classList.remove("loading");
+        });
     }
 }
 

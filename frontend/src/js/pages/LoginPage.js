@@ -13,7 +13,6 @@ class LoginPage extends Page {
     }
 
     async render(app) {
-        require("../main.js");
         require("../customElements/CustomForm.js");
 
         if (this.auth.authenticated) { return this.app.navigate("/home") }

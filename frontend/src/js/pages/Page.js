@@ -41,6 +41,7 @@ class Page {
             );
         });
         document.title = this.name;
+        this.renderNavbar(this);
         this.render(app);
     }
 
@@ -56,6 +57,13 @@ class Page {
     handleClick(event, app) {
         event.preventDefault();
         this.app.navigate(event.currentTarget.getAttribute("data-href"));
+    }
+
+    renderNavbar(page) {
+        require("../customElements/Navbar.js");
+        const navbarElement = document.createElement("nav-bar");
+        navbarElement.page = this;
+        this.mainElement.insertBefore(navbarElement, this.mainElement.firstChild);
     }
 
     /**

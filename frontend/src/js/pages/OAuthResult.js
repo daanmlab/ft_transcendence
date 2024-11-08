@@ -13,7 +13,6 @@ class OAuthResultPage extends Page {
     }
 
     render(app) {
-        require("../main.js");
         this.handleOAuthCallback();
     }
 

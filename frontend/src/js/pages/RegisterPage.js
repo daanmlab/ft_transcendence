@@ -12,7 +12,6 @@ class RegisterPage extends Page {
     }
 
     render(app) {
-        require("../main.js");
         require("../customElements/CustomForm.js");
 
         const form = this.mainElement.querySelector("custom-form");
