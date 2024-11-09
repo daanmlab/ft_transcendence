@@ -23,7 +23,7 @@
                 height="200" />
             <p id="username"></p>
         </div>
-        <button class="btn btn-primary" id="logout">Logout</button>
+        <button class="btn btn-primary" id="logwout">Logout</button>
     </section>
 
     <section id="Login">
@@ -132,10 +132,6 @@
             <div class="col-md-10 bg-light rounded p-4 d-flex flex-column" style="height: 400px;">
                 <ul class="nav nav-tabs mb-3" id="pills-tab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" href="#two-factor"
-                            role="tab" aria-controls="pills-home" aria-selected="true">Two-Factor Authentication</a>
-                    </li>
-                    <li class="nav-item" role="presentation">
                         <a class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" href="#change-username"
                             role="tab" aria-controls="pills-profile" aria-selected="false">Username</a>
                     </li>
@@ -148,13 +144,62 @@
                             role="tab" aria-controls="pills-password" aria-selected="false">Password</a>
                     </li>
                     <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="pills-avatar-tab" data-bs-toggle="pill" href="#change-avatar" role="tab"
+                            aria-controls="pills-avatar" aria-selected="false">Change Avatar</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" href="#two-factor"
+                            role="tab" aria-controls="pills-home" aria-selected="true">Two-Factor Authentication</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
                         <a class="nav-link" id="pills-settings-tab" data-bs-toggle="pill" href="#delete-account"
                             role="tab" aria-controls="pills-settings" aria-selected="false">Delete Account</a>
                     </li>
                 </ul>
-
                 <div id="tab-content" class="tab-content flex-fill" style="height: calc(100% - 56px);">
-
+                    <!-- Change Username -->
+                    <div class="tab-pane fade" id="change-username" role="tabpanel" aria-labelledby="pills-profile-tab">
+                        <h3>Change Username</h3>
+                        <div class="mb-3">
+                            <label for="new-username" class="form-label">New Username</label>
+                            <input type="text" class="form-control" id="new-username" placeholder="Enter new username">
+                        </div>
+                        <button class="btn btn-primary">Change Username</button>
+                    </div>
+                    <!-- Change Email -->
+                    <div class="tab-pane fade" id="change-email" role="tabpanel" aria-labelledby="pills-messages-tab">
+                        <h3>Change Email</h3>
+                        <div class="mb-3">
+                            <label for="new-email" class="form-label">New Email</label>
+                            <input type="email" class="form-control" id="new-email" placeholder="Enter new email">
+                        </div>
+                        <button class="btn btn-primary">Change Email</button>
+                    </div>
+                    <!-- Change Password -->
+                    <div class="tab-pane fade" id="change-password" role="tabpanel"
+                        aria-labelledby="pills-password-tab">
+                        <h3>Change Password</h3>
+                        <div class="mb-3">
+                            <label for="new-password" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="new-password"
+                                placeholder="Enter new password">
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirm-password" class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control" id="confirm-password"
+                                placeholder="Confirm new password">
+                        </div>
+                        <button class="btn btn-primary">Change Password</button>
+                    </div>
+                    <!-- Change Avatar -->
+                    <div class="tab-pane fade" id="change-avatar" role="tabpanel" aria-labelledby="pills-avatar-tab">
+                        <h3>Change Avatar</h3>
+                        <div class="mb-3">
+                            <label for="new-avatar" class="form-label">Upload New Avatar</label>
+                            <input type="file" class="form-control" id="new-avatar">
+                        </div>
+                        <button class="btn btn-primary">Upload Avatar</button>
+                    </div>
                     <!-- Two-Factor Authentication -->
                     <div class="tab-pane fade show active" id="two-factor" role="tabpanel"
                         aria-labelledby="pills-home-tab">
@@ -179,50 +224,12 @@
                         </div>
                         <button class="btn btn-primary mt-3">Update 2FA Settings</button>
                     </div>
-
-                    <!-- Change Username -->
-                    <div class="tab-pane fade" id="change-username" role="tabpanel" aria-labelledby="pills-profile-tab">
-                        <h3>Change Username</h3>
-                        <div class="mb-3">
-                            <label for="new-username" class="form-label">New Username</label>
-                            <input type="text" class="form-control" id="new-username" placeholder="Enter new username">
-                        </div>
-                        <button class="btn btn-primary">Change Username</button>
-                    </div>
-
-                    <!-- Change Email -->
-                    <div class="tab-pane fade" id="change-email" role="tabpanel" aria-labelledby="pills-messages-tab">
-                        <h3>Change Email</h3>
-                        <div class="mb-3">
-                            <label for="new-email" class="form-label">New Email</label>
-                            <input type="email" class="form-control" id="new-email" placeholder="Enter new email">
-                        </div>
-                        <button class="btn btn-primary">Change Email</button>
-                    </div>
-
                     <!-- Delete Account -->
                     <div class="tab-pane fade" id="delete-account" role="tabpanel" aria-labelledby="pills-settings-tab">
                         <h3>Delete Account</h3>
                         <p class="text-danger">Warning: This action is irreversible.</p>
                         <button class="btn btn-danger" data-bs-toggle="modal"
                             data-bs-target="#deleteAccountModal">Delete My Account</button>
-                    </div>
-
-                    <!-- Change Password -->
-                    <div class="tab-pane fade" id="change-password" role="tabpanel"
-                        aria-labelledby="pills-password-tab">
-                        <h3>Change Password</h3>
-                        <div class="mb-3">
-                            <label for="new-password" class="form-label">New Password</label>
-                            <input type="password" class="form-control" id="new-password"
-                                placeholder="Enter new password">
-                        </div>
-                        <div class="mb-3">
-                            <label for="confirm-password" class="form-label">Confirm New Password</label>
-                            <input type="password" class="form-control" id="confirm-password"
-                                placeholder="Confirm new password">
-                        </div>
-                        <button class="btn btn-primary">Change Password</button>
                     </div>
                 </div>
             </div>

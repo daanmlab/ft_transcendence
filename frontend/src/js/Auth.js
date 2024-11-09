@@ -55,7 +55,7 @@ export class Auth {
         }
     
         try {
-            const response = await axios.post("http://localhost:8000/api/token/refresh/", {
+            const response = await axios.post("http://localhost:8000/api/token/refresh", {
                 refresh: refreshToken
             });
             const newAccessToken = response.data.access;
@@ -156,7 +156,7 @@ export class Auth {
         if (this.oauthPopup) return; // CORS policy prevents checking if popup is open
 
         this.oauthPopup = window.open(
-            "http://localhost:8000/api/oauth/42/",
+            "http://localhost:8000/api/oauth/42",
             "OAuth Login",
             "width=600,height=600"
         );
