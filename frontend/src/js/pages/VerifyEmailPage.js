@@ -1,4 +1,5 @@
 import Page from "./Page";
+import { API_URL } from "../constants.js";
 
 class VerifyEmailPage extends Page {
     constructor(app) {
@@ -28,7 +29,7 @@ class VerifyEmailPage extends Page {
         }
 
         try {
-            const response = await fetch(`http://localhost:8000/api/verify-email/${token}/`, {
+            const response = await fetch(`${API_URL}/api/verify-email/${token}/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

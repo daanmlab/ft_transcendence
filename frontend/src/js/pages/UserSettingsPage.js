@@ -1,6 +1,7 @@
 import Page from "./Page";
 import axios from "axios";
 import { Modal } from 'bootstrap';
+import { API_URL } from "../constants.js";
 
 class UserSettingsPage extends Page {
     constructor(app) {
@@ -85,7 +86,7 @@ class UserSettingsPage extends Page {
     sendRequest(data, successMessage) {
         axios({
             method: data ? 'patch' : 'delete',
-            url: "http://localhost:8000/api/user",
+            url: `${API_URL}/user`,
             data: data || {},
             headers: {
                 "Content-Type": "application/json",
@@ -111,7 +112,7 @@ class UserSettingsPage extends Page {
     sendAvatarRequest(formData, successMessage) {
         axios({
             method: 'patch',
-            url: "http://localhost:8000/api/user",
+            url: `${API_URL}/user`,
             data: formData,
             headers: {
                 "Authorization": `Bearer ${this.auth.token}`,
