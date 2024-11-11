@@ -1,5 +1,4 @@
 import Page from "./Page.js";
-import { EMPTY_AVATAR_URL } from "../constants.js";
 
 class ProfilePage extends Page {
     constructor(app) {
@@ -11,33 +10,34 @@ class ProfilePage extends Page {
             app: app,
         });
     }
-
-
-    async render(app) {
-        const { auth } = this;
-        const avatar_upload = await auth.loadAvatar(auth.user.avatar_upload);
-        const user = {
-            username: auth.user.username,
-            avatar: avatar_upload ? avatar_upload : EMPTY_AVATAR_URL,
+    getUser() { // get dummy user
+        return {
+            username: this.auth.user.username,
+            avatar_upload: this.auth.user.avatar_upload,
+            avatar: this.auth.user.avatar,
             wins: 0,
             losses: 0,
-            joined:  new Date(auth.user.date_joined).toLocaleDateString('en-GB'),
+            date_joined: new Date(this.auth.user.date_joined).toLocaleDateString('en-GB'),
             matchHistory: [
                 { opponent: "opponent1", result: "win", date: "2021-01-10" },
                 { opponent: "opponent2", result: "loss", date: "2021-01-15" },
                 { opponent: "opponent3", result: "win", date: "2021-01-20" },
-            ],
+            ]
         };
-    
-        const userInfo = auth.user;
-        console.log(userInfo);
-    
-        document.querySelector("#profile-avatar").src = user.avatar;
-        document.querySelector("#profile-username").textContent = user.username;
-        document.querySelector("#profile-wins").textContent = user.wins;
-        document.querySelector("#profile-losses").textContent = user.losses;
-        document.querySelector("#profile-joined").textContent = "joined: " + user.joined;
-    
+    }
+
+    async render(app) {
+        require("../customElements/UserProfileCard.js");
+        
+        const { auth } = this;
+        const user = this.getUser();
+        console.log("user info", auth.user);
+
+        const UserProfileCard = this.mainElement.querySelector("user-profile");
+        UserProfileCard.page = this;
+        UserProfileCard.updateProfile(user);
+
+        document.querySelector("#profile-joined").textContent = "joined: " + user.date_joined;
         const matchHistoryElement = document.querySelector("#match-history");
         user.matchHistory.forEach(match => {
             const matchItem = document.createElement("li");
