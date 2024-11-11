@@ -34,7 +34,7 @@ ALLOWED_HOSTS = []
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=int(config('ACCESS_TOKEN_LIFETIME', default='60'))),
     'REFRESH_TOKEN_LIFETIME': timedelta(minutes=int(config('REFRESH_TOKEN_LIFETIME', default='1440'))),
-    'ROTATE_REFRESH_TOKENS': False,
+    'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
     'ALGORITHM': 'HS256',
@@ -237,10 +237,12 @@ LOGGING = {
     },
 }
 
-# JWT
+# Media settings
+import os
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
-SIMPLE_JWT = {
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "ROTATE_REFRESH_TOKENS": True,
-    "BLACKLIST_AFTER_ROTATION": True,
-}
+import os
+if not os.path.exists(MEDIA_ROOT):
+    os.makedirs(MEDIA_ROOT)
+    os.makedirs(os.path.join(MEDIA_ROOT, 'avatars'), exist_ok=True)

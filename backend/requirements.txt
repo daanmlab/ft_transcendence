@@ -10,3 +10,4 @@ asyncio
 requests
 pyotp
 djangorestframework-simplejwt
+pillow

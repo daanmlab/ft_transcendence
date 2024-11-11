@@ -1,5 +1,6 @@
 import Cookies from "js-cookie";
 import axios from "axios";
+import { API_URL, MEDIA_URL } from "./constants.js";
 
 export class Auth {
     constructor(isCurrentPageProtected, app) {
@@ -16,7 +17,7 @@ export class Auth {
         if (this.token) {
             try {
                 const response = await axios.get(
-                    "http://localhost:8000/api/user",
+                    `${API_URL}/user`,
                     {
                         headers: {
                             Authorization: `Bearer ${this.token}`,
@@ -55,7 +56,7 @@ export class Auth {
         }
     
         try {
-            const response = await axios.post("http://localhost:8000/api/token/refresh", {
+            const response = await axios.post(`${API_URL}/token/refresh`, {
                 refresh: refreshToken
             });
             const newAccessToken = response.data.access;
@@ -98,7 +99,7 @@ export class Auth {
         }
         try {
             const response = await axios.post(
-                "http://localhost:8000/api/register",
+                `${API_URL}/register`,
                 { username, email, password }
             );
             return response;
@@ -115,7 +116,7 @@ export class Auth {
         try {
             const otpToken = Cookies.get("otp_token");
             const response = await axios.post(
-                "http://localhost:8000/api/login",
+                `${API_URL}/login`,
                 {
                     email: email,
                     password: password,
@@ -156,7 +157,7 @@ export class Auth {
         if (this.oauthPopup) return; // CORS policy prevents checking if popup is open
 
         this.oauthPopup = window.open(
-            "http://localhost:8000/api/oauth/42/",
+            `${API_URL}/oauth/42`,
             "OAuth Login",
             "width=600,height=600"
         );
@@ -198,7 +199,7 @@ export class Auth {
         }
         try {
             const response = await axios.post(
-                "http://localhost:8000/api/verify-otp",
+                `${API_URL}/verify-otp`,
                 {
                     otp: otp,
                     otp_token: Cookies.get("otp_token"),
@@ -221,4 +222,30 @@ export class Auth {
             throw error;
         }
     }
+    
+    /* Fetches an array of avatar URLs */
+    async fetchAvatarUrls(avatarPaths) {
+        try {
+            const requests = avatarPaths.map(path => this.loadAvatar(path));
+            return await Promise.all(requests);
+        } catch (error) {
+            console.error("Failed to fetch avatar URLs", error);
+            return avatarPaths.map(() => null);
+        }
+    }
+
+    /* Fetches a single avatar URL */
+    async loadAvatar(path) {
+        try {
+            const response = await axios.get(`${MEDIA_URL}/${path}`, {
+                headers: { Authorization: `Bearer ${this.token}` },
+                responseType: "blob"
+            });
+            return URL.createObjectURL(response.data);
+        } catch (error) {
+            console.error(`Failed to load avatar at ${path}`, error);
+            return null;
+        }
+    }
+
 }

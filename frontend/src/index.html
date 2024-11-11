@@ -5,9 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" />
+    <style>
+        body.loading {
+            visibility: hidden;
+        }
+    </style>
 </head>
 
-<body>
+<body class="loading">
     <p id="noScript">
         this website requires javascript to be enabled
     </p>
@@ -27,61 +35,66 @@
     </section>
 
     <section id="Login">
-        <div class="d-flex align-items-center py-4 bg-body-tertiary">
-            <main class="form-signin w-100 m-auto">
-                <custom-form class="pb-6" id="login-form">
-                    <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
-                    <div class="form-floating">
-                        <input type="email" class="form-control" data-id="Email" placeholder="name@example.com"
-                            autocomplete="email" />
-                        <label for="Email">Email address</label>
+        <div class="vh-100 d-flex justify-content-center align-items-center">
+            <div class="bg-body-tertiary p-5">
+                <main class="form-signin w-100 m-auto">
+                    <custom-form id="login-form">
+                        <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" data-id="Email" placeholder="name@example.com"
+                                autocomplete="email" />
+                            <label for="Email">Email address</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" data-id="Password" placeholder="Password" />
+                            <label for="Password">Password</label>
+                        </div>
+                        <button class="btn btn-primary w-100 py-2" type="submit">
+                            Sign in
+                        </button>
+                    </custom-form>
+                    <div class="d-flex justify-content-between mt-4">
+                        <button class="btn btn-primary w-100 text-white" id="oauth">
+                            <p class="text-white m-0">Sign in with 42</p>
+                        </button>
                     </div>
-                    <div class="form-floating">
-                        <input type="password" class="form-control" data-id="Password" placeholder="Password" />
-                        <label for="Password">Password</label>
-                    </div>
-                    <button class="btn btn-primary w-100 py-2" type="submit">
-                        Sign in
-                    </button>
-                    <a class="d-inline-block text-center w-100" data-href="/register">Register</a>
-                </custom-form>
-                <div class="d-flex justify-content-between">
-                    <button class="btn btn-primary w-100 text-white" style="margin-top: 60px;" id="oauth">
-                        <p class="text-white m-0">Sign in with 42</p>
-                    </button>
-                </div>
-            </main>
+                    <a class="d-inline-block text-center w-100 mt-3" data-href="/register">Register</a>
+                </main>
+            </div>
         </div>
     </section>
 
     <section id="Register">
-        <div class="d-flex align-items-center py-4 bg-body-tertiary">
-            <main class="form-signin w-100 m-auto">
-                <custom-form class="text-center">
-                    <h1 class="h3 mb-3 fw-normal">Let's get you registered :)</h1>
-                    <div class="form-floating">
-                        <input type="text" class="form-control" data-id="Username" placeholder="littlefrenchboy" />
-                        <label for="Username">Username</label>
-                    </div>
-                    <div class="form-floating">
-                        <input type="email" class="form-control" data-id="Email" placeholder="name@example.com" />
-                        <label for="Email">Email address</label>
-                    </div>
-                    <div class="form-floating">
-                        <input type="password" class="form-control" data-id="Password" placeholder="Password" />
-                        <label for="Password">Password</label>
-                    </div>
-                    <div class="form-floating">
-                        <input type="password" class="form-control" data-id="ConfirmPassword" placeholder="Password" />
-                        <label for="ConfirmPassword">Confirm Password</label>
-                    </div>
+        <div class="vh-100 d-flex justify-content-center align-items-center">
+            <div class="bg-body-tertiary p-5">
+                <main class="form-signin w-100 m-auto">
+                    <custom-form>
+                        <h1 class="h3 mb-3 fw-normal">Let's get you registered :)</h1>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" data-id="Username" placeholder="littlefrenchboy" />
+                            <label for="Username">Username</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" data-id="Email" placeholder="name@example.com" />
+                            <label for="Email">Email address</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" data-id="Password" placeholder="Password" />
+                            <label for="Password">Password</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" data-id="ConfirmPassword"
+                                placeholder="Password" />
+                            <label for="ConfirmPassword">Confirm Password</label>
+                        </div>
 
-                    <button class="btn btn-primary w-100 py-2" type="submit">
-                        Sign in
-                    </button>
-                    <a class="text-center w-100" data-href="/login">already with us?</a>
-                    </form>
-            </main>
+                        <button class="btn btn-primary w-100 py-2" type="submit">
+                            Sign in
+                        </button>
+                        <a class="d-inline-block text-center w-100 mt-3" data-href="/login">already with us?</a>
+                        </form>
+                </main>
+            </div>
         </div>
     </section>
 
@@ -132,10 +145,6 @@
             <div class="col-md-10 bg-light rounded p-4 d-flex flex-column" style="height: 400px;">
                 <ul class="nav nav-tabs mb-3" id="pills-tab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" href="#two-factor"
-                            role="tab" aria-controls="pills-home" aria-selected="true">Two-Factor Authentication</a>
-                    </li>
-                    <li class="nav-item" role="presentation">
                         <a class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" href="#change-username"
                             role="tab" aria-controls="pills-profile" aria-selected="false">Username</a>
                     </li>
@@ -148,13 +157,62 @@
                             role="tab" aria-controls="pills-password" aria-selected="false">Password</a>
                     </li>
                     <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="pills-avatar-tab" data-bs-toggle="pill" href="#change-avatar" role="tab"
+                            aria-controls="pills-avatar" aria-selected="false">Change Avatar</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" href="#two-factor"
+                            role="tab" aria-controls="pills-home" aria-selected="true">Two-Factor Authentication</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
                         <a class="nav-link" id="pills-settings-tab" data-bs-toggle="pill" href="#delete-account"
                             role="tab" aria-controls="pills-settings" aria-selected="false">Delete Account</a>
                     </li>
                 </ul>
-
                 <div id="tab-content" class="tab-content flex-fill" style="height: calc(100% - 56px);">
-
+                    <!-- Change Username -->
+                    <div class="tab-pane fade" id="change-username" role="tabpanel" aria-labelledby="pills-profile-tab">
+                        <h3>Change Username</h3>
+                        <div class="mb-3">
+                            <label for="new-username" class="form-label">New Username</label>
+                            <input type="text" class="form-control" id="new-username" placeholder="Enter new username">
+                        </div>
+                        <button class="btn btn-primary">Change Username</button>
+                    </div>
+                    <!-- Change Email -->
+                    <div class="tab-pane fade" id="change-email" role="tabpanel" aria-labelledby="pills-messages-tab">
+                        <h3>Change Email</h3>
+                        <div class="mb-3">
+                            <label for="new-email" class="form-label">New Email</label>
+                            <input type="email" class="form-control" id="new-email" placeholder="Enter new email">
+                        </div>
+                        <button class="btn btn-primary">Change Email</button>
+                    </div>
+                    <!-- Change Password -->
+                    <div class="tab-pane fade" id="change-password" role="tabpanel"
+                        aria-labelledby="pills-password-tab">
+                        <h3>Change Password</h3>
+                        <div class="mb-3">
+                            <label for="new-password" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="new-password"
+                                placeholder="Enter new password">
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirm-password" class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control" id="confirm-password"
+                                placeholder="Confirm new password">
+                        </div>
+                        <button class="btn btn-primary">Change Password</button>
+                    </div>
+                    <!-- Change Avatar -->
+                    <div class="tab-pane fade" id="change-avatar" role="tabpanel" aria-labelledby="pills-avatar-tab">
+                        <h3>Change Avatar</h3>
+                        <div class="mb-3">
+                            <label for="new-avatar" class="form-label">Upload New Avatar</label>
+                            <input type="file" class="form-control" id="new-avatar">
+                        </div>
+                        <button class="btn btn-primary">Upload Avatar</button>
+                    </div>
                     <!-- Two-Factor Authentication -->
                     <div class="tab-pane fade show active" id="two-factor" role="tabpanel"
                         aria-labelledby="pills-home-tab">
@@ -179,50 +237,12 @@
                         </div>
                         <button class="btn btn-primary mt-3">Update 2FA Settings</button>
                     </div>
-
-                    <!-- Change Username -->
-                    <div class="tab-pane fade" id="change-username" role="tabpanel" aria-labelledby="pills-profile-tab">
-                        <h3>Change Username</h3>
-                        <div class="mb-3">
-                            <label for="new-username" class="form-label">New Username</label>
-                            <input type="text" class="form-control" id="new-username" placeholder="Enter new username">
-                        </div>
-                        <button class="btn btn-primary">Change Username</button>
-                    </div>
-
-                    <!-- Change Email -->
-                    <div class="tab-pane fade" id="change-email" role="tabpanel" aria-labelledby="pills-messages-tab">
-                        <h3>Change Email</h3>
-                        <div class="mb-3">
-                            <label for="new-email" class="form-label">New Email</label>
-                            <input type="email" class="form-control" id="new-email" placeholder="Enter new email">
-                        </div>
-                        <button class="btn btn-primary">Change Email</button>
-                    </div>
-
                     <!-- Delete Account -->
                     <div class="tab-pane fade" id="delete-account" role="tabpanel" aria-labelledby="pills-settings-tab">
                         <h3>Delete Account</h3>
                         <p class="text-danger">Warning: This action is irreversible.</p>
                         <button class="btn btn-danger" data-bs-toggle="modal"
                             data-bs-target="#deleteAccountModal">Delete My Account</button>
-                    </div>
-
-                    <!-- Change Password -->
-                    <div class="tab-pane fade" id="change-password" role="tabpanel"
-                        aria-labelledby="pills-password-tab">
-                        <h3>Change Password</h3>
-                        <div class="mb-3">
-                            <label for="new-password" class="form-label">New Password</label>
-                            <input type="password" class="form-control" id="new-password"
-                                placeholder="Enter new password">
-                        </div>
-                        <div class="mb-3">
-                            <label for="confirm-password" class="form-label">Confirm New Password</label>
-                            <input type="password" class="form-control" id="confirm-password"
-                                placeholder="Confirm new password">
-                        </div>
-                        <button class="btn btn-primary">Change Password</button>
                     </div>
                 </div>
             </div>
@@ -248,14 +268,7 @@
     </section>
 
     <section id="Home">
-        <h1>Test</h1>
-        <a data-href="/settings">User settings</a>
-        <div id="user-info" class="text-center">
-            <img id="avatar" src="" alt="User Avatar" class="rounded-circle object-fit-cover border" width="200"
-                height="200" />
-            <p id="username"></p>
-        </div>
-        <button class="btn btn-primary" id="logout">Logout</button>
+        <h1>THIS IS THE HOME PAGE</h1>
         <a data-href="/test">test</a>
     </section>
 

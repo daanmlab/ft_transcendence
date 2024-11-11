@@ -1,6 +1,7 @@
 import Page from "./Page";
 import axios from "axios";
 import { Modal } from 'bootstrap';
+import { API_URL } from "../constants.js";
 
 class UserSettingsPage extends Page {
     constructor(app) {
@@ -14,7 +15,6 @@ class UserSettingsPage extends Page {
     }
 
     render(app) {
-        require("../main.js");
         this.setupEventListeners();
         this.setInitial2FASelection();
     }
@@ -28,7 +28,8 @@ class UserSettingsPage extends Page {
         const elements = [
             { button: "#change-username button", input: "#new-username", field: "username", message: "Username successfully changed." },
             { button: "#change-email button", input: "#new-email", field: "email", message: "Email successfully changed. Please verify your new email address." },
-            { button: "#change-password button", input: "#new-password", field: "new_password", message: "Password successfully changed.", confirmInput: "#confirm-password" }
+            { button: "#change-password button", input: "#new-password", field: "new_password", message: "Password successfully changed.", confirmInput: "#confirm-password" },
+            { button: "#change-avatar button", input: "#new-avatar", field: "avatar", message: "Avatar successfully updated." },
         ];
 
         elements.forEach(({ button, input, field, message, confirmInput }) => {
@@ -63,6 +64,17 @@ class UserSettingsPage extends Page {
             this.showMessage("Passwords do not match.", "error");
             return;
         }
+        if (field === "avatar") {
+            const fileInput = document.querySelector("#new-avatar");
+            if (fileInput.files.length === 0) {
+                this.showMessage("Please select an image to upload.", "error");
+                return;
+            }
+            const formData = new FormData();
+            formData.append("avatar_upload", fileInput.files[0]);
+            this.sendAvatarRequest(formData, successMessage);
+            return;
+        }
         if (!newValue || newValue === this.auth.user[field]) {
             this.showMessage(`Enter a valid ${field.replace('_', ' ')}.`, "error");
             return;
@@ -73,10 +85,35 @@ class UserSettingsPage extends Page {
     sendRequest(data, successMessage) {
         axios({
             method: data ? 'patch' : 'delete',
-            url: "http://localhost:8000/api/user",
+            url: `${API_URL}/user`,
             data: data || {},
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${this.auth.token}`,
+            }
+        })
+            .then(() => {
+                this.showMessage(successMessage, "success");
+                setTimeout(() => this.app.navigate(this.url), 5000);
+            })
+            .catch(error => {
+                const errors = error.response.data;
+                for (const key in errors) {
+                    if (errors[key]) {
+                        this.showMessage(this.capitalizeFirstLetter(errors[key][0]), "error");
+                        return;
+                    }
+                }
+                this.showMessage("An error occurred while updating the settings.", "error");
+            });
+    }
+
+    sendAvatarRequest(formData, successMessage) {
+        axios({
+            method: 'patch',
+            url: `${API_URL}/user`,
+            data: formData,
+            headers: {
                 "Authorization": `Bearer ${this.auth.token}`,
             }
         })
