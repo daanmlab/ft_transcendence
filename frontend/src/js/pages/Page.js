@@ -61,9 +61,12 @@ class Page {
 
     renderNavbar(page) {
         require("../customElements/Navbar.js");
+        const existingNavbar = this.mainElement.parentNode.querySelector("nav-bar");
+        if (existingNavbar) { existingNavbar.remove(); }
         const navbarElement = document.createElement("nav-bar");
         navbarElement.page = this;
-        this.mainElement.insertBefore(navbarElement, this.mainElement.firstChild);
+
+        this.mainElement.parentNode.insertBefore(navbarElement, this.mainElement);
     }
 
     /**

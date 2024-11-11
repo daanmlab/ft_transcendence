@@ -1,3 +1,5 @@
+import { EMPTY_AVATAR_URL } from "../constants.js";
+
 class Navbar extends HTMLElement {
     constructor() {
         super().attachShadow({ mode: "open" });
@@ -37,11 +39,13 @@ class Navbar extends HTMLElement {
                     padding: 0;
                     margin: 0;
                 }
+                .profile {
+                    cursor: pointer;
+                }
                 img.avatar {
-                    width: 40px;
-                    height: 40px;
                     border-radius: 50%;
                     margin-right: 0.5rem;
+                    border: 1px solid white;
                 }
                 .username {
                     color: white;
@@ -50,8 +54,8 @@ class Navbar extends HTMLElement {
             </style>
             <nav class="navbar">
                 <a class="navbar-brand" data-href="/">Home</a>
-                <div class="avatar navbar-center">
-                    <img src="/static/images/empty-avatar.jpg" alt="Avatar" class="avatar" />
+                <div class="profile navbar-center" data-href="/profile">
+                <img src={EMPTY_AVATAR_URL} width="40" height="40" alt="Avatar" class="avatar" />
                     <span class="username"></span>
                 </div>
                 <ul class="navbar-nav">
@@ -83,21 +87,23 @@ class Navbar extends HTMLElement {
         this.dispatchEvent(new CustomEvent("navigate", { detail: href, bubbles: true, composed: true }));
     }
 
-    updateAuthValues() {
+    async updateAuthValues() {
         const { auth } = this.page;
         const loginEl = this.shadowRoot.querySelector(".login");
         const registerEl = this.shadowRoot.querySelector(".register");
-        const avatarEl = this.shadowRoot.querySelector(".avatar");
+        const profileEl = this.shadowRoot.querySelector(".profile");
         const settingsEl = this.shadowRoot.querySelector(".settings");
         const logoutEl = this.shadowRoot.querySelector(".logout");
+
+        const avatar_upload = await auth.loadAvatar(auth.user.avatar_upload);
 
         if (auth.authenticated) {
             loginEl.style.display = "none";
             registerEl.style.display = "none";
-            avatarEl.querySelector("img").src = auth.user.avatar || "/static/images/empty-avatar.jpg";
-            avatarEl.querySelector(".username").textContent = auth.user.username;
+            profileEl.querySelector("img").src = avatar_upload || auth.user.avatar  || EMPTY_AVATAR_URL;
+            profileEl.querySelector(".username").textContent = auth.user.username;
         } else {
-            avatarEl.style.display = "none";
+            profileEl.style.display = "none";
             logoutEl.style.display = "none";
             settingsEl.style.display = "none";
         }

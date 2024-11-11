@@ -1,4 +1,5 @@
 import Page from "./Page.js";
+import { EMPTY_AVATAR_URL } from "../constants.js";
 
 class ProfilePage extends Page {
     constructor(app) {
@@ -12,13 +13,15 @@ class ProfilePage extends Page {
     }
 
 
-    render(app) {
+    async render(app) {
+        const { auth } = this;
+        const avatar_upload = await auth.loadAvatar(auth.user.avatar_upload);
         const user = {
-            username: "username",
-            avatar: "/static/images/empty-avatar.jpg",
+            username: auth.user.username,
+            avatar: avatar_upload ? avatar_upload : EMPTY_AVATAR_URL,
             wins: 0,
             losses: 0,
-            joined: "2021-01-01",
+            joined:  new Date(auth.user.date_joined).toLocaleDateString('en-GB'),
             matchHistory: [
                 { opponent: "opponent1", result: "win", date: "2021-01-10" },
                 { opponent: "opponent2", result: "loss", date: "2021-01-15" },
@@ -26,10 +29,8 @@ class ProfilePage extends Page {
             ],
         };
     
-        const { auth } = this;
         const userInfo = auth.user;
         console.log(userInfo);
-        const mainElement = this.mainElement;
     
         document.querySelector("#profile-avatar").src = user.avatar;
         document.querySelector("#profile-username").textContent = user.username;

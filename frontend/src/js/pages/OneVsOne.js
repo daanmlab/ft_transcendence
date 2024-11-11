@@ -1,4 +1,5 @@
 import Page from "./Page.js";
+import { EMPTY_AVATAR_URL } from "../constants.js";
 
 class OneVsOne extends Page {
     constructor(app) {
@@ -27,12 +28,12 @@ class OneVsOne extends Page {
         const selectedFriendUsername = document.querySelector("#selected-friend-username");
         const inviteButton = document.querySelector("#invite-friend");
 
-        selectedFriendAvatar.src = "/static/images/empty-avatar.jpg";
+        selectedFriendAvatar.src = EMPTY_AVATAR_URL;
 
         friends.forEach(friend => {
-            const avatarSrc = friend.avatar ? friend.avatar : "/static/images/empty-avatar.jpg";
+            const avatarSrc = friend.avatar ? friend.avatar : EMPTY_AVATAR_URL;
             const friendItem = document.createElement("li");
-            friendItem.className = "list-group-item d-flex justify-content-between align-items-center";
+            friendItem.className = "list-group-item d-flex justify-content-between align-items-center cursor-pointer";
             friendItem.innerHTML = `
                 <div>
                     <img src="${avatarSrc}" alt="${friend.username}'s avatar" class="rounded-circle object-fit-cover border" width="50" height="50">

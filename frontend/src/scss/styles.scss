@@ -10,9 +10,20 @@
 [data-page="test"] {
 	overflow: hidden;
 	height: 100vh;
-	// background-color: red;
 }
 
 .form-signin {
     min-width: 400px;
+}
+
+#main {
+	padding: 3rem;
+}
+
+.card {
+	cursor: pointer;
+}
+
+.cursor-pointer {
+	cursor: pointer;
 }

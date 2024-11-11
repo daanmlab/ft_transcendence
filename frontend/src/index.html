@@ -141,8 +141,8 @@
     </section>
 
     <section id="UserSettings" class="container mt-5">
-        <div class="row justify-content-center align-items-center min-vh-100 bg-white">
-            <div class="col-md-10 bg-light rounded p-4 d-flex flex-column" style="height: 400px;">
+        <div class="row justify-content-center min-vh-100 bg-white">
+            <div class="bg-light rounded p-4 d-flex flex-column" style="height: 400px;">
                 <ul class="nav nav-tabs mb-3" id="pills-tab" role="tablist">
                     <li class="nav-item" role="presentation">
                         <a class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" href="#change-username"
@@ -264,12 +264,34 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div>profile
     </section>
 
-    <section id="Home">
-        <h1>THIS IS THE HOME PAGE</h1>
-        <a data-href="/test">test</a>
+    <section id="Home" class="container mt-5">
+        <h1 class="mb-4 text-center">CHOOSE YOUR DESTINY</h1>
+        <div class="row">
+            <div class="col-md-4" data-href="/pong">
+                <div class="card bg-light my-4" style="min-height: 250px;">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Play against AI</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4"data-href="/onevsone">
+                <div class="card bg-light my-4" style="min-height: 250px;">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">1vs1</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4"data-href="/tournament">
+                <div class="card bg-light my-4" style="min-height: 250px;">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Tournaments</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 
     <section id="OneVsOne" class="container mt-5">
