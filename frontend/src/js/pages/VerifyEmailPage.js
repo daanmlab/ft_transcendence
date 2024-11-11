@@ -14,7 +14,6 @@ class VerifyEmailPage extends Page {
     }
 
     render(app) {
-        require("../main.js");
         this.verifyEmail();
     }
 
