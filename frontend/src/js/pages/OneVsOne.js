@@ -1,4 +1,5 @@
 import Page from "./Page.js";
+import { EMPTY_AVATAR_URL } from "../constants.js";
 
 class OneVsOne extends Page {
     constructor(app) {
@@ -11,46 +12,72 @@ class OneVsOne extends Page {
         });
     }
 
-    render(app) {
-        const { auth } = this;
-        const userInfo = auth.user;
-        console.log(userInfo);
-
-        const friends = [
-            { username: "friend1", avatar: "" },
-            { username: "friend2", avatar: "" },
-            { username: "friend3", avatar: "" },
+    getUsers() { // get dummy users
+        return [
+            {
+                username: this.auth.user.username,
+                avatar_upload: this.auth.user.avatar_upload,
+                avatar: this.auth.user.avatar,
+                wins: 0,
+                losses: 0,
+                date_joined: new Date(this.auth.user.date_joined).toLocaleDateString('en-GB'),
+                matchHistory: [
+                    { opponent: "opponent1", result: "win", date: "2021-01-10" },
+                    { opponent: "opponent2", result: "loss", date: "2021-01-15" },
+                    { opponent: "opponent3", result: "win", date: "2021-01-20" },
+                ],
+            },
+            {
+                username: "user2",
+                avatar_upload: "avatar_upload2",
+                avatar: "",
+                wins: 0,
+                losses: 0,
+                date_joined: new Date("2021-02-01").toLocaleDateString('en-GB'),
+                matchHistory: [
+                    { opponent: "opponent1", result: "loss", date: "2021-02-10" },
+                    { opponent: "opponent2", result: "win", date: "2021-02-15" },
+                    { opponent: "opponent3", result: "loss", date: "2021-02-20" },
+                ],
+            },
+            {
+                username: "user3",
+                avatar_upload: "avatar_upload3",
+                avatar: "",
+                wins: 0,
+                losses: 0,
+                date_joined: new Date("2021-03-01").toLocaleDateString('en-GB'),
+                matchHistory: [
+                    { opponent: "opponent1", result: "win", date: "2021-03-10" },
+                    { opponent: "opponent2", result: "win", date: "2021-03-15" },
+                    { opponent: "opponent3", result: "loss", date: "2021-03-20" },
+                ],
+            }
         ];
+    }
+
+    render(app) {
+        require("../customElements/UserProfileCard.js");
+        require("../customElements/UserProfileCardSm.js");
+        const { auth } = this;
+        console.log("user info", auth.user);
 
         const friendListElement = document.querySelector("#friend-list");
-        const selectedFriendAvatar = document.querySelector("#selected-friend-avatar");
-        const selectedFriendUsername = document.querySelector("#selected-friend-username");
         const inviteButton = document.querySelector("#invite-friend");
+        const selectedFriend = this.mainElement.querySelector("user-profile");
 
-        selectedFriendAvatar.src = "/static/images/empty-avatar.jpg";
-
+        selectedFriend.page = this;
+        const friends = this.getUsers();
+        
         friends.forEach(friend => {
-            const avatarSrc = friend.avatar ? friend.avatar : "/static/images/empty-avatar.jpg";
-            const friendItem = document.createElement("li");
-            friendItem.className = "list-group-item d-flex justify-content-between align-items-center";
-            friendItem.innerHTML = `
-                <div>
-                    <img src="${avatarSrc}" alt="${friend.username}'s avatar" class="rounded-circle object-fit-cover border" width="50" height="50">
-                    <span>${friend.username}</span>
-                </div>
-            `;
+            const friendItem = document.createElement("user-profile-small");
+            friendItem.page = this;
+            friendItem.updateProfile(friend);
             friendItem.addEventListener("click", () => {
-                selectedFriendAvatar.src = avatarSrc;
-                selectedFriendUsername.textContent = friend.username;
+                selectedFriend.updateProfile(friend);
                 inviteButton.classList.remove("d-none");
                 inviteButton.onclick = () => {
-                    const existingPendingButton = friendItem.querySelector(".btn-warning");
-                    if (!existingPendingButton) {
-                        const pendingButton = document.createElement("button");
-                        pendingButton.className = "btn btn-warning btn-sm";
-                        pendingButton.innerText = "Pending";
-                        friendItem.appendChild(pendingButton);
-                    }
+                    friendItem.appendPendingButton();
                     inviteButton.classList.add("d-none");
                 };
             });
@@ -58,6 +85,7 @@ class OneVsOne extends Page {
         });
 
         inviteButton.classList.add("d-none");
+
     }
 }
 

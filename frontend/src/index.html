@@ -141,8 +141,8 @@
     </section>
 
     <section id="UserSettings" class="container mt-5">
-        <div class="row justify-content-center align-items-center min-vh-100 bg-white">
-            <div class="col-md-10 bg-light rounded p-4 d-flex flex-column" style="height: 400px;">
+        <div class="row justify-content-center min-vh-100 bg-white">
+            <div class="bg-light rounded p-4 d-flex flex-column" style="height: 400px;">
                 <ul class="nav nav-tabs mb-3" id="pills-tab" role="tablist">
                     <li class="nav-item" role="presentation">
                         <a class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" href="#change-username"
@@ -264,12 +264,34 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div>profile
     </section>
 
-    <section id="Home">
-        <h1>THIS IS THE HOME PAGE</h1>
-        <a data-href="/test">test</a>
+    <section id="Home" class="container mt-5">
+        <h1 class="mb-4 text-center">CHOOSE YOUR DESTINY</h1>
+        <div class="row">
+            <div class="col-md-4" data-href="/pong">
+                <div class="card bg-light my-4" style="min-height: 250px;">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Play against AI</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4"data-href="/onevsone">
+                <div class="card bg-light my-4" style="min-height: 250px;">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">1vs1</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4"data-href="/tournament">
+                <div class="card bg-light my-4" style="min-height: 250px;">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Tournaments</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 
     <section id="OneVsOne" class="container mt-5">
@@ -277,15 +299,10 @@
         <div class="row">
             <p>Friends</p>
             <div class="col-md-4">
-                <ul class="list-group" id="friend-list">
-                </ul>
+                <ul class="list-group" id="friend-list"></ul>
             </div>
             <div class="col-md-8 d-flex flex-column align-items-center text-center">
-                <div id="selected-friend" class="mb-3">
-                    <img id="selected-friend-avatar" src="" alt="User Avatar"
-                        class="rounded-circle object-fit-cover border" width="200" height="200" />
-                    <p id="selected-friend-username"></p>
-                </div>
+                <user-profile></user-profile>
                 <button class="btn btn-primary" id="invite-friend">Invite</button>
             </div>
         </div>
@@ -316,17 +333,7 @@
     <section id="Profile" class="container mt-5">
         <h1 class="mb-4">Profile</h1>
         <div class="row">
-            <div class="col-md-4 d-flex flex-column align-items-center text-center">
-                <div id="profile-info" class="mb-3">
-                    <img id="profile-avatar" src="" alt="User Avatar" class="rounded-circle object-fit-cover border"
-                        width="200" height="200" />
-                    <p id="profile-username"></p>
-                </div>
-                <div id="profile-stats" class="mb-3">
-                    <p>Wins: <span id="profile-wins"></span></p>
-                    <p>Losses: <span id="profile-losses"></span></p>
-                </div>
-            </div>
+            <user-profile class="col-md-4"></user-profile>
             <div class="col-md-8">
                 <p id="profile-joined"></p>
                 <h3>Match History</h3>
