@@ -80,3 +80,6 @@ notes
 
 #migrations
 backend/app/migrations/
+
+#file uploads
+backend/media/

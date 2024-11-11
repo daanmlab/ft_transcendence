@@ -12,7 +12,7 @@ from app.views.oauth_views import (
     OAuth42CallbackView,
 )
 
-from rest_framework_simplejwt.views import (#TODO:implement refresh token 
+from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenObtainPairView
 )
@@ -28,8 +28,7 @@ urlpatterns = [
     path('register', RegisterView.as_view(), name='register'),
     path('user', UserView.as_view(), name='user'),
     path('verify-email/<str:token>/', VerifyEmailView.as_view(), name='verify-email'),
-    path('oauth/42/', OAuth42View.as_view(), name='oauth_42'),
-    path('oauth/42/callback/', OAuth42CallbackView.as_view(), name='oauth_42_callback'),
+    path('oauth/42', OAuth42View.as_view(), name='oauth_42'),
+    path('oauth/42/callback', OAuth42CallbackView.as_view(), name='oauth_42_callback'),
     path('verify-otp', VerifyOTPView.as_view(), name='verify-otp'),
 ]
-
