@@ -14,7 +14,6 @@ class UserSettingsPage extends Page {
     }
 
     render(app) {
-        require("../main.js");
         this.setupEventListeners();
         this.setInitial2FASelection();
     }
