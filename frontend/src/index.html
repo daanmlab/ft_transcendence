@@ -271,6 +271,70 @@
         <h1>THIS IS THE HOME PAGE</h1>
         <a data-href="/test">test</a>
     </section>
+
+    <section id="OneVsOne" class="container mt-5">
+        <h1 class="mb-4">1v1 Game</h1>
+        <div class="row">
+            <p>Friends</p>
+            <div class="col-md-4">
+                <ul class="list-group" id="friend-list">
+                </ul>
+            </div>
+            <div class="col-md-8 d-flex flex-column align-items-center text-center">
+                <div id="selected-friend" class="mb-3">
+                    <img id="selected-friend-avatar" src="" alt="User Avatar"
+                        class="rounded-circle object-fit-cover border" width="200" height="200" />
+                    <p id="selected-friend-username"></p>
+                </div>
+                <button class="btn btn-primary" id="invite-friend">Invite</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="Tournament" class="container mt-5">
+        <h1 class="mb-4">Tournament</h1>
+        <div class="row">
+            <p>Open tournaments</p>
+            <div class="col-md-4">
+                <ul class="list-group" id="tournament-list">
+                </ul>
+            </div>
+            <div class="col-md-8 d-flex flex-column align-items-center text-center">
+                <form id="create-tournament-form" class="w-50">
+                    <div class="form-group mb-3">
+                        <label for="tournament-name">Tournament Name</label>
+                        <input type="text" class="form-control" id="tournament-name"
+                            placeholder="Enter tournament name">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Tournament</button>
+                </form>
+            </div>
+        </div>
+        <!-- Selected tournament bracket and counter -->
+    </section>
+
+    <section id="Profile" class="container mt-5">
+        <h1 class="mb-4">Profile</h1>
+        <div class="row">
+            <div class="col-md-4 d-flex flex-column align-items-center text-center">
+                <div id="profile-info" class="mb-3">
+                    <img id="profile-avatar" src="" alt="User Avatar" class="rounded-circle object-fit-cover border"
+                        width="200" height="200" />
+                    <p id="profile-username"></p>
+                </div>
+                <div id="profile-stats" class="mb-3">
+                    <p>Wins: <span id="profile-wins"></span></p>
+                    <p>Losses: <span id="profile-losses"></span></p>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <p id="profile-joined"></p>
+                <h3>Match History</h3>
+                <ul class="list-group" id="match-history">
+                </ul>
+            </div>
+        </div>
+    </section>
 </body>
 
 </html>
