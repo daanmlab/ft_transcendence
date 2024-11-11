@@ -9,7 +9,7 @@ import {
     HomePage,
     OneVsOne,
     TournamentPage,
-    GameStatsPage
+    ProfilePage
 } from "./pages/index.js";
 import "../scss/styles.scss";
 
@@ -27,7 +27,7 @@ class App {
             home: new HomePage(this),
             oneVsOne: new OneVsOne(this),
             tournament: new TournamentPage(this),
-            gameStats: new GameStatsPage(this)
+            gameStats: new ProfilePage(this)
         };
         this.currentPage = null;
         this.init();
@@ -36,6 +36,7 @@ class App {
     }
 
     navigate(path) {
+        console.log("path", path);
         if (path === "/") {
             path = "/home";
         }
@@ -63,9 +64,9 @@ class App {
 
     init() {
         window.addEventListener("popstate", () => {
-            this.navigate(window.location.pathname);
+            this.navigate(window.location.pathname.toLowerCase());
         });
-        this.navigate(window.location.pathname);
+        this.navigate(window.location.pathname.toLowerCase());
     }
 }
 

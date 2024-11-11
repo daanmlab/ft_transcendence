@@ -8,7 +8,7 @@ import UserSettingsPage from "./UserSettingsPage.js";
 import HomePage from "./HomePage.js";
 import OneVsOne from "./OneVsOne.js";
 import TournamentPage from "./TournamentPage.js";
-import GameStatsPage from "./GameStatsPage.js";
+import ProfilePage from "./ProfilePage.js";
 
 export { 
     LoginPage, 
@@ -21,5 +21,5 @@ export {
     HomePage,
     OneVsOne,
     TournamentPage,
-    GameStatsPage
+    ProfilePage
 }
