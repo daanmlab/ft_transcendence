@@ -1,13 +1,15 @@
 import {
     LoginPage,
-    TestPage,
     NotFoundPage,
     RegisterPage,
     VerifyEmailPage,
     OAuthResultPage,
     TwoFactorAuthPage,
     UserSettingsPage,
-    HomePage
+    HomePage,
+    OneVsOne,
+    TournamentPage,
+    GameStatsPage
 } from "./pages/index.js";
 import "../scss/styles.scss";
 
@@ -15,7 +17,6 @@ class App {
     constructor() {
         this.mainElement = document.querySelector("#main");
         this.pages = {
-            test: new TestPage(this),
             login: new LoginPage(this),
             register: new RegisterPage(this),
             404: new NotFoundPage(this),
@@ -24,6 +25,9 @@ class App {
             twoFactorAuth: new TwoFactorAuthPage(this),
             settings: new UserSettingsPage(this),
             home: new HomePage(this),
+            oneVsOne: new OneVsOne(this),
+            tournament: new TournamentPage(this),
+            gameStats: new GameStatsPage(this)
         };
         this.currentPage = null;
         this.init();

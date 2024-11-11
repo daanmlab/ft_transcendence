@@ -55,7 +55,7 @@ export class Auth {
         }
     
         try {
-            const response = await axios.post("http://localhost:8000/api/token/refresh/", {
+            const response = await axios.post("http://localhost:8000/api/token/refresh", {
                 refresh: refreshToken
             });
             const newAccessToken = response.data.access;
