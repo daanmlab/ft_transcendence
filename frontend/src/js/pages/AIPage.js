@@ -1,11 +1,11 @@
 import Page from "./Page.js";
 
-class HomePage extends Page {
+class AIPage extends Page {
     constructor(app) {
         super({
-            name: "home",
-            url: "/home",
-            pageElement: "#Home",
+            name: "ai",
+            url: "/ai",
+            pageElement: "#AI",
             isProtected: true,
             app: app,
         });
@@ -18,4 +18,4 @@ class HomePage extends Page {
     }
 }
 
-export default HomePage;
+export default AIPage;

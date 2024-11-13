@@ -243,7 +243,7 @@ export class Auth {
             });
             return URL.createObjectURL(response.data);
         } catch (error) {
-            console.error(`Failed to load avatar at ${path}`, error);
+            console.warn(`Failed to load avatar at ${path}`, error);
             return null;
         }
     }

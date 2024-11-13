@@ -9,7 +9,8 @@ import {
     HomePage,
     OneVsOne,
     TournamentPage,
-    ProfilePage
+    ProfilePage,
+    AIPage
 } from "./pages/index.js";
 import "../scss/styles.scss";
 
@@ -27,7 +28,8 @@ class App {
             home: new HomePage(this),
             oneVsOne: new OneVsOne(this),
             tournament: new TournamentPage(this),
-            gameStats: new ProfilePage(this)
+            gameStats: new ProfilePage(this),
+            AI: new AIPage(this)
         };
         this.currentPage = null;
         this.init();
