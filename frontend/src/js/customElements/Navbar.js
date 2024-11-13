@@ -95,9 +95,9 @@ class Navbar extends HTMLElement {
         const settingsEl = this.shadowRoot.querySelector(".settings");
         const logoutEl = this.shadowRoot.querySelector(".logout");
 
-        const avatar_upload = await auth.loadAvatar(auth.user.avatar_upload);
-
+        
         if (auth.authenticated) {
+            const avatar_upload = await auth.loadAvatar(auth.user.avatar_upload);
             loginEl.style.display = "none";
             registerEl.style.display = "none";
             profileEl.querySelector("img").src = avatar_upload || auth.user.avatar  || EMPTY_AVATAR_URL;
