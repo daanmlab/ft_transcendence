@@ -270,7 +270,7 @@
     <section id="Home" class="container mt-5">
         <h1 class="mb-4 text-center">CHOOSE YOUR DESTINY</h1>
         <div class="row">
-            <div class="col-md-4" data-href="/pong">
+            <div class="col-md-4" data-href="/ai">
                 <div class="card bg-light my-4" style="min-height: 250px;">
                     <div class="card-body text-center">
                         <h5 class="card-title">Play against AI</h5>
@@ -294,17 +294,32 @@
         </div>
     </section>
 
+    <section id="AI" class="container mt-5">
+        <h1 class="mb-4">AI Game</h1>
+        </div>
+        <div id="pong-simulator" class="bg-secondary text-white rounded" style="width: 500px; height: 500px; font-size: 2rem; margin: 0 auto">
+        <p>Pong</p>
+        </div>
+    </section>
+
     <section id="OneVsOne" class="container mt-5">
         <h1 class="mb-4">1v1 Game</h1>
         <div class="row">
-            <p>Friends</p>
             <div class="col-md-4">
-                <ul class="list-group" id="friend-list"></ul>
+                <p>Invitations Received</p>
+                <ul class="list-group" id="receive-list"></ul>
             </div>
-            <div class="col-md-8 d-flex flex-column align-items-center text-center">
+            <div class="col-md-4">
+                <p>Send Invitations</p>
+                <ul class="list-group" id="send-list"></ul>
+            </div>
+            <div class="col-md-4 d-flex flex-column align-items-center text-center">
                 <user-profile></user-profile>
-                <button class="btn btn-primary" id="invite-friend">Invite</button>
+                <button class="btn btn-primary" id="action-friend">Invite</button>
             </div>
+        </div>
+        <div id="pong-simulator" class="d-none bg-secondary text-white rounded" style="width: 500px; height: 500px; font-size: 2rem; margin: 0 auto">
+        <p>Pong</p>
         </div>
     </section>
 
@@ -329,7 +344,6 @@
             </div>
         </div>
         <tournament-bracket class="d-none"></tournament-bracket>
-        <!-- Selected tournament bracket and counter -->
     </section>
 
     <section id="Profile" class="container mt-5">

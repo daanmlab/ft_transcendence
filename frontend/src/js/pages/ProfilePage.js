@@ -1,4 +1,5 @@
 import Page from "./Page.js";
+import "../customElements/UserProfileCardSm.js";
 
 class ProfilePage extends Page {
     constructor(app) {
@@ -27,8 +28,6 @@ class ProfilePage extends Page {
     }
 
     async render(app) {
-        require("../customElements/UserProfileCard.js");
-        
         const { auth } = this;
         const user = this.getUser();
         console.log("user info", auth.user);

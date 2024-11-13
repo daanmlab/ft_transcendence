@@ -16,8 +16,6 @@ class UserProfileCard extends HTMLElement {
                     border-radius: 50%;
                     object-fit: cover;
                     border: 1px solid #dee2e6;
-                    width: 200px;
-                    height: 200px;
                 }
                 .profile-info, .profile-stats {
                     margin-bottom: 1rem;
@@ -31,7 +29,7 @@ class UserProfileCard extends HTMLElement {
             </style>
             <div class="profile-container">
                 <div id="profile-info" class="profile-info">
-                    <img id="profile-avatar" src="${EMPTY_AVATAR_URL}" alt="User Avatar" class="profile-avatar" />
+                    <img id="profile-avatar" src="${EMPTY_AVATAR_URL}" alt="User Avatar" class="profile-avatar" width="150" height="150">
                     <p id="profile-username"></p>
                 </div>
                 <div id="profile-stats" class="profile-stats">

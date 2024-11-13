@@ -1,5 +1,5 @@
 import Page from "./Page.js";
-
+import "../customElements/Bracket.js";
 class TournamentPage extends Page {
     constructor(app) {
         super({
@@ -22,8 +22,6 @@ class TournamentPage extends Page {
     }
 
     render(app) {
-        require("../customElements/Bracket.js");
-
         const { auth } = this;
         const userInfo = auth.user;
         console.log(userInfo);
@@ -53,7 +51,7 @@ class TournamentPage extends Page {
                 tournamentItem.addEventListener("click", () => {
                     const bracketElement = document.querySelector("tournament-bracket");
                     bracketElement.classList.remove("d-none");
-                    bracketElement.init(["A", "B", "C", "D"], openTournaments[0].name);
+                    bracketElement.init(["A", "B", "C", "D"], openTournaments[2].name);
                 });
             }
         });

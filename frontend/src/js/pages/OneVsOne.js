@@ -1,5 +1,7 @@
 import Page from "./Page.js";
-import { EMPTY_AVATAR_URL } from "../constants.js";
+import "../customElements/UserProfileCard.js";
+import "../customElements/UserProfileCardSm.js";
+import "../customElements/Pong.js";
 
 class OneVsOne extends Page {
     constructor(app) {
@@ -12,33 +14,23 @@ class OneVsOne extends Page {
         });
     }
 
-    getUsers() { // get dummy users
+    getFriends() { // get dummy users
         return [
             {
                 username: this.auth.user.username,
                 avatar_upload: this.auth.user.avatar_upload,
                 avatar: this.auth.user.avatar,
-                wins: 0,
+                wins: 20,
                 losses: 0,
                 date_joined: new Date(this.auth.user.date_joined).toLocaleDateString('en-GB'),
-                matchHistory: [
-                    { opponent: "opponent1", result: "win", date: "2021-01-10" },
-                    { opponent: "opponent2", result: "loss", date: "2021-01-15" },
-                    { opponent: "opponent3", result: "win", date: "2021-01-20" },
-                ],
             },
             {
                 username: "user2",
                 avatar_upload: "avatar_upload2",
                 avatar: "",
-                wins: 0,
-                losses: 0,
+                wins: 1,
+                losses: 1,
                 date_joined: new Date("2021-02-01").toLocaleDateString('en-GB'),
-                matchHistory: [
-                    { opponent: "opponent1", result: "loss", date: "2021-02-10" },
-                    { opponent: "opponent2", result: "win", date: "2021-02-15" },
-                    { opponent: "opponent3", result: "loss", date: "2021-02-20" },
-                ],
             },
             {
                 username: "user3",
@@ -47,45 +39,65 @@ class OneVsOne extends Page {
                 wins: 0,
                 losses: 0,
                 date_joined: new Date("2021-03-01").toLocaleDateString('en-GB'),
-                matchHistory: [
-                    { opponent: "opponent1", result: "win", date: "2021-03-10" },
-                    { opponent: "opponent2", result: "win", date: "2021-03-15" },
-                    { opponent: "opponent3", result: "loss", date: "2021-03-20" },
-                ],
+            }
+        ];
+    }
+
+    getInvites() { // get dummy invites
+        return [
+            {
+                username: "user4",
+                avatar_upload: "",
+                avatar: "",
+                wins: 0,
+                losses: 0,
+                date_joined: new Date("2021-03-01").toLocaleDateString('en-GB'),
             }
         ];
     }
 
     render(app) {
-        require("../customElements/UserProfileCard.js");
-        require("../customElements/UserProfileCardSm.js");
         const { auth } = this;
         console.log("user info", auth.user);
-
-        const friendListElement = document.querySelector("#friend-list");
-        const inviteButton = document.querySelector("#invite-friend");
+    
+        const sendList = document.querySelector("#send-list");
+        const receiveList = document.querySelector("#receive-list");
+        const inviteBtn = document.querySelector("#action-friend");
         const selectedFriend = this.mainElement.querySelector("user-profile");
-
+    
         selectedFriend.page = this;
-        const friends = this.getUsers();
-        
-        friends.forEach(friend => {
+    
+        const setupFriendItem = (friend, actionText, actionCallback) => {
             const friendItem = document.createElement("user-profile-small");
             friendItem.page = this;
             friendItem.updateProfile(friend);
             friendItem.addEventListener("click", () => {
+                inviteBtn.classList.remove("d-none");
+                inviteBtn.textContent = actionText;
+                inviteBtn.onclick = actionCallback;
                 selectedFriend.updateProfile(friend);
-                inviteButton.classList.remove("d-none");
-                inviteButton.onclick = () => {
-                    friendItem.appendPendingButton();
-                    inviteButton.classList.add("d-none");
-                };
             });
-            friendListElement.appendChild(friendItem);
+            return friendItem;
+        };
+    
+        this.getFriends().forEach(friend => {
+            const friendItem = setupFriendItem(friend, "Invite", () => {
+                friendItem.appendPendingButton();
+                inviteBtn.classList.add("d-none");
+            });
+            sendList.appendChild(friendItem);
         });
-
-        inviteButton.classList.add("d-none");
-
+    
+        this.getInvites().forEach(invite => {
+            const friendItem = setupFriendItem(invite, "Accept", () => {
+                console.log("Starting game");
+                const pongGame = document.querySelector("#pong-simulator");
+                pongGame.classList.remove("d-none");
+            });
+            receiveList.appendChild(friendItem);
+        });
+    
+        inviteBtn.classList.add("d-none");
     }
 }
 
