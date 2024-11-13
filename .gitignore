@@ -83,3 +83,6 @@ backend/app/migrations/
 
 #file uploads
 backend/media/
+
+#other
+test.sql
