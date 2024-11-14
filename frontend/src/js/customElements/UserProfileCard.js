@@ -16,16 +16,23 @@ class UserProfileCard extends HTMLElement {
                     border-radius: 50%;
                     object-fit: cover;
                     border: 1px solid #dee2e6;
+                    transition: opacity 0.3s;
                 }
                 .profile-info, .profile-stats {
                     margin-bottom: 1rem;
+                    transition: opacity 0.3s;
                 }
-				p {
-					margin: 0;
-				}
-				.profile-stats {
-					visibility: hidden;	
-				}
+                p {
+                    margin: 0;
+                }
+                .profile-stats {
+                    visibility: hidden;
+                    opacity: 0;
+                }
+                .profile-stats.visible {
+                    visibility: visible;
+                    opacity: 1;
+                }
             </style>
             <div class="profile-container">
                 <div id="profile-info" class="profile-info">
@@ -40,7 +47,7 @@ class UserProfileCard extends HTMLElement {
         `;
     }
 
-	set page(page) {
+    set page(page) {
         this._page = page;
     }
 
@@ -49,21 +56,31 @@ class UserProfileCard extends HTMLElement {
     }
 
     async updateProfile(user) {
-		if (!user) return;
+        if (!user) return;
 
-		const avatarEl = this.shadowRoot.getElementById("profile-avatar");
+        const avatarEl = this.shadowRoot.getElementById("profile-avatar");
         const usernameEl = this.shadowRoot.getElementById("profile-username");
         const winsEl = this.shadowRoot.getElementById("profile-wins");
         const lossesEl = this.shadowRoot.getElementById("profile-losses");
-		const profileStats = this.shadowRoot.getElementById("profile-stats");
+        const profileStats = this.shadowRoot.getElementById("profile-stats");
         const { auth } = this.page;
         const avatar_upload = await auth.loadAvatar(user.avatar_upload);
-		
-        avatarEl.src = avatar_upload || user.avatar || EMPTY_AVATAR_URL;
-        usernameEl.textContent = user.username;
-        winsEl.textContent = user.wins;
-        lossesEl.textContent = user.losses;
-		profileStats.style.visibility = "visible";
+
+        avatarEl.style.opacity = 0;
+        usernameEl.style.opacity = 0;
+        profileStats.style.opacity = 0;
+
+        setTimeout(() => {
+            avatarEl.src = avatar_upload || user.avatar || EMPTY_AVATAR_URL;
+            usernameEl.textContent = user.username;
+            winsEl.textContent = user.wins;
+            lossesEl.textContent = user.losses;
+            profileStats.classList.add("visible");
+
+            avatarEl.style.opacity = 1;
+            usernameEl.style.opacity = 1;
+            profileStats.style.opacity = 1;
+        }, 300);
     }
 }
 

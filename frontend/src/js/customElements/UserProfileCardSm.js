@@ -11,19 +11,31 @@ class UserProfileCardSm extends HTMLElement {
                     text-align: left;
                     margin-bottom: 0.5rem;
                     cursor: pointer;
+                    padding: 0.5rem;
+                    border-radius: 0.5rem;
+                    transition: background-color 0.3s, box-shadow 0.3s;
+                }
+                .profile-container:hover {
+                    background-color: #f8f9fa;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                 }
                 .profile-avatar {
                     border-radius: 50%;
                     object-fit: cover;
-                    border: 1px solid #dee2e6;
-                    margin-right: 0.5rem;
+                    border: 2px solid #dee2e6;
+                    margin-right: 0.75rem;
+                    transition: transform 0.3s;
+                }
+                .profile-container:hover .profile-avatar {
+                    transform: scale(1.1);
                 }
                 .profile-username {
                     font-size: 1rem;
                     font-weight: bold;
+                    color: #343a40;
                 }
                 .btn-warning {
-					margin-left: 10px;
+                    margin-left: 10px;
                     background-color: #ffc107;
                     border: none;
                     color: white;
@@ -31,6 +43,15 @@ class UserProfileCardSm extends HTMLElement {
                     text-align: center;
                     text-decoration: none;
                     border-radius: 0.25rem;
+                    transition: background-color 0.3s;
+                }
+                .btn-warning:hover {
+                    background-color: #e0a800;
+                }
+
+                .selected {
+                    background-color: #f8f9fa;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                 }
             </style>
             <div class="profile-container">
@@ -38,6 +59,7 @@ class UserProfileCardSm extends HTMLElement {
                 <span id="profile-username" class="profile-username"></span>
             </div>
         `;
+        this.shadowRoot.querySelector('.profile-container').addEventListener('click', () => this.updateSelected());
     }
 
     set page(page) {
@@ -46,6 +68,14 @@ class UserProfileCardSm extends HTMLElement {
 
     get page() {
         return this._page;
+    }
+
+    updateSelected() {
+        document.querySelectorAll("user-profile-small").forEach((profile) => {
+            profile.shadowRoot.querySelector(".profile-container").classList.remove("selected");
+        });
+        this.shadowRoot.querySelector(".profile-container").classList.add("selected");
+        console.log("selected", this);
     }
 
     async updateProfile(user) {
