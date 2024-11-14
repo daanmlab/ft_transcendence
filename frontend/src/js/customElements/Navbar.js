@@ -12,6 +12,7 @@ class Navbar extends HTMLElement {
                     align-items: center;
                     padding: 0.5rem 1rem;
                     background-color: #0d6efd;
+                    height: 40px;
                 }
                 .navbar a, .nav-link {
                     color: white;
@@ -50,12 +51,17 @@ class Navbar extends HTMLElement {
                 .username {
                     color: white;
                     font-weight: 500;
+                    width: 100px;
+                }
+
+                .login, .register {
+                    display: none;
                 }
             </style>
             <nav class="navbar">
-                <a class="navbar-brand" data-href="/">Home</a>
+                <a class="navbar-brand" data-href="/">PONG</a>
                 <div class="profile navbar-center" data-href="/profile">
-                <img src={EMPTY_AVATAR_URL} width="40" height="40" alt="Avatar" class="avatar" />
+                    <img src={EMPTY_AVATAR_URL} width="40" height="40" alt="Avatar" class="avatar" />
                     <span class="username"></span>
                 </div>
                 <ul class="navbar-nav">
@@ -98,11 +104,11 @@ class Navbar extends HTMLElement {
         
         if (auth.authenticated) {
             const avatar_upload = await auth.loadAvatar(auth.user.avatar_upload);
-            loginEl.style.display = "none";
-            registerEl.style.display = "none";
             profileEl.querySelector("img").src = avatar_upload || auth.user.avatar  || EMPTY_AVATAR_URL;
             profileEl.querySelector(".username").textContent = auth.user.username;
         } else {
+            loginEl.style.display = "block";
+            registerEl.style.display = "block";
             profileEl.style.display = "none";
             logoutEl.style.display = "none";
             settingsEl.style.display = "none";
