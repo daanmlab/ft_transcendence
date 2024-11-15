@@ -2,6 +2,7 @@ import logging
 
 from django.contrib.auth import get_user_model
 from django.core.signing import Signer, BadSignature
+from django.shortcuts import get_object_or_404
 
 from rest_framework.exceptions import APIException
 from rest_framework.views import APIView
@@ -61,16 +62,12 @@ class VerifyEmailView(APIView):
 class UserView(CreateAPIView, RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
 
-<<<<<<< Updated upstream
-    def get_object(self):
-=======
     def get_object(self): # permission check
         user_id = self.kwargs.get('pk')
         if user_id:
             obj = get_object_or_404(User, pk=user_id)
             self.check_object_permissions(self.request, obj)
             return obj
->>>>>>> Stashed changes
         return self.request.user
 
     def perform_create(self, serializer): # send verification email
