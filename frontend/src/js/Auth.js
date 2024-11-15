@@ -56,7 +56,7 @@ export class Auth {
         }
     
         try {
-            const response = await axios.post(`${API_URL}/token/refresh`, {
+            const response = await axios.post(`${API_URL}/token/refresh/`, {
                 refresh: refreshToken
             });
             const newAccessToken = response.data.access;
@@ -99,7 +99,7 @@ export class Auth {
         }
         try {
             const response = await axios.post(
-                `${API_URL}/register`,
+                `${API_URL}/register/`,
                 { username, email, password }
             );
             return response;
@@ -116,7 +116,7 @@ export class Auth {
         try {
             const otpToken = Cookies.get("otp_token");
             const response = await axios.post(
-                `${API_URL}/login`,
+                `${API_URL}/token/`,
                 {
                     email: email,
                     password: password,
@@ -144,6 +144,37 @@ export class Auth {
             } else {
                 console.error("Axios configuration error:", error.message);
             }
+            throw error;
+        }
+    }
+
+    // two-factor-auth one-time password
+    async verifyOtp(otp) {
+        if (!otp) {
+            throw new Error("Please enter your one-time password");
+        }
+        try {
+            const response = await axios.post(
+                `${API_URL}/verify-otp`,
+                {
+                    otp: otp,
+                    otp_token: Cookies.get("otp_token"),
+                }
+            );
+            if (response.data.success) {
+                console.log("Login successful");
+                Cookies.set("access_token", response.data.access);
+                Cookies.set("refresh_token", response.data.refresh);
+                Cookies.remove("otp_token");
+                this.app.navigate("/home");
+                return response;
+            } else {
+                throw new Error("An error occurred");
+            }
+        } catch (error) {
+            console.error(
+                `OTP error\n${error.response.data.error}\n${error.message}`
+            );
             throw error;
         }
     }
@@ -193,35 +224,7 @@ export class Auth {
         }
     }
 
-    async verifyOtp(otp) {
-        if (!otp) {
-            throw new Error("Please enter your one-time password");
-        }
-        try {
-            const response = await axios.post(
-                `${API_URL}/verify-otp`,
-                {
-                    otp: otp,
-                    otp_token: Cookies.get("otp_token"),
-                }
-            );
-            if (response.data.success) {
-                console.log("Login successful");
-                Cookies.set("access_token", response.data.access);
-                Cookies.set("refresh_token", response.data.refresh);
-                Cookies.remove("otp_token");
-                this.app.navigate("/home");
-                return response;
-            } else {
-                throw new Error("An error occurred");
-            }
-        } catch (error) {
-            console.error(
-                `OTP error\n${error.response.data.error}\n${error.message}`
-            );
-            throw error;
-        }
-    }
+
     
     /* Fetches an array of avatar URLs */
     async fetchAvatarUrls(avatarPaths) {

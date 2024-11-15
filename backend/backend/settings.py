@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     'channels',
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
+    'silk'
 ]
 
 ASGI_APPLICATION = 'backend.asgi.application'
@@ -100,6 +101,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'silk.middleware.SilkyMiddleware',
+
 ]
 
 FRONTEND_URL = "http://localhost:8080"

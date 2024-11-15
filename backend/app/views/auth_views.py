@@ -34,7 +34,7 @@ class LoginView(TwoFactorAuthenticationMixin, GenericAPIView):
         if user.two_factor_method != 'none':
             return self.handle_two_factor_authentication(request, user)
         
-        return generate_jwt_response(user.id)
+        return generate_jwt_response(user.id, serializer.validated_data['refresh'], serializer.validated_data['access'])
 
 class RegisterView(CreateAPIView):
     permission_classes = [AllowAny]

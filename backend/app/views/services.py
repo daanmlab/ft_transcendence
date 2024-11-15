@@ -45,11 +45,14 @@ def send_verification_email(user):
         logger.error(f"Error while sending verification email to user ID {user.id}: {str(e)}")
         raise Exception('Error while sending verification email')
         
-def generate_jwt_response(user_id):
+def generate_jwt_response(user_id, refresh=None, access=None):
     user = User.objects.get(id=user_id)
-    refresh = RefreshToken.for_user(user)
+    if not refresh:
+        refresh = RefreshToken.for_user(user)
+    if not access:
+        access = refresh.access_token
     return Response({
         "success": True,
         "refresh": str(refresh),
-        "access": str(refresh.access_token)
+        "access": str(access)
     }, status=status.HTTP_200_OK)

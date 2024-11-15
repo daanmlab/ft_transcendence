@@ -11,3 +11,4 @@ requests
 pyotp
 djangorestframework-simplejwt
 pillow
+django-silk
