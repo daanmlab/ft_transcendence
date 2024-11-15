@@ -29,10 +29,8 @@ class LoginView(TwoFactorAuthenticationMixin, GenericAPIView):
         serializer.is_valid(raise_exception=True)
         
         user = serializer.validated_data['user']
-        
         if user.two_factor_method != 'none':
             return self.handle_two_factor_authentication(request, user)
-        
         return generate_jwt_response(user.id, serializer.validated_data['refresh'], serializer.validated_data['access'])
 
 class VerifyEmailView(APIView):
@@ -63,10 +61,19 @@ class VerifyEmailView(APIView):
 class UserView(CreateAPIView, RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
 
+<<<<<<< Updated upstream
     def get_object(self):
+=======
+    def get_object(self): # permission check
+        user_id = self.kwargs.get('pk')
+        if user_id:
+            obj = get_object_or_404(User, pk=user_id)
+            self.check_object_permissions(self.request, obj)
+            return obj
+>>>>>>> Stashed changes
         return self.request.user
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer): # send verification email
         user = serializer.save()
         logger.info(f"User with ID {user.id} registered successfully")
         try:
@@ -76,7 +83,7 @@ class UserView(CreateAPIView, RetrieveUpdateDestroyAPIView):
             logger.error(f"Verification email failed: {str(e)}")
             raise APIException(f"Failed to send verification email. User was not created.")
 
-    def get_permissions(self):
+    def get_permissions(self): # permission settings
         if self.request.method == 'POST':
             return [AllowAny()]
         return [IsAuthenticated()]

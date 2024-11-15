@@ -54,7 +54,6 @@ class CustomUser(AbstractUser):
     new_email_is_verified = models.BooleanField(default=False)
     avatar_oauth = models.URLField(blank=True, null=True)
     avatar_upload = models.ImageField(upload_to='avatars/', blank=True, null=True)
-    oauth_provider = models.CharField(max_length=50, blank=True, null=True)
     oauth_uid = models.CharField(max_length=255, blank=True, null=True)
     two_factor_method = models.CharField(max_length=5, choices=TWO_FACTOR_CHOICES, default='none')
     USERNAME_FIELD = 'email'

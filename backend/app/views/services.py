@@ -14,7 +14,6 @@ signer = Signer()
 
 def get_or_create_user_from_oauth(user_info):
     user, created = User.objects.get_or_create(
-        oauth_provider='42',
         oauth_uid=str(user_info['id']),
         defaults={
             'username': user_info['login'],

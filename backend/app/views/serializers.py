@@ -34,7 +34,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'avatar_oauth', 'avatar_upload','two_factor_method', 'new_email', 'new_password', 'date_joined']
+        fields = '__all__'
         read_only_fields = ['id', 'avatar_oauth', 'date_joined']
 
     def create(self, validated_data):
@@ -51,8 +51,8 @@ class UserSerializer(serializers.ModelSerializer):
             instance.set_password(new_password)
 
         if new_email:
+            instance.new_email = new_email
             try:
-                instance.new_email = new_email
                 send_verification_email(instance)
             except Exception as e:
                 logger.erwror(f"Verification email failed: {str(e)}")
