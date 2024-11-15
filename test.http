@@ -7,3 +7,16 @@ Content-Type: application/json
   	"password": "FACUFACU"
 }
 
+###
+
+GET  http://localhost:8000/api/user/2 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMxNjk2NzQwLCJpYXQiOjE3MzE2OTMxNDAsImp0aSI6ImM0MDI0MjFkNzE1MDRhYWI4MjMyMzA2NDEzMmM5OTI2IiwidXNlcl9pZCI6MX0.9D6iOA3CqNipAFPfsZYft2sY3kSWWSGSPUN2ehzSRxA
+
+###
+
+###
+
+DELETE  http://localhost:8000/api/user/2 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMxNjk2NzQwLCJpYXQiOjE3MzE2OTMxNDAsImp0aSI6ImM0MDI0MjFkNzE1MDRhYWI4MjMyMzA2NDEzMmM5OTI2IiwidXNlcl9pZCI6MX0.9D6iOA3CqNipAFPfsZYft2sY3kSWWSGSPUN2ehzSRxA
+
+###

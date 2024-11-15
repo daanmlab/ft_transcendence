@@ -2,11 +2,12 @@ import logging
 
 from django.contrib.auth import get_user_model
 from django.core.signing import Signer, BadSignature
+from django.shortcuts import get_object_or_404
 
 from rest_framework.exceptions import APIException
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, BasePermission
 from rest_framework.generics import GenericAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView
 from rest_framework import status
 
@@ -20,6 +21,10 @@ User = get_user_model()
 signer = Signer()
 logger = logging.getLogger(__name__)
 
+class IsOwnerOrReadOnly(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj == request.user
+    
 class LoginView(TwoFactorAuthenticationMixin, GenericAPIView):
     permission_classes = [AllowAny]
     serializer_class = LoginSerializer
@@ -43,14 +48,14 @@ class VerifyEmailView(APIView):
             user_id = signer.unsign(token)
             user: UserModel = User.objects.get(pk=user_id)
             
-            if user.new_email:
+            if user.new_email: # User is updating email
                 user.email = user.new_email
                 user.email_is_verified = True
                 user.new_email = None
                 user.new_email_is_verified = False
                 user.save()
                 return Response({'message': 'Email verified and updated successfully.'}, status=status.HTTP_200_OK)
-            elif not user.email_is_verified:
+            elif not user.email_is_verified: # User is verifying email for the first time
                 user.email_is_verified = True
                 user.save()
                 return Response({'message': 'Email verified successfully.'}, status=status.HTTP_200_OK)
@@ -59,11 +64,15 @@ class VerifyEmailView(APIView):
         except (BadSignature, User.DoesNotExist):
             return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
 
-
-class UserView(CreateAPIView, RetrieveUpdateDestroyAPIView):
+class UserDetailView(CreateAPIView, RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
 
     def get_object(self):
+        user_id = self.kwargs.get('pk')
+        if user_id:
+            obj = get_object_or_404(User, pk=user_id)
+            self.check_object_permissions(self.request, obj)
+            return obj
         return self.request.user
 
     def perform_create(self, serializer):
@@ -79,4 +88,6 @@ class UserView(CreateAPIView, RetrieveUpdateDestroyAPIView):
     def get_permissions(self):
         if self.request.method == 'POST':
             return [AllowAny()]
-        return [IsAuthenticated()]
+        if self.request.method == 'GET' and 'pk' in self.kwargs:
+            return [IsAuthenticated()]
+        return [IsAuthenticated(), IsOwnerOrReadOnly()]

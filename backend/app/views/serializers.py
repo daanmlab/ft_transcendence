@@ -55,7 +55,7 @@ class UserSerializer(serializers.ModelSerializer):
                 instance.new_email = new_email
                 send_verification_email(instance)
             except Exception as e:
-                logger.erwror(f"Verification email failed: {str(e)}")
+                logger.error(f"Verification email failed: {str(e)}")
                 raise APIException("Failed to send verification email. User was not updated.")
 
         return super().update(instance, validated_data)
