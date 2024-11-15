@@ -3,7 +3,7 @@ function getFriends() { // get dummy users
         {
             username: "user1",
             avatar_upload: "",
-            avatar: "",
+            avatar_oauth: "",
             wins: 20,
             losses: 5,
             date_joined: new Date("2021-02-01").toLocaleDateString('en-GB'),
@@ -11,7 +11,7 @@ function getFriends() { // get dummy users
         {
             username: "user2",
             avatar_upload: "avatar_upload2",
-            avatar: "",
+            avatar_oauth: "",
             wins: 1,
             losses: 1,
             date_joined: new Date("2021-02-01").toLocaleDateString('en-GB'),
@@ -19,7 +19,7 @@ function getFriends() { // get dummy users
         {
             username: "user3",
             avatar_upload: "avatar_upload3",
-            avatar: "",
+            avatar_oauth: "",
             wins: 0,
             losses: 0,
             date_joined: new Date("2021-03-01").toLocaleDateString('en-GB'),
@@ -32,7 +32,7 @@ function getInvites() { // get dummy invites
         {
             username: "user4",
             avatar_upload: "",
-            avatar: "",
+            avatar_oauth: "",
             wins: 0,
             losses: 0,
             date_joined: new Date("2021-03-01").toLocaleDateString('en-GB'),

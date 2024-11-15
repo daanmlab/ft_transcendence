@@ -19,13 +19,13 @@ def get_or_create_user_from_oauth(user_info):
         defaults={
             'username': user_info['login'],
             'email': user_info['email'],
-            'avatar': user_info['image']['versions']['medium'],
+            'avatar_oauth': user_info['image']['versions']['medium'],
             'email_is_verified': True,
         }
     )
     
     if not created:
-        user.avatar = user_info['image']['versions']['medium']
+        user.avatar_oauth = user_info['image']['versions']['medium']
         user.save()
     
     return RefreshToken.for_user(user)
@@ -38,7 +38,7 @@ def send_verification_email(user):
             'Verify your email',
             f'Click the link to verify your email: {verification_url}',
             settings.DEFAULT_FROM_EMAIL,
-            [user.email_pending or user.email],
+            [user.new_email or user.email],
         )
         logger.info(f"Verification email sent to user ID {user.id}")
     except Exception as e:

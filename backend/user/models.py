@@ -10,7 +10,11 @@ class CustomUserManager(BaseUserManager):
             raise ValueError(_('The Email field must be set'))
         if not username:
             raise ValueError(_('The Username field must be set'))
+
         email = self.normalize_email(email)
+        if self.model.objects.filter(email=email).exists():
+            raise ValueError(_('A user with this email already exists.'))
+
         user = self.model(email=email, username=username, **extra_fields)
         user.set_password(password)
         user.save()
@@ -46,9 +50,9 @@ class CustomUser(AbstractUser):
     )
     email = models.EmailField(_('email address'), max_length=255, unique=True)
     email_is_verified = models.BooleanField(default=False)
-    email_pending = models.EmailField(_('pending email address'), max_length=255, blank=True, null=True)
-    email_pending_is_verified = models.BooleanField(default=False)
-    avatar = models.URLField(blank=True, null=True)
+    new_email = models.EmailField(_('pending email address'), max_length=255, blank=True, null=True)
+    new_email_is_verified = models.BooleanField(default=False)
+    avatar_oauth = models.URLField(blank=True, null=True)
     avatar_upload = models.ImageField(upload_to='avatars/', blank=True, null=True)
     oauth_provider = models.CharField(max_length=50, blank=True, null=True)
     oauth_uid = models.CharField(max_length=255, blank=True, null=True)

@@ -27,7 +27,7 @@ class UserSettingsPage extends Page {
     setupEventListeners() {
         const elements = [
             { button: "#change-username button", input: "#new-username", field: "username", message: "Username successfully changed." },
-            { button: "#change-email button", input: "#new-email", field: "email", message: "Email successfully changed. Please verify your new email address." },
+            { button: "#change-email button", input: "#new-email", field: "new_email", message: "Email successfully changed. Please verify your new email address." },
             { button: "#change-password button", input: "#new-password", field: "new_password", message: "Password successfully changed.", confirmInput: "#confirm-password" },
             { button: "#change-avatar button", input: "#new-avatar", field: "avatar", message: "Avatar successfully updated." },
         ];
