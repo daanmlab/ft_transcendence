@@ -6,23 +6,21 @@ from django.core.validators import validate_email, FileExtensionValidator
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError, APIException, AuthenticationFailed
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .services import send_verification_email
 import os
 
 User = get_user_model()
 
-class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
-
-    def validate(self, data):
-        user = authenticate(email=data['email'], password=data['password'])
-        if user and user.is_active:
-            if not user.email_is_verified:
-                raise serializers.ValidationError("Email is not verified")
-            data['user'] = user
-            return data
-        raise AuthenticationFailed("Incorrect Credentials")
+class LoginSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        
+        if not self.user.email_is_verified:
+            raise serializers.ValidationError("Email is not verified.")
+        
+        data['user'] = self.user
+        return data
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])    

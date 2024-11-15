@@ -40,7 +40,7 @@ class TwoFactorAuthenticationMixin:
 
     def validate_existing_token(self, otp_token, user):
         decoded_token = OTPToken(otp_token)
-        decoded_token.validate_user(user.id)  # Moved logic
+        decoded_token.validate_user(user.id)
         return decoded_token.payload
 
     def create_new_otp_token(self, user):

@@ -21,14 +21,14 @@ class CustomForm extends HTMLElement {
                     color: red;
                     text-align: center;
                     position: absolute;
-                    bottom: -3.5rem;
+                    bottom: -8.5rem;
                     width: 100%;
                 }
                 .success {
                     color: green;
                     text-align: center;
                     position: absolute;
-                    bottom: -3rem;
+                    bottom: -8.5rem;
                     width: 100%;
                 }
                 .spinner-border {
