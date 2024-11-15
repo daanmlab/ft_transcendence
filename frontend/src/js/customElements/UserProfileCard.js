@@ -71,7 +71,7 @@ class UserProfileCard extends HTMLElement {
         profileStats.style.opacity = 0;
 
         setTimeout(() => {
-            avatarEl.src = avatar_upload || user.avatar || EMPTY_AVATAR_URL;
+            avatarEl.src = avatar_upload || user.avatar_oauth || EMPTY_AVATAR_URL;
             usernameEl.textContent = user.username;
             winsEl.textContent = user.wins;
             lossesEl.textContent = user.losses;

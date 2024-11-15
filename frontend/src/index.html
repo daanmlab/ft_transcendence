@@ -66,18 +66,13 @@
               </div>
             </div>
           </div>
-
-        <div class="vh-100 d-flex justify-content-center align-items-center">
-            <div class="bg-body-tertiary p-5">
-
-            </div>
         </div>
     </section>
 
     <section id="Register">
         <div class="vh-100 d-flex justify-content-center align-items-center">
             <div class="bg-body-tertiary p-5">
-                <main class="form-signin w-100 m-auto">
+                <main id="register-form-container" class="form-signin w-100 m-auto">
                     <custom-form>
                         <h1 class="h3 mb-3 fw-normal">Let's get you registered :)</h1>
                         <div class="form-floating mb-3">
@@ -97,12 +92,12 @@
                                 placeholder="Password" />
                             <label for="ConfirmPassword">Confirm Password</label>
                         </div>
-
                         <button class="btn btn-primary w-100 py-2" type="submit">
                             Sign in
                         </button>
                         <a class="d-inline-block text-center w-100 mt-3" data-href="/login">already with us?</a>
-                        </form>
+                    </custom-form>
+                    <p id="login-success" class="text-success"></p>
                 </main>
             </div>
         </div>

@@ -104,7 +104,7 @@ class Navbar extends HTMLElement {
         
         if (auth.authenticated) {
             const avatar_upload = await auth.loadAvatar(auth.user.avatar_upload);
-            profileEl.querySelector("img").src = avatar_upload || auth.user.avatar  || EMPTY_AVATAR_URL;
+            profileEl.querySelector("img").src = avatar_upload || auth.user.avatar_oauth  || EMPTY_AVATAR_URL;
             profileEl.querySelector(".username").textContent = auth.user.username;
         } else {
             loginEl.style.display = "block";

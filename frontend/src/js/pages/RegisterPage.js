@@ -23,12 +23,10 @@ class RegisterPage extends Page {
                     formData.password,
                     formData.confirmpassword
                 );
-                form.showFormSuccess("User registered successfully. Please verify your email.");
-                Array.from(form.children).forEach(child => {
-                    if (!child.classList.contains('success')) {
-                        child.style.display = 'none';
-                    }
-                });
+                const successMessage = "User registered successfully. Please verify your email.";
+                form.showFormSuccess(successMessage);
+                this.mainElement.querySelector("#login-success").textContent = successMessage;
+                form.style.display = "none";
             } catch (error) {
                 let errorMessage = "An unknown error occurred";
                 if (error.response && error.response.data) {

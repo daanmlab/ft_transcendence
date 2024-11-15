@@ -99,7 +99,7 @@ export class Auth {
         }
         try {
             const response = await axios.post(
-                `${API_URL}/register/`,
+                `${API_URL}/user`,
                 { username, email, password }
             );
             return response;

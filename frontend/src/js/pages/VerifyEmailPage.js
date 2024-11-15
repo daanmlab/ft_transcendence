@@ -28,7 +28,7 @@ class VerifyEmailPage extends Page {
         }
 
         try {
-            const response = await fetch(`${API_URL}/api/verify-email/${token}/`, {
+            const response = await fetch(`${API_URL}/verify-email/${token}/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

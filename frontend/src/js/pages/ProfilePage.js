@@ -15,7 +15,7 @@ class ProfilePage extends Page {
         return {
             username: this.auth.user.username,
             avatar_upload: this.auth.user.avatar_upload,
-            avatar: this.auth.user.avatar,
+            avatar_oauth: this.auth.user.avatar_oauth,
             wins: 0,
             losses: 0,
             date_joined: new Date(this.auth.user.date_joined).toLocaleDateString('en-GB'),

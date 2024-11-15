@@ -86,7 +86,7 @@ class UserProfileCardSm extends HTMLElement {
         const { auth } = this.page;
         const avatar_upload = await auth.loadAvatar(user.avatar_upload);
 
-        avatarEl.src = avatar_upload || user.avatar || EMPTY_AVATAR_URL;
+        avatarEl.src = avatar_upload || user.avatar_oauth || EMPTY_AVATAR_URL;
         usernameEl.textContent = user.username;
     }
 
