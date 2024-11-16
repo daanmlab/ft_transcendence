@@ -12,7 +12,7 @@ class CustomUserManager(BaseUserManager):
             raise ValueError(_('The Username field must be set'))
 
         email = self.normalize_email(email)
-        if self.model.objects.filter(email=email).exists():
+        if self.model.objects.filter(email=email, email_is_verified=True).exists():
             raise ValueError(_('A user with this email already exists.'))
 
         user = self.model(email=email, username=username, **extra_fields)
