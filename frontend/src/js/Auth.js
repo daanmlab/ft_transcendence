@@ -94,9 +94,6 @@ export class Auth {
         if (password !== password_confirmation) {
             throw new Error("Passwords do not match");
         }
-        if (email.indexOf("@") === -1) {
-            throw new Error("Invalid email address");
-        }
         try {
             const response = await axios.post(
                 `${API_URL}/user`,

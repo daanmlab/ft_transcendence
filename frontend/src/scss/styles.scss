@@ -20,6 +20,10 @@ html {
 
 #main {
     padding: 3rem;
+
+    @media (min-width: 1200px) {
+        padding: 3rem 10rem;
+    }
 }
 
 .card {
@@ -27,6 +31,7 @@ html {
     overflow: hidden;
     transition: transform 0.3s, box-shadow 0.3s;
     height: 270px;
+    max-width: 400px;
 }
 
 .card:hover {

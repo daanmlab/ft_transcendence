@@ -62,7 +62,7 @@ class VerifyEmailView(APIView):
 class UserView(CreateAPIView, RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
 
-    def get_object(self): # permission check
+    def get_object(self): # check permissions
         user_id = self.kwargs.get('pk')
         if user_id:
             obj = get_object_or_404(User, pk=user_id)
@@ -73,14 +73,23 @@ class UserView(CreateAPIView, RetrieveUpdateDestroyAPIView):
     def perform_create(self, serializer): # send verification email
         user = serializer.save()
         logger.info(f"User with ID {user.id} registered successfully")
-        try:
-            send_verification_email(user)
-        except Exception as e:
-            user.delete()
-            logger.error(f"Verification email failed: {str(e)}")
-            raise APIException(f"Failed to send verification email. User was not created.")
+        self._handle_verification_email(user, is_creation=True)
 
-    def get_permissions(self): # permission settings
+    def perform_update(self, serializer): # send verification email
+        user = serializer.save()
+        if serializer.validated_data.get('new_email'):
+            self._handle_verification_email(user)
+
+    def get_permissions(self): # set permissions
         if self.request.method == 'POST':
             return [AllowAny()]
         return [IsAuthenticated()]
+    
+    def _handle_verification_email(self, user, is_creation=False):
+        try:
+            send_verification_email(user)
+        except Exception as e:
+            logger.error(f"Verification email failed: {str(e)}")
+            if is_creation:
+                user.delete()
+            raise APIException(f"Failed to send verification email. User was not {('created' if is_creation else 'updated')}.")
