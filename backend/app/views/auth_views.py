@@ -34,10 +34,8 @@ class LoginView(TwoFactorAuthenticationMixin, GenericAPIView):
         serializer.is_valid(raise_exception=True)
         
         user = serializer.validated_data['user']
-        
         if user.two_factor_method != 'none':
             return self.handle_two_factor_authentication(request, user)
-        
         return generate_jwt_response(user.id, serializer.validated_data['refresh'], serializer.validated_data['access'])
 
 class VerifyEmailView(APIView):
@@ -67,7 +65,7 @@ class VerifyEmailView(APIView):
 class UserDetailView(CreateAPIView, RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
 
-    def get_object(self):
+    def get_object(self): # check permissions
         user_id = self.kwargs.get('pk')
         if user_id:
             obj = get_object_or_404(User, pk=user_id)
@@ -75,17 +73,26 @@ class UserDetailView(CreateAPIView, RetrieveUpdateDestroyAPIView):
             return obj
         return self.request.user
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer): # send verification email
         user = serializer.save()
         logger.info(f"User with ID {user.id} registered successfully")
+        self._handle_verification_email(user, is_creation=True)
+
+    def perform_update(self, serializer): # send verification email
+        user = serializer.save()
+        if serializer.validated_data.get('new_email'):
+            self._handle_verification_email(user)
+
+    def _handle_verification_email(self, user, is_creation=False):
         try:
             send_verification_email(user)
         except Exception as e:
-            user.delete()
             logger.error(f"Verification email failed: {str(e)}")
-            raise APIException(f"Failed to send verification email. User was not created.")
+            if is_creation:
+                user.delete()
+            raise APIException(f"Failed to send verification email. User was not {('created' if is_creation else 'updated')}.")
 
-    def get_permissions(self):
+    def get_permissions(self):  # set permissions
         if self.request.method == 'POST':
             return [AllowAny()]
         if self.request.method == 'GET' and 'pk' in self.kwargs:

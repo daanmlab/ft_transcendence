@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.base_user import BaseUserManager
-from django.core.validators import RegexValidator, MinLengthValidator
+from django.core.validators import RegexValidator, MinLengthValidator, EmailValidator, FileExtensionValidator
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password, **extra_fields):
@@ -48,14 +48,28 @@ class CustomUser(AbstractUser):
             )
         ]
     )
-    email = models.EmailField(_('email address'), max_length=255, unique=True)
+    email = models.EmailField(
+        _('email address'), 
+        max_length=255, 
+        unique=True, 
+        validators=[EmailValidator]
+    )
     email_is_verified = models.BooleanField(default=False)
-    new_email = models.EmailField(_('pending email address'), max_length=255, blank=True, null=True)
+    new_email = models.EmailField(
+        _('pending email address'), 
+        max_length=255, 
+        blank=True, 
+        null=True, 
+        validators=[EmailValidator]
+    )
     new_email_is_verified = models.BooleanField(default=False)
     avatar_oauth = models.URLField(blank=True, null=True)
-    avatar_upload = models.ImageField(upload_to='avatars/', blank=True, null=True)
-    oauth_provider = models.CharField(max_length=50, blank=True, null=True)
-    oauth_uid = models.CharField(max_length=255, blank=True, null=True)
+    avatar_upload = models.ImageField(
+        upload_to='avatars/', 
+        blank=True, 
+        null=True, 
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif'])]
+    )
     two_factor_method = models.CharField(max_length=5, choices=TWO_FACTOR_CHOICES, default='none')
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']

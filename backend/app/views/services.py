@@ -14,7 +14,6 @@ signer = Signer()
 
 def get_or_create_user_from_oauth(user_info):
     user, created = User.objects.get_or_create(
-        oauth_provider='42',
         oauth_uid=str(user_info['id']),
         defaults={
             'username': user_info['login'],
@@ -31,19 +30,14 @@ def get_or_create_user_from_oauth(user_info):
     return RefreshToken.for_user(user)
 
 def send_verification_email(user):
-    try:
-        token = signer.sign(user.pk)
-        verification_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
-        send_mail(
-            'Verify your email',
-            f'Click the link to verify your email: {verification_url}',
-            settings.DEFAULT_FROM_EMAIL,
-            [user.new_email or user.email],
-        )
-        logger.info(f"Verification email sent to user ID {user.id}")
-    except Exception as e:
-        logger.error(f"Error while sending verification email to user ID {user.id}: {str(e)}")
-        raise Exception('Error while sending verification email')
+    verification_url = f"{settings.FRONTEND_URL}/verify-email?token={signer.sign(user.pk)}"
+    send_mail(
+        'Verify your email',
+        f'Click the link to verify your email: {verification_url}',
+        settings.DEFAULT_FROM_EMAIL,
+        [user.new_email or user.email],
+    )
+    logger.info(f"Verification email sent to user ID {user.id}")
         
 def generate_jwt_response(user_id, refresh=None, access=None):
     user = User.objects.get(id=user_id)
