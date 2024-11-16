@@ -4,32 +4,41 @@ import logging
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.conf import settings
-from django.core.validators import validate_email, FileExtensionValidator
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError, APIException, AuthenticationFailed
+from rest_framework.exceptions import ValidationError, APIException
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .services import send_verification_email
+from user.models import GameStats
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
+
+class EmailNotVerifiedException(APIException):
+    status_code = 401
+    default_detail = "Email is not verified."
+    default_code = "email_not_verified"
 
 class LoginSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
         if not self.user.email_is_verified:
-            raise serializers.ValidationError("Email is not verified.")
-        
+            raise EmailNotVerifiedException()
         data['user'] = self.user
         return data
+
+class GameStatsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GameStats
+        fields = ['total_matches', 'wins', 'losses']
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])
     new_password = serializers.CharField(write_only=True, required=False, validators=[validate_password])
+    game_stats = GameStatsSerializer()
 
     class Meta:
         model = User
-        fields = '__all__'
-        read_only_fields = ['id', 'avatar_oauth', 'date_joined']
+        fields = ['id', 'username', 'email', 'password', 'avatar_oauth', 'avatar_upload','two_factor_method', 'new_email', 'new_password', 'date_joined', 'game_stats']
+        read_only_fields = ['id', 'avatar_oauth', 'date_joined', 'game_stats']
 
     def update(self, instance, validated_data):
         new_password = validated_data.pop('new_password', None)
