@@ -11,13 +11,13 @@ class ProfilePage extends Page {
             app: app,
         });
     }
-    getUser() { // get dummy user
+    getAuthUser() {
         return {
             username: this.auth.user.username,
             avatar_upload: this.auth.user.avatar_upload,
             avatar_oauth: this.auth.user.avatar_oauth,
-            wins: 0,
-            losses: 0,
+            wins: this.auth.user.game_stats.wins,
+            losses: this.auth.user.game_stats.losses,
             date_joined: new Date(this.auth.user.date_joined).toLocaleDateString('en-GB'),
             matchHistory: [
                 { opponent: "opponent1", result: "win", date: "2021-01-10" },
@@ -29,7 +29,7 @@ class ProfilePage extends Page {
 
     async render(app) {
         const { auth } = this;
-        const user = this.getUser();
+        const user = this.getAuthUser();
         console.log("user info", auth.user);
 
         const UserProfileCard = this.mainElement.querySelector("user-profile");

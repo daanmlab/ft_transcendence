@@ -11,10 +11,6 @@ class CustomUserManager(BaseUserManager):
         if not username:
             raise ValueError(_('The Username field must be set'))
 
-        email = self.normalize_email(email)
-        if self.model.objects.filter(email=email, email_is_verified=True).exists():
-            raise ValueError(_('A user with this email already exists.'))
-
         user = self.model(email=email, username=username, **extra_fields)
         user.set_password(password)
         user.save()
@@ -54,7 +50,7 @@ class CustomUser(AbstractUser):
         unique=True, 
         validators=[EmailValidator]
     )
-    email_is_verified = models.BooleanField(default=False)
+    email_is_verified = models.BooleanField(default=True)
     new_email = models.EmailField(
         _('pending email address'), 
         max_length=255, 
@@ -83,3 +79,17 @@ class CustomUser(AbstractUser):
         if self.email_is_verified:
             self.email = self.email.lower()
         super().save(*args, **kwargs)
+
+class GameStats(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    user = models.OneToOneField(
+        CustomUser, 
+        on_delete=models.CASCADE, 
+        related_name='game_stats'
+    )
+    total_matches = models.PositiveIntegerField(default=0)
+    wins = models.PositiveIntegerField(default=0)
+    losses = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"GameStats for {self.user.username}"
