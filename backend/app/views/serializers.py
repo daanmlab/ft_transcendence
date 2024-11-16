@@ -33,10 +33,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         new_password = validated_data.pop('new_password', None)
-
         if new_password:
             instance.set_password(new_password)
-
         return super().update(instance, validated_data)
 
     def validate_new_email(self, value):
