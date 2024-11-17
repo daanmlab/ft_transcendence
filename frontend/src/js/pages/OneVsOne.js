@@ -17,7 +17,7 @@ class OneVsOne extends Page {
     render(app) {
         const { getFriends, getInvites } = require('../dummyData.js');
 
-        const { auth } = this;
+        const { auth } = this.app;
         console.log("user info", auth.user);
     
         const sendList = document.querySelector("#send-list");
@@ -30,12 +30,12 @@ class OneVsOne extends Page {
         const setupFriendItem = (friend, actionText, actionCallback) => {
             const friendItem = document.createElement("user-profile-small");
             friendItem.page = this;
-            friendItem.updateProfile(friend);
+            friendItem.setUser(friend);
             friendItem.addEventListener("click", () => {
                 inviteBtn.classList.remove("d-none");
                 inviteBtn.textContent = actionText;
                 inviteBtn.onclick = actionCallback;
-                selectedFriend.updateProfile(friend);
+                selectedFriend.setUser(friend);
             });
             return friendItem;
         };

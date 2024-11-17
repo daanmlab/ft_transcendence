@@ -13,18 +13,17 @@ class TwoFactorAuthPage extends Page {
 
 	async render(app) {
 		require("../customElements/CustomForm.js");
-
-		if (this.auth.authenticated){ return this.app.navigate("/home") }
-		if (!this.auth.checkOtpToken()) return;
+		const { auth } = this.app;
+		if (auth.authenticated){ return this.app.navigate("/home") }
+		if (!auth.checkOtpToken()) return;
 
 		const form = this.mainElement.querySelector("custom-form");
 		form.submitForm = async (formData) => {
 			try {
-				const response = await this.auth.verifyOtp(
+				const response = await auth.verifyOtp(
 					formData.otp,
 				);
 				this.app.navigate("/home");
-				return response;
 			} catch (error) {
 				if (error.response) {
 					if (error.response.status === 400 || error.response.status === 410) {

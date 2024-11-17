@@ -15,10 +15,13 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 from app.views.two_factor_auth_views import VerifyOTPView
 
+from app.views.user_views import UserListView
+
 urlpatterns = [
     path('token/', LoginView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('user', UserDetailView.as_view(), name='user-detail'),
+	path('users/', UserListView.as_view(), name='user-list'),
 	path('user/<int:pk>', UserDetailView.as_view(), name='user-detail-pk'),
     path('verify-email/<str:token>/', VerifyEmailView.as_view(), name='verify-email'),
     path('oauth/42', OAuth42View.as_view(), name='oauth_42'),

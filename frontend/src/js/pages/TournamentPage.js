@@ -22,7 +22,7 @@ class TournamentPage extends Page {
     }
 
     render(app) {
-        const { auth } = this;
+        const { auth } = this.app;
         const userInfo = auth.user;
         console.log(userInfo);
     

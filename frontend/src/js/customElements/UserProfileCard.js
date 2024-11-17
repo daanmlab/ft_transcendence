@@ -55,7 +55,7 @@ class UserProfileCard extends HTMLElement {
         return this._page;
     }
 
-    async updateProfile(user) {
+    async setUser(user) {
         if (!user) return;
 
         const avatarEl = this.shadowRoot.getElementById("profile-avatar");
@@ -63,8 +63,8 @@ class UserProfileCard extends HTMLElement {
         const winsEl = this.shadowRoot.getElementById("profile-wins");
         const lossesEl = this.shadowRoot.getElementById("profile-losses");
         const profileStats = this.shadowRoot.getElementById("profile-stats");
-        const { auth } = this.page;
-        const avatar_upload = await auth.loadAvatar(user.avatar_upload);
+        const { api } = this.page.app;
+        const avatar_upload = user.avatar_upload ? await api.fetchAvatarObjectUrl(user.avatar_upload): null;
 
         avatarEl.style.opacity = 0;
         usernameEl.style.opacity = 0;
@@ -73,8 +73,8 @@ class UserProfileCard extends HTMLElement {
         setTimeout(() => {
             avatarEl.src = avatar_upload || user.avatar_oauth || EMPTY_AVATAR_URL;
             usernameEl.textContent = user.username;
-            winsEl.textContent = user.wins;
-            lossesEl.textContent = user.losses;
+            winsEl.textContent = user.game_stats.wins;
+            lossesEl.textContent = user.game_stats.losses;
             profileStats.classList.add("visible");
 
             avatarEl.style.opacity = 1;

@@ -14,13 +14,13 @@ class LoginPage extends Page {
 
     async render(app) {
         require("../customElements/CustomForm.js");
-
-        if (this.auth.authenticated) { return this.app.navigate("/home") }
+        const { auth } = this.app;
+        if (auth.authenticated) { return this.app.navigate("/home") }
 
         const form = this.mainElement.querySelector("custom-form");
         form.submitForm = async (formData) => {
             try {
-                const response = await this.auth.login(
+                const response = await auth.login(
                     formData.email,
                     formData.password
                 );
@@ -43,7 +43,7 @@ class LoginPage extends Page {
 
         const oAuthButton = this.mainElement.querySelector("#oauth");
         oAuthButton.addEventListener("click", () => {
-            this.auth.oAuthLogin().catch((error) => {
+            auth.oAuthLogin().catch((error) => {
                 form.showFormError(error.message);
             });
         });

@@ -1,7 +1,6 @@
 import Page from "./Page";
-import axios from "axios";
 import { Modal } from 'bootstrap';
-import { API_URL } from "../constants.js";
+import { capitalizeFirstLetter } from "../utils";
 
 class UserSettingsPage extends Page {
     constructor(app) {
@@ -13,14 +12,14 @@ class UserSettingsPage extends Page {
             app: app,
         });
     }
-
+    
     render(app) {
         this.setupEventListeners();
         this.setInitial2FASelection();
     }
 
     setInitial2FASelection() {
-        const twoFactorElement = document.getElementById(`2fa-${this.auth.user.two_factor_method}`);
+        const twoFactorElement = document.getElementById(`2fa-${this.app.auth.user.two_factor_method}`);
         if (twoFactorElement) twoFactorElement.checked = true;
     }
 
@@ -54,8 +53,14 @@ class UserSettingsPage extends Page {
     }
 
     deleteAccount() {
-        this.sendRequest(null, "Account successfully deleted.");
-        Modal.getInstance(document.getElementById('deleteAccountModal')).hide();
+        this.app.api.deleteUser()
+            .then(() => {
+                this.showMessage("Account successfully deleted.", "success");
+                Modal.getInstance(document.getElementById('deleteAccountModal')).hide();
+            })
+            .catch(error => {
+                this.showMessage("An error occurred while deleting the account.", "error");
+            });
     }
 
     handleChange(field, newValue, successMessage, confirmPasswordValue = null) {
@@ -70,28 +75,22 @@ class UserSettingsPage extends Page {
                 this.showMessage("Please select an image to upload.", "error");
                 return;
             }
-            const formData = new FormData();
-            formData.append("avatar_upload", fileInput.files[0]);
-            this.sendAvatarRequest(formData, successMessage);
+            const file = fileInput.files[0];
+            this.app.api.uploadAvatar(file)
+                .then(() => {
+                    this.showMessage(successMessage, "success");
+                    setTimeout(() => this.app.navigate(this.url), 5000);
+                })
+                .catch(error => {
+                    this.showMessage("An error occurred while updating the avatar.", "error");
+                });
             return;
         }
-        if (!newValue || newValue === this.auth.user[field]) {
+        if (!newValue || newValue === this.app.auth.user[field]) {
             this.showMessage(`Enter a valid ${field.replace('_', ' ')}.`, "error");
             return;
         }
-        this.sendRequest({ [field]: newValue }, successMessage);
-    }
-
-    sendRequest(data, successMessage) {
-        axios({
-            method: data ? 'patch' : 'delete',
-            url: `${API_URL}/user`,
-            data: data || {},
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${this.auth.token}`,
-            }
-        })
+        this.app.api.updateUser({ [field]: newValue })
             .then(() => {
                 this.showMessage(successMessage, "success");
                 setTimeout(() => this.app.navigate(this.url), 5000);
@@ -100,41 +99,12 @@ class UserSettingsPage extends Page {
                 const errors = error.response.data;
                 for (const key in errors) {
                     if (errors[key]) {
-                        this.showMessage(this.capitalizeFirstLetter(errors[key][0]), "error");
+                        this.showMessage(capitalizeFirstLetter(errors[key][0]), "error");
                         return;
                     }
                 }
                 this.showMessage("An error occurred while updating the settings.", "error");
             });
-    }
-
-    sendAvatarRequest(formData, successMessage) {
-        axios({
-            method: 'patch',
-            url: `${API_URL}/user`,
-            data: formData,
-            headers: {
-                "Authorization": `Bearer ${this.auth.token}`,
-            }
-        })
-            .then(() => {
-                this.showMessage(successMessage, "success");
-                setTimeout(() => this.app.navigate(this.url), 5000);
-            })
-            .catch(error => {
-                const errors = error.response.data;
-                for (const key in errors) {
-                    if (errors[key]) {
-                        this.showMessage(this.capitalizeFirstLetter(errors[key][0]), "error");
-                        return;
-                    }
-                }
-                this.showMessage("An error occurred while updating the settings.", "error");
-            });
-    }
-
-    capitalizeFirstLetter(message) {
-        return message.charAt(0).toUpperCase() + message.slice(1);
     }
 
     showMessage(message, type) {
@@ -150,7 +120,7 @@ class UserSettingsPage extends Page {
         setTimeout(() => {
             messageContainer.classList.remove("show");
             setTimeout(() => messageContainer.remove(), 150);
-        }, 5000);
+        }, 3000);
     }
 }
 

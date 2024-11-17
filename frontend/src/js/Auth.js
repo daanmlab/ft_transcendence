@@ -1,67 +1,49 @@
 import Cookies from "js-cookie";
-import axios from "axios";
-import { API_URL, MEDIA_URL } from "./constants.js";
+import { API_URL } from "./constants.js"; // TODO: handle oauth in Api.js
 
 export class Auth {
-    constructor(isCurrentPageProtected, app) {
-        this.isCurrentPageProtected = isCurrentPageProtected;
+    constructor(app) {
+        this.app = app;
         this.user = null;
         this.authenticated = false;
-        this.app = app;
-        this.token = Cookies.get("token");
+        this.accessToken = Cookies.get("access_token");
         this.oauthPopup = null;
     }
 
     async authenticate() {
-        this.token = Cookies.get("access_token");
-        if (this.token) {
+        if (this.accessToken) {
             try {
-                const response = await axios.get(
-                    `${API_URL}/user`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${this.token}`,
-                        },
-                    }
-                );
-                Cookies.set("access_token", this.token);
-                this.user = response.data;
+                const response = await this.app.api.getUser();
+                this.user = response;
                 this.authenticated = true;
                 return true;
             } catch (error) {
-                if (error.response && error.response.status === 401) {
-                    console.log("Access token expired, attempting to refresh");
-                    const refreshed = await this.refreshAccessToken();
-                    if (refreshed) {
-                        return this.authenticate();
-                    }
-                }
                 console.error(error);
-                this.token = null;
+                this.accessToken = null;
                 Cookies.remove("access_token");
+                Cookies.remove("refresh_token");
                 this.authenticated = false;
                 return false;
             }
         } else {
+            console.log("No access token found");
             this.authenticated = false;
             return false;
         }
     }
-    
+
     async refreshAccessToken() {
         const refreshToken = Cookies.get("refresh_token");
         if (!refreshToken) {
             console.error("No refresh token available");
             return false;
         }
-    
         try {
-            const response = await axios.post(`${API_URL}/token/refresh/`, {
+            const response = await this.app.api.request("post", "/token/refresh/", {
                 refresh: refreshToken
             });
-            const newAccessToken = response.data.access;
-            Cookies.set("access_token", newAccessToken);
-            this.token = newAccessToken;
+            Cookies.set("access_token", response.access);
+            this.accessToken = response.access;
             console.log("Access token successfully refreshed");
             return true;
         } catch (error) {
@@ -69,14 +51,6 @@ export class Auth {
             this.logout();
             return false;
         }
-    }
-    
-    checkAuthorization() {
-        if (!this.authenticated && this.isCurrentPageProtected) {
-            this.app.navigate("/login");
-            return false;
-        }
-        return true;
     }
 
     checkOtpToken() {
@@ -95,11 +69,7 @@ export class Auth {
             throw new Error("Passwords do not match");
         }
         try {
-            const response = await axios.post(
-                `${API_URL}/user`,
-                { username, email, password }
-            );
-            return response;
+            return await this.app.api.createUser({ username, email, password });
         } catch (error) {
             console.error("Auth: Error response data:", error.response.data);
             throw error;
@@ -112,32 +82,25 @@ export class Auth {
         }
         try {
             const otpToken = Cookies.get("otp_token");
-            const response = await axios.post(
-                `${API_URL}/token/`,
-                {
-                    email: email,
-                    password: password,
-                    otp_token: otpToken ? otpToken : null,
-                }
-            );
-            if (response.data.success) {
+            const responseData = await this.app.api.login(email, password, otpToken ? otpToken : null);
+            if (responseData.success) {
                 console.log("Login successful");
-                Cookies.set("access_token", response.data.access);
-                Cookies.set("refresh_token", response.data.refresh);
+                Cookies.set("access_token", responseData.access);
+                Cookies.set("refresh_token", responseData.refresh);
+                this.accessToken = responseData.access;
                 this.app.navigate("/home");
-                return response;
+                return responseData;
             } else {
-                Cookies.set("otp_token", response.data.otp_token);
+                console.log("2FA required");
+                Cookies.set("otp_token", responseData.otp_token);
                 this.app.navigate("/two-factor-auth");
-                return response;
+                return responseData;
             }
         } catch (error) {
             if (error.response) {
                 console.error(
-                    `Login error\n${error.response.data.error}\n${error.message}`
+                    `Login error\n${error.response.error}\n${error.message}`
                 );
-            } else if (error.request) {
-                console.error("No response received:", error.request);
             } else {
                 console.error("Axios configuration error:", error.message);
             }
@@ -151,26 +114,22 @@ export class Auth {
             throw new Error("Please enter your one-time password");
         }
         try {
-            const response = await axios.post(
-                `${API_URL}/verify-otp`,
-                {
-                    otp: otp,
-                    otp_token: Cookies.get("otp_token"),
-                }
-            );
-            if (response.data.success) {
-                console.log("Login successful");
-                Cookies.set("access_token", response.data.access);
-                Cookies.set("refresh_token", response.data.refresh);
+            const otpToken = Cookies.get("otp_token");
+            const responseData = await this.app.api.verifyOtp(otp, otpToken);
+            if (responseData.success) {
+                console.log("2FA successful");
+                Cookies.set("access_token", responseData.access);
+                Cookies.set("refresh_token", responseData.refresh);
+                this.accessToken = responseData.access;
+                this.authenticated = true;
                 Cookies.remove("otp_token");
-                this.app.navigate("/home");
-                return response;
+                return responseData;
             } else {
                 throw new Error("An error occurred");
             }
         } catch (error) {
             console.error(
-                `OTP error\n${error.response.data.error}\n${error.message}`
+                `OTP error\n${error.response.error}\n${error.message}`
             );
             throw error;
         }
@@ -216,36 +175,8 @@ export class Auth {
         console.log("Logging out");
         Cookies.remove("access_token");
         Cookies.remove("refresh_token");
-        if (window.location.pathname !== "/login") {
+        this.accessToken = null;
+        this.authenticated = false;
         this.app.navigate("/login");
-        }
     }
-
-
-    
-    /* Fetches an array of avatar URLs */
-    async fetchAvatarUrls(avatarPaths) {
-        try {
-            const requests = avatarPaths.map(path => this.loadAvatar(path));
-            return await Promise.all(requests);
-        } catch (error) {
-            console.error("Failed to fetch avatar URLs", error);
-            return avatarPaths.map(() => null);
-        }
-    }
-
-    /* Fetches a single avatar URL */
-    async loadAvatar(path) {
-        try {
-            const response = await axios.get(`${MEDIA_URL}/${path}`, {
-                headers: { Authorization: `Bearer ${this.token}` },
-                responseType: "blob"
-            });
-            return URL.createObjectURL(response.data);
-        } catch (error) {
-            console.warn(`Failed to load avatar at ${path}`, error);
-            return null;
-        }
-    }
-
 }
