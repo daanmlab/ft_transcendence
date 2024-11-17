@@ -33,8 +33,10 @@ function getInvites() { // get dummy invites
             username: "user4",
             avatar_upload: "",
             avatar_oauth: "",
-            wins: 0,
-            losses: 0,
+            game_stats: {
+                wins: 20,
+                losses: 5,
+            },
             date_joined: new Date("2021-03-01").toLocaleDateString('en-GB'),
         }
     ];

@@ -12,7 +12,7 @@ class AIPage extends Page {
     }
 
     async render(app) {
-        const { auth } = this;
+        const { auth } = this.app;
         const userInfo = auth.user;
         console.log("userInfo", userInfo);
     }

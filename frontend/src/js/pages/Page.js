@@ -18,16 +18,18 @@ class Page {
         this.name = name;
         this.url = url;
         this.pageElement = document.querySelector(pageElement);
+        this.isProtected = isProtected;
         this.mainElement = document.querySelector("#main");
-        this.auth = new Auth(isProtected, app);
         this.app = app;
         this.handleClick = this.handleClick.bind(this);
         this.preserveParams = preserveParams;
     }
 
     async open(app) {
-        await this.auth.authenticate();
-        if (!this.auth.checkAuthorization()) return;
+        if (this.isProtected) {
+            await this.app.auth.authenticate();
+            if (!this.app.auth.authenticated) {return this.app.navigate("/login");};
+        }
         document.querySelectorAll("section").forEach((section) => { section.remove() });
         const tempElement = document.createElement(this.pageElement.tagName);
         tempElement.innerHTML = this.pageElement.innerHTML;

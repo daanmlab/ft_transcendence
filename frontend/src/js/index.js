@@ -13,10 +13,14 @@ import {
     AIPage
 } from "./pages/index.js";
 import "../scss/styles.scss";
+import { Api } from "./Api.js";
+import { Auth } from "./Auth.js";
 
 class App {
     constructor() {
         this.mainElement = document.querySelector("#main");
+        this.auth = new Auth(this);
+        this.api = new Api(this.auth);
         this.pages = {
             login: new LoginPage(this),
             register: new RegisterPage(this),
@@ -41,15 +45,13 @@ class App {
         });
     }
 
-
-
     navigate(path) {
         console.log("path", path);
         if (path === "/") {
             path = "/home";
         } else if (path === "/logout") {
             if (this.currentPage) {
-                this.currentPage.auth.logout();
+                this.auth.logout();
                 return
             }
         }

@@ -78,13 +78,13 @@ class UserProfileCardSm extends HTMLElement {
         console.log("selected", this);
     }
 
-    async updateProfile(user) {
+    async setUser(user) {
         if (!user) return;
 
         const avatarEl = this.shadowRoot.getElementById("profile-avatar");
         const usernameEl = this.shadowRoot.getElementById("profile-username");
-        const { auth } = this.page;
-        const avatar_upload = await auth.loadAvatar(user.avatar_upload);
+        const { api } = this.page.app;
+        const avatar_upload = user.avatar_upload ? await api.fetchAvatarObjectUrl(user.avatar_upload): null;
 
         avatarEl.src = avatar_upload || user.avatar_oauth || EMPTY_AVATAR_URL;
         usernameEl.textContent = user.username;

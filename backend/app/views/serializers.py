@@ -33,7 +33,7 @@ class GameStatsSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])
     new_password = serializers.CharField(write_only=True, required=False, validators=[validate_password])
-    game_stats = GameStatsSerializer()
+    game_stats = GameStatsSerializer(required=False)
 
     class Meta:
         model = User
@@ -46,6 +46,14 @@ class UserSerializer(serializers.ModelSerializer):
             instance.set_password(new_password)
         return super().update(instance, validated_data)
 
+    def create(self, validated_data):
+        password = validated_data.pop('password', None)
+        user = super().create(validated_data)
+        if password:
+            user.set_password(password)
+            user.save()
+        return user
+    
     def validate_new_email(self, value):
         if User.objects.filter(email=value).exists() or User.objects.filter(new_email=value).exists():
             raise serializers.ValidationError("This email is already registered to another account.")

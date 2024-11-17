@@ -94,7 +94,7 @@ class Navbar extends HTMLElement {
     }
 
     async updateAuthValues() {
-        const { auth } = this.page;
+        const { auth, api } = this.page.app;
         const loginEl = this.shadowRoot.querySelector(".login");
         const registerEl = this.shadowRoot.querySelector(".register");
         const profileEl = this.shadowRoot.querySelector(".profile");
@@ -103,9 +103,10 @@ class Navbar extends HTMLElement {
 
         
         if (auth.authenticated) {
-            const avatar_upload = await auth.loadAvatar(auth.user.avatar_upload);
-            profileEl.querySelector("img").src = avatar_upload || auth.user.avatar_oauth  || EMPTY_AVATAR_URL;
-            profileEl.querySelector(".username").textContent = auth.user.username;
+            const { user } = auth;
+            const avatar_upload = user.avatar_upload ? await api.fetchAvatarObjectUrl(user.avatar_upload): null;
+            profileEl.querySelector("img").src = avatar_upload || user.avatar_oauth  || EMPTY_AVATAR_URL;
+            profileEl.querySelector(".username").textContent = user.username;
         } else {
             loginEl.style.display = "block";
             registerEl.style.display = "block";

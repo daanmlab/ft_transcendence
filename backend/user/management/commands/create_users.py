@@ -2,7 +2,9 @@ from django.core.management.base import BaseCommand
 from user.models import CustomUser, GameStats
 from faker import Faker
 import random
-
+import requests
+from django.core.files.base import ContentFile
+from io import BytesIO
 class Command(BaseCommand):
     help = "Create a group of users with associated game stats"
 
@@ -10,15 +12,32 @@ class Command(BaseCommand):
         fake = Faker()
         number_of_users = 10
 
-        for _ in range(number_of_users):
+        self.stdout.write(self.style.NOTICE("Starting user creation process..."))
+
+        for i in range(number_of_users):
+            self.stdout.write(self.style.NOTICE(f"Creating user {i + 1} of {number_of_users}..."))
+
             username = fake.user_name()
             email = fake.email()
+
+            self.stdout.write(self.style.NOTICE(f"Generated username: {username}, email: {email}"))
 
             user = CustomUser.objects.create_user(
                 email=email,
                 username=username,
                 password="pass"
             )
+
+            self.stdout.write(self.style.NOTICE(f"User {username} created. Downloading avatar..."))
+
+            image_url = fake.image_url()
+            response = requests.get(image_url)
+            if response.status_code == 200:
+                image_name = f"{username}.jpg"
+                user.avatar_upload.save(image_name, ContentFile(response.content), save=True)
+                self.stdout.write(self.style.NOTICE(f"Avatar for {username} saved as {image_name}"))
+            else:
+                self.stdout.write(self.style.WARNING(f"Failed to download avatar for {username}"))
 
             game_stats = user.game_stats
 
@@ -32,3 +51,5 @@ class Command(BaseCommand):
             game_stats.save()
 
             self.stdout.write(self.style.SUCCESS(f"Successfully created user: {username}, Password: pass"))
+
+        self.stdout.write(self.style.SUCCESS("User creation process completed."))

@@ -12,9 +12,10 @@ class HomePage extends Page {
     }
 
     async render(app) {
-        const { getFriends, getInvites } = require('../dummyData.js');
+        const { getInvites } = require('../dummyData.js');
 
-        const { auth } = this;
+        const { auth, api } = this.app;
+        
         const userInfo = auth.user;
         console.log("userInfo", userInfo);
 
@@ -22,23 +23,24 @@ class HomePage extends Page {
         const receiveList = document.querySelector("#receive-list");
         const inviteBtn = document.querySelector("#action-friend");
         const selectedFriend = this.mainElement.querySelector("user-profile");
-    
         selectedFriend.page = this;
     
         const setupFriendItem = (friend, actionText, actionCallback) => {
             const friendItem = document.createElement("user-profile-small");
             friendItem.page = this;
-            friendItem.updateProfile(friend);
+            friendItem.setUser(friend);
             friendItem.addEventListener("click", () => {
                 inviteBtn.classList.remove("d-none");
                 inviteBtn.textContent = actionText;
                 inviteBtn.onclick = actionCallback;
-                selectedFriend.updateProfile(friend);
+                selectedFriend.setUser(friend);
             });
             return friendItem;
         };
-    
-        getFriends().forEach(friend => {
+
+        const users = await api.getUsers()
+        console.log("users", users);
+        users.forEach(friend => {
             const friendItem = setupFriendItem(friend, "Invite", () => {
                 friendItem.appendPendingButton();
                 inviteBtn.classList.add("d-none");
