@@ -318,7 +318,7 @@
                 </div>
             </div>
         </div>
-        <h2 class="my-4 text-center display-5">Add friends</h2>
+        <h2 class="my-5 text-center display-6">Add friends</h2>
         <div class="row">
             <div class="col-md-4">
                 <p class="font-weight-bold">Invitations Received</p>
@@ -392,12 +392,21 @@
     <section id="Profile" class="container mt-5">
         <h1 class="mb-4">Profile</h1>
         <div class="row">
-            <user-profile class="col-md-4"></user-profile>
+            <user-profile class="col-md-4" id="user"></user-profile>
             <div class="col-md-8">
                 <p id="profile-joined"></p>
                 <h3>Match History</h3>
                 <ul class="list-group" id="match-history">
                 </ul>
+            </div>
+        </div>
+        <h2 class="my-5 text-center display-6">Your friends</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <ul class="list-group" id="friend-list"></ul>
+            </div>
+            <div class="col-md-4 d-flex flex-column align-items-center text-center">
+                <user-profile id="selected-friend"></user-profile>
             </div>
         </div>
     </section>

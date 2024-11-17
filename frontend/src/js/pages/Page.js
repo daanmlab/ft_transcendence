@@ -28,7 +28,7 @@ class Page {
     async open(app) {
         if (this.isProtected) {
             await this.app.auth.authenticate();
-            if (!this.app.auth.authenticated) {return this.app.navigate("/login");};
+            if (!this.app.auth.authenticated) return this.app.navigate("/login");;
         }
         document.querySelectorAll("section").forEach((section) => { section.remove() });
         const tempElement = document.createElement(this.pageElement.tagName);

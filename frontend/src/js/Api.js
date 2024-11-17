@@ -73,6 +73,27 @@ export class Api {
         return this.request("get", "/users/");
     }
 
+    async getFriendsInvitable() {
+        return this.request("get", "/friends-invitable/");
+    }
+
+    async getFriendRequests() {
+        return this.request("get", "/friends-requests/");
+    }
+
+    async getFriends() {
+        return this.request("get", "/friends/");
+    }
+
+    /* Friends */
+    async friendRequest(userId) {
+        return this.request("post", `/friend-request/${userId}`, {});
+    }
+
+    async friendAccept(userId) {
+        return this.request("post", `/friend-accept/${userId}`, {});
+    }
+
     /* Media */
     async uploadAvatar(file) {
         const formData = new FormData();

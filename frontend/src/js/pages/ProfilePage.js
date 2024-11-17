@@ -18,11 +18,11 @@ class ProfilePage extends Page {
     }
 
     async render(app) {
-        const { auth } = this.app;
+        const { auth, api } = this.app;
         const user = auth.user;
         console.log("user info", auth.user);
 
-        const UserProfileCard = this.mainElement.querySelector("user-profile");
+        const UserProfileCard = this.mainElement.querySelector("user-profile#user");
         UserProfileCard.page = this;
         UserProfileCard.setUser(user);
 
@@ -33,6 +33,26 @@ class ProfilePage extends Page {
             matchItem.className = "list-group-item";
             matchItem.textContent = `${match.opponent} - ${match.result} - ${match.date}`;
             matchHistoryElement.appendChild(matchItem);
+        });
+
+        const friendList = document.querySelector("#friend-list");
+        const selectedFriend = this.mainElement.querySelector("user-profile#selected-friend");
+        selectedFriend.page = this;
+
+        const setupFriendItem = (friend) => {
+            const friendItem = document.createElement("user-profile-small");
+            friendItem.page = this;
+            friendItem.setUser(friend);
+            friendItem.addEventListener("click", () => {
+                selectedFriend.setUser(friend);
+            });
+            return friendItem;
+        };
+
+        const friends = await api.getFriends();
+        friends.forEach(friend => {
+            const friendItem = setupFriendItem(friend);
+            friendList.appendChild(friendItem);
         });
     }
 }
