@@ -93,3 +93,30 @@ class GameStats(models.Model):
 
     def __str__(self):
         return f"GameStats for {self.user.username}"
+
+class Friendship(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected')
+    ]
+    
+    id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(
+        CustomUser, 
+        on_delete=models.CASCADE, 
+        related_name='friendships_initiated'
+    )
+    friend = models.ForeignKey(
+        CustomUser, 
+        on_delete=models.CASCADE, 
+        related_name='friendships_received'
+    )
+    status = models.CharField(
+        max_length=10, 
+        choices=STATUS_CHOICES, 
+        default='pending'
+    )
+
+    def __str__(self):
+        return f"{self.user.username} -> {self.friend.username} ({self.status})"

@@ -1,4 +1,5 @@
 import Page from "./Page.js";
+import { showMessage } from "../utils.js";
 
 class HomePage extends Page {
     constructor(app) {
@@ -12,8 +13,6 @@ class HomePage extends Page {
     }
 
     async render(app) {
-        const { getInvites } = require('../dummyData.js');
-
         const { auth, api } = this.app;
         
         const userInfo = auth.user;
@@ -38,19 +37,32 @@ class HomePage extends Page {
             return friendItem;
         };
 
-        const users = await api.getUsers()
-        console.log("users", users);
-        users.forEach(friend => {
-            const friendItem = setupFriendItem(friend, "Invite", () => {
-                friendItem.appendPendingButton();
-                inviteBtn.classList.add("d-none");
+        const friendsInvitable = await api.getFriendsInvitable()
+        friendsInvitable.forEach(friend => {
+            const friendItem = setupFriendItem(friend, "Invite", async () => {
+                try {
+                    await api.friendRequest(friend.id);
+                    friendItem.appendPendingButton();
+                    inviteBtn.classList.add("d-none");
+                } catch (error) {
+                    showMessage(error.response.data.message);
+                }
             });
             sendList.appendChild(friendItem);
         });
     
-        getInvites().forEach(invite => {
-            const friendItem = setupFriendItem(invite, "Accept", () => {
-                friendItem.remove();
+        const friendsRequests = await api.getFriendRequests();
+        friendsRequests.forEach(invite => {
+            const friendItem = setupFriendItem(invite, "Accept", async () => {
+                try {
+                    const response = await api.friendAccept(invite.id);
+                    receiveList.removeChild(friendItem);
+                    inviteBtn.classList.add("d-none");
+                    showMessage(response.message);
+                } catch (error) {
+                    console.log(error);
+                    showMessage(error.response.data.message);
+                }
             });
             receiveList.appendChild(friendItem);
         });

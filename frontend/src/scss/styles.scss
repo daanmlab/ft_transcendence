@@ -72,3 +72,11 @@ html {
         opacity: 1;
     }
 }
+
+.message-popup {
+    bottom: 20px;
+}
+
+.transition-opacity {
+    transition: opacity 0.5s ease-in-out;
+}
