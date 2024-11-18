@@ -1,5 +1,3 @@
-import { Auth } from "../Auth.js";
-
 /**
  * Class representing a Page
  * @class
@@ -63,12 +61,9 @@ class Page {
 
     renderNavbar(page) {
         require("../customElements/Navbar.js");
-        const existingNavbar = this.mainElement.parentNode.querySelector("nav-bar");
-        if (existingNavbar) { existingNavbar.remove(); }
-        const navbarElement = document.createElement("nav-bar");
+        const navbarElement = this.mainElement.parentNode.querySelector("nav-bar");
         navbarElement.page = this;
-
-        this.mainElement.parentNode.insertBefore(navbarElement, this.mainElement);
+        navbarElement.updateAuthValues();
     }
 
     /**

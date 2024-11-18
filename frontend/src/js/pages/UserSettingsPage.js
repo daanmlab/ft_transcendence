@@ -87,13 +87,12 @@ class UserSettingsPage extends Page {
             return;
         }
         if (!newValue || newValue === this.app.auth.user[field]) {
-            this.showMessage(`Enter a valid ${field.replace('_', ' ')}.`, "error");
             return;
         }
         this.app.api.updateUser({ [field]: newValue })
             .then(() => {
                 this.showMessage(successMessage, "success");
-                setTimeout(() => this.app.navigate(this.url), 5000);
+                setTimeout(() => this.app.navigate(this.url), 3000);
             })
             .catch(error => {
                 const errors = error.response.data;
