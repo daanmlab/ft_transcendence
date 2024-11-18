@@ -39,10 +39,6 @@ class App {
         this.init();
         if (document.getElementById("noScript"))
             document.getElementById("noScript").remove();
-
-        document.addEventListener("navigate", (event) => { // Custom event dispatched from Navbar.handleClick()
-            this.navigate(event.detail);
-        });
     }
 
     navigate(path) {
@@ -50,10 +46,7 @@ class App {
         if (path === "/") {
             path = "/home";
         } else if (path === "/logout") {
-            if (this.currentPage) {
-                this.auth.logout();
-                return
-            }
+            return this.auth.logout();
         }
         const page = Object.values(this.pages).find(
             (page) => page.url === path

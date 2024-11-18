@@ -29,7 +29,6 @@ class Navbar extends HTMLElement {
                     font-weight: bold;
                 }
                 .navbar-center {
-                    display: flex;
                     align-items: center;
                     gap: 0.5rem;
                 }
@@ -54,9 +53,6 @@ class Navbar extends HTMLElement {
                     width: 100px;
                 }
 
-                .login, .register {
-                    display: none;
-                }
             </style>
             <nav class="navbar">
                 <a class="navbar-brand" data-href="/">PONG</a>
@@ -72,47 +68,44 @@ class Navbar extends HTMLElement {
                 </ul>
             </nav>
         `;
-
-        this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
-            element.addEventListener("click", this.handleClick.bind(this));
-        });
     }
 
     set page(page) {
         this._page = page;
-        this.updateAuthValues();
     }
 
     get page() {
         return this._page;
     }
 
-    handleClick(event) {
-        event.preventDefault();
-        const href = event.currentTarget.getAttribute("data-href");
-        this.dispatchEvent(new CustomEvent("navigate", { detail: href, bubbles: true, composed: true }));
+    setDisplay(elements, display) {
+        elements.forEach(el => el.style.display = display);
     }
 
     async updateAuthValues() {
         const { auth, api } = this.page.app;
+        
+        this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
+            element.addEventListener("click", this.page.handleClick.bind(this));
+        });
+
         const loginEl = this.shadowRoot.querySelector(".login");
         const registerEl = this.shadowRoot.querySelector(".register");
         const profileEl = this.shadowRoot.querySelector(".profile");
         const settingsEl = this.shadowRoot.querySelector(".settings");
         const logoutEl = this.shadowRoot.querySelector(".logout");
 
-        
         if (auth.authenticated) {
             const { user } = auth;
-            const avatar_upload = user.avatar_upload ? await api.fetchAvatarObjectUrl(user.avatar_upload): null;
-            profileEl.querySelector("img").src = avatar_upload || user.avatar_oauth  || EMPTY_AVATAR_URL;
+            const avatar_upload = user.avatar_upload ? await api.fetchAvatarObjectUrl(user.avatar_upload) : null;
+            profileEl.querySelector("img").src = avatar_upload || user.avatar_oauth || EMPTY_AVATAR_URL;
             profileEl.querySelector(".username").textContent = user.username;
+            this.setDisplay([loginEl, registerEl], "none");
+            this.setDisplay([settingsEl, logoutEl], "block");
+            this.setDisplay([profileEl], "flex");
         } else {
-            loginEl.style.display = "block";
-            registerEl.style.display = "block";
-            profileEl.style.display = "none";
-            logoutEl.style.display = "none";
-            settingsEl.style.display = "none";
+            this.setDisplay([loginEl, registerEl], "block");
+            this.setDisplay([profileEl, settingsEl, logoutEl], "none");
         }
     }
 }
