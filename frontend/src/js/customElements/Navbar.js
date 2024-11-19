@@ -86,8 +86,8 @@ class Navbar extends HTMLElement {
         const { auth, api } = this.page.app;
         
         this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
-            element.removeEventListener("click", this.page.handleClick); // Remove existing listener
-            element.addEventListener("click", this.page.handleClick); // Add the listener
+            element.removeEventListener("click", this.page.handleClick);
+            element.addEventListener("click", this.page.handleClick);
         });
 
         const loginEl = this.shadowRoot.querySelector(".login");
