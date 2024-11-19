@@ -55,7 +55,7 @@ class Navbar extends HTMLElement {
 
             </style>
             <nav class="navbar">
-                <a class="navbar-brand" data-href="/">PONG</a>
+                <a class="navbar-brand" data-href="/home">PONG</a>
                 <div class="profile navbar-center" data-href="/profile">
                     <img src={EMPTY_AVATAR_URL} width="40" height="40" alt="Avatar" class="avatar" />
                     <span class="username"></span>
@@ -86,7 +86,8 @@ class Navbar extends HTMLElement {
         const { auth, api } = this.page.app;
         
         this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
-            element.addEventListener("click", this.page.handleClick.bind(this));
+            element.removeEventListener("click", this.page.handleClick); // Remove existing listener
+            element.addEventListener("click", this.page.handleClick); // Add the listener
         });
 
         const loginEl = this.shadowRoot.querySelector(".login");
