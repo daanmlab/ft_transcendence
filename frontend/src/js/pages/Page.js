@@ -20,13 +20,17 @@ class Page {
         this.mainElement = document.querySelector("#main");
         this.app = app;
         this.handleClick = this.handleClick.bind(this);
-        this.preserveParams = preserveParams;
+        this.preserveParams = preserveParams; // TODO: workaround for OAuthResultPage, check if this is necessary
     }
 
-    async open(app) {
+    /**
+     * Opens the page, authenticates if necessary, and renders the content.
+     */
+    async open() {
+        const { app } = this;
         if (this.isProtected) {
-            await this.app.auth.authenticate();
-            if (!this.app.auth.authenticated) return this.app.navigate("/login");;
+            await app.auth.authenticate();
+            if (!app.auth.authenticated) return app.navigate("/login");
         }
         document.querySelectorAll("section").forEach((section) => { section.remove() });
         const tempElement = document.createElement(this.pageElement.tagName);
@@ -45,6 +49,9 @@ class Page {
         this.render(app);
     }
 
+    /**
+     * Closes the page and removes event listeners.
+     */
     close() {
         this.mainElement.querySelectorAll("[data-href]").forEach((element) => {
             element.removeEventListener("click", (event) =>
@@ -54,7 +61,11 @@ class Page {
         this.mainElement.innerHTML = "";
     }
 
-    handleClick(event, app) {
+    /**
+     * Handles click events for navigation.
+     * @param {Event} event - The click event
+     */
+    handleClick(event) {
         event.preventDefault();
         const path = event.currentTarget.getAttribute("data-href");
         if (path && path !== window.location.pathname) {
@@ -62,7 +73,10 @@ class Page {
         }
     }
 
-    renderNavbar(page) {
+    /**
+     * Renders the navigation bar.
+     */
+    renderNavbar() {
         require("../customElements/Navbar.js");
         const navbarElement = this.mainElement.parentNode.querySelector("nav-bar");
         navbarElement.page = this;
@@ -71,10 +85,9 @@ class Page {
 
     /**
      * Renders the page
-     * @param {object} app - The app object
      * @abstract
      */
-    render(app) {
+    render() {
         console.warn(`TEST: Rendering ${this.name} page`);
     }
 }

@@ -21,7 +21,7 @@ class TournamentPage extends Page {
         tournamentItem.appendChild(pendingButton);
     }
 
-    render(app) {
+    render() {
         const { auth } = this.app;
         const userInfo = auth.user;
         console.log(userInfo);

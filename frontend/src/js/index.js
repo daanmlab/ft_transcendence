@@ -16,6 +16,9 @@ import "../scss/styles.scss";
 import { Api } from "./Api.js";
 import { Auth } from "./Auth.js";
 
+/**
+ * App class initializes the application, manages page navigation, and handles authentication.
+ */
 class App {
     constructor() {
         this.mainElement = document.querySelector("#main");
@@ -41,6 +44,10 @@ class App {
             document.getElementById("noScript").remove();
     }
 
+    /**
+     * Navigates to the specified path and updates the current page.
+     * @param {string} path - The path to navigate to.
+     */
     navigate(path) {
         console.log("path", path);
         if (path === "/") {
@@ -70,6 +77,9 @@ class App {
         }
     }
 
+    /**
+     * Initializes the application, sets up event listeners, and handles initial navigation.
+     */
     init() {
         window.addEventListener("popstate", () => {
             this.navigate(window.location.pathname.toLowerCase());

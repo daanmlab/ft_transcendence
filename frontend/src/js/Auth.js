@@ -1,6 +1,9 @@
 import Cookies from "js-cookie";
 import { API_URL } from "./constants.js"; // TODO: handle oauth in Api.js
 
+/**
+ * Auth class handles user authentication, including login, registration, token management, and OAuth.
+ */
 export class Auth {
     constructor(app) {
         this.app = app;
@@ -10,6 +13,10 @@ export class Auth {
         this.oauthPopup = null;
     }
 
+    /**
+     * Authenticates the user using the access token stored in cookies.
+     * @returns {Promise<boolean>} True if authenticated, false otherwise.
+     */
     async authenticate() {
         if (this.accessToken) {
             try {
@@ -32,6 +39,10 @@ export class Auth {
         }
     }
 
+    /**
+     * Refreshes the access token using the refresh token stored in cookies.
+     * @returns {Promise<boolean>} True if the token was refreshed, false otherwise.
+     */
     async refreshAccessToken() {
         const refreshToken = Cookies.get("refresh_token");
         if (!refreshToken) {
@@ -53,14 +64,15 @@ export class Auth {
         }
     }
 
-    checkOtpToken() {
-        if (!Cookies.get("otp_token")) {
-            this.app.navigate("/login");
-            return false;
-        }
-        return true;
-    }
-
+    /**
+     * Registers a new user.
+     * @param {string} username - The username of the new user.
+     * @param {string} email - The email of the new user.
+     * @param {string} password - The password of the new user.
+     * @param {string} password_confirmation - The password confirmation.
+     * @returns {Promise<Object>} The response from the API.
+     * @throws {Error} If any field is missing or passwords do not match.
+     */
     async register(username, email, password, password_confirmation) {
         if (!username || !email || !password || !password_confirmation) {
             throw new Error("All fields are required");
@@ -76,6 +88,13 @@ export class Auth {
         }
     }
 
+    /**
+     * Logs in a user.
+     * @param {string} email - The email of the user.
+     * @param {string} password - The password of the user.
+     * @returns {Promise<Object>} The response from the API.
+     * @throws {Error} If email or password is missing or login fails.
+     */
     async login(email, password) {
         if (!email || !password) {
             throw new Error("Email and password are required");
@@ -108,8 +127,17 @@ export class Auth {
         }
     }
 
-    // two-factor-auth one-time password
+    /**
+     * Verifies the one-time password (OTP) for two-factor authentication.
+     * @param {string} otp - The one-time password.
+     * @returns {Promise<Object>} The response from the API.
+     * @throws {Error} If OTP is missing or verification fails.
+     */
     async verifyOtp(otp) {
+        if (!Cookies.get("otp_token")) {
+            console.error("No OTP token found");
+            return this.app.navigate("/login");
+        }
         if (!otp) {
             throw new Error("Please enter your one-time password");
         }
@@ -135,6 +163,13 @@ export class Auth {
         }
     }
 
+    /**
+     * Initiates OAuth login process:
+     * - Checks if user is already authenticated.
+     * - Opens a new which calls the OAuth endpoint.
+     * - Checks for token cookie every second.
+     * @throws {Error} If popup is blocked by the browser.
+     */
     async oAuthLogin() {
         await this.authenticate();
         if (this.authenticated) {
@@ -171,6 +206,9 @@ export class Auth {
         checkForTokenCookie();
     }
 
+    /**
+     * Logs out the user by removing tokens and navigating to the login page.
+     */
     logout() {
         console.log("Logging out");
         Cookies.remove("access_token");

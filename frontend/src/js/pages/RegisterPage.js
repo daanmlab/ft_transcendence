@@ -11,7 +11,7 @@ class RegisterPage extends Page {
         });
     }
 
-    render(app) {
+    render() {
         require("../customElements/CustomForm.js");
 
         const form = this.mainElement.querySelector("custom-form");
@@ -28,6 +28,7 @@ class RegisterPage extends Page {
                 this.mainElement.querySelector("#login-success").textContent = successMessage;
                 form.style.display = "none";
             } catch (error) {
+                console.error("error", error);
                 let errorMessage = "An unknown error occurred";
                 if (error.response && error.response.data) {
                     errorMessage = this.formatErrorMessages(error.response.data);
@@ -39,20 +40,16 @@ class RegisterPage extends Page {
         };
     }
 
-    formatErrorMessages(errorData) { // This is horrible and should be simplified
-        const errorMessages = [];
+    formatErrorMessages(errorData) {
         if (errorData.detail) {
-            errorMessages.push(errorData.detail);
+            return errorData.detail;
         } else {
-            for (const key in errorData) {
-                if (errorData[key].length > 0) {
-                    errorData[key].forEach(msg => {
-                        errorMessages.push(msg.charAt(0).toUpperCase() + msg.slice(1));
-                    });
-                }
+            const firstKey = Object.keys(errorData)[0];
+            if (errorData[firstKey].length > 0) {
+                const msg = errorData[firstKey][0];
+                return msg.charAt(0).toUpperCase() + msg.slice(1);
             }
         }
-        return errorMessages.join(' ');
     }
 }
 

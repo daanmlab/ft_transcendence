@@ -13,7 +13,7 @@ class UserSettingsPage extends Page {
         });
     }
     
-    render(app) {
+    render() {
         this.setupEventListeners();
         this.setInitial2FASelection();
     }

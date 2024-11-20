@@ -17,7 +17,7 @@ class ProfilePage extends Page {
         { opponent: "opponent3", result: "win", date: "2021-01-20" },]
     }
 
-    async render(app) {
+    async render() {
         const { auth, api } = this.app;
         const user = auth.user;
         console.log("user info", auth.user);

@@ -12,7 +12,7 @@ class LoginPage extends Page {
         });
     }
 
-    async render(app) {
+    async render() {
         require("../customElements/CustomForm.js");
         const { auth } = this.app;
         if (auth.authenticated) { return this.app.navigate("/home") }
