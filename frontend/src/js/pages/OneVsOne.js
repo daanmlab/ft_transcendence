@@ -14,7 +14,7 @@ class OneVsOne extends Page {
         });
     }
 
-    render(app) {
+    render() {
         const { getFriends, getInvites } = require('../dummyData.js');
 
         const { auth } = this.app;

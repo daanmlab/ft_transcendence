@@ -13,7 +13,7 @@ class VerifyEmailPage extends Page {
         });
     }
 
-    render(app) {
+    render() {
         this.verifyEmail();
     }
 

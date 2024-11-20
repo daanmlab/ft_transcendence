@@ -12,7 +12,7 @@ class OAuthResultPage extends Page {
         });
     }
 
-    render(app) {
+    render() {
         this.handleOAuthCallback();
     }
 
@@ -27,7 +27,6 @@ class OAuthResultPage extends Page {
             setTimeout(window.close(), 3000);
         }
     }
-
 }
 
 export default OAuthResultPage;

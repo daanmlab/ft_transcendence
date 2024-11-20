@@ -11,18 +11,15 @@ class TwoFactorAuthPage extends Page {
 		});
 	}
 
-	async render(app) {
+	async render() {
 		require("../customElements/CustomForm.js");
 		const { auth } = this.app;
 		if (auth.authenticated){ return this.app.navigate("/home") }
-		if (!auth.checkOtpToken()) return;
 
 		const form = this.mainElement.querySelector("custom-form");
 		form.submitForm = async (formData) => {
 			try {
-				const response = await auth.verifyOtp(
-					formData.otp,
-				);
+				await auth.verifyOtp(formData.otp);
 				this.app.navigate("/home");
 			} catch (error) {
 				if (error.response) {

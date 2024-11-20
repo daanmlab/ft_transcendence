@@ -12,7 +12,7 @@ class HomePage extends Page {
         });
     }
 
-    async render(app) {
+    async render() {
         const { auth, api } = this.app;
         
         const userInfo = auth.user;
