@@ -56,7 +56,10 @@ class Page {
 
     handleClick(event, app) {
         event.preventDefault();
-        this.app.navigate(event.currentTarget.getAttribute("data-href"));
+        const path = event.currentTarget.getAttribute("data-href");
+        if (path && path !== window.location.pathname) {
+            this.app.navigate(path);
+        }
     }
 
     renderNavbar(page) {
