@@ -13,7 +13,11 @@ from app.views.oauth_views import (
 
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from app.views.two_factor_auth_views import VerifyOTPView
+from app.views.two_factor_auth_views import (
+	VerifyOTPView,
+	AuthenticatorSetupView,
+	VerifyAuthenticatorSetupView,
+)
 
 from app.views.user_views import (
 	UserListView,
@@ -38,5 +42,7 @@ urlpatterns = [
     path('verify-email/<str:token>/', VerifyEmailView.as_view(), name='verify-email'),
     path('oauth/42', OAuth42View.as_view(), name='oauth_42'),
     path('oauth/42/callback', OAuth42CallbackView.as_view(), name='oauth_42_callback'),
-    path('verify-otp', VerifyOTPView.as_view(), name='verify-otp'),
+    path('2fa/verify-otp', VerifyOTPView.as_view(), name='verify-otp'),
+	path('2fa/setup/', AuthenticatorSetupView.as_view(), name='authenticator_setup'),
+    path('2fa/verify-setup/', VerifyAuthenticatorSetupView.as_view(), name='verify_authenticator_setup'),
 ]

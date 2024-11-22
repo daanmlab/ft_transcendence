@@ -8,14 +8,17 @@ from rest_framework.exceptions import APIException
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated, BasePermission
-from rest_framework.generics import GenericAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView
 from rest_framework import status
 
 from .serializers import LoginSerializer, UserSerializer
 from .services import send_verification_email, generate_jwt_response
 
 from app.models import User as UserModel
-from app.mixins.two_factor_auth_mixin import TwoFactorAuthenticationMixin
+
+from app.views.two_factor_auth_views import TwoFactorAuthView
+
+from app.tokens.OTPToken import OTPToken
 
 User = get_user_model()
 signer = Signer()
@@ -25,18 +28,25 @@ class IsOwnerOrReadOnly(BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj == request.user
     
-class LoginView(TwoFactorAuthenticationMixin, GenericAPIView):
+class LoginView(TwoFactorAuthView):
     permission_classes = [AllowAny]
     serializer_class = LoginSerializer
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
         user = serializer.validated_data['user']
         if user.two_factor_method != 'none':
-            return self.handle_two_factor_authentication(request, user)
-        return generate_jwt_response(user.id, serializer.validated_data['refresh'], serializer.validated_data['access'])
+            otp_token = OTPToken.generate_token(user)
+            if user.two_factor_method == 'email':
+                self.generate_otp(user)
+                # TODO: Send OTP via email
+            return Response({
+                'two_factor_required': True,
+                'otp_token': otp_token,
+            })
+        
+        return generate_jwt_response(user, serializer.validated_data['refresh'])
 
 class VerifyEmailView(APIView):
     permission_classes = [AllowAny]

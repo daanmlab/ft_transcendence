@@ -91,11 +91,10 @@ export class Api {
      * @param {string} [otpToken=null] - The OTP token for two-factor authentication.
      * @returns {Promise<Object>} The response data.
      */
-    async login(email, password, otpToken = null) {
+    async login(email, password) {
         return this.request("post", "/token/", {
             email: email,
             password: password,
-            otp_token: otpToken,
         });
     }
 
@@ -105,10 +104,10 @@ export class Api {
      * @param {string} otpToken - The OTP token.
      * @returns {Promise<Object>} The response data.
      */
-    async verifyOtp(otp, otpToken) {
-        return this.request("post", "/verify-otp", {
+    async verifyOtp(otp, OtpToken) {
+        return this.request("post", "2fa/verify-otp", {
             otp: otp,
-            otp_token: otpToken,
+            otp_token: OtpToken,
         });
     }
 
