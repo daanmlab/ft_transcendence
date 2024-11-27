@@ -2,7 +2,7 @@ import axios from "axios";
 import { API_URL, MEDIA_URL } from "./constants.js";
 
 /**
- * Api class handles all API requests.
+ * Handles all API requests.
  */
 export class Api {
     constructor(auth) {
@@ -22,6 +22,7 @@ export class Api {
      * @throws {Error} If the request fails.
      */
     async request(method, url, data = null, config = {}) {
+        // Get the access token from the global auth object.
         const token = this.auth.accessToken;
         if (token) {
             config.headers = {
@@ -29,6 +30,7 @@ export class Api {
                 Authorization: `Bearer ${token}`,
             };
         }
+        // Make the request and handle 401 errors by refreshing the access token.
         try {
             const response = await this.client.request({
                 method,
@@ -68,6 +70,15 @@ export class Api {
     }
 
     /**
+     * Retrieves a user's profile data.
+     * @param {string} userId - The ID of the user.
+     * @returns {Promise<Object>} The response
+     */
+    async getProfile(userId) {
+        return this.request("get", `/user/${userId}`);
+    }
+
+    /**
      * Updates the authenticated user's data.
      * @param {Object} data - The updated user data.
      * @returns {Promise<Object>} The response data.
@@ -88,27 +99,45 @@ export class Api {
      * Logs in a user.
      * @param {string} email - The user's email.
      * @param {string} password - The user's password.
-     * @param {string} [otpToken=null] - The OTP token for two-factor authentication.
      * @returns {Promise<Object>} The response data.
      */
-    async login(email, password, otpToken = null) {
+    async login(email, password) {
         return this.request("post", "/token/", {
             email: email,
             password: password,
-            otp_token: otpToken,
         });
     }
 
     /**
      * Verifies the one-time password (OTP) for two-factor authentication.
-     * @param {string} otp - The one-time password.
-     * @param {string} otpToken - The OTP token.
-     * @returns {Promise<Object>} The response data.
+     * @param {string} otp - A one-time password.
+     * @param {string} otpToken - A OTP token.
+     * @returns {Promise<Object>} JWT refresh and access tokens.
      */
-    async verifyOtp(otp, otpToken) {
-        return this.request("post", "/verify-otp", {
+    async verifyOtp(otp, OtpToken) {
+        return this.request("post", "2fa/verify-otp/", {
             otp: otp,
-            otp_token: otpToken,
+            otp_token: OtpToken,
+        });
+    }
+
+
+    /**
+     * Sets up an authenticator app as two-factor authentication for the authenticated user.
+     * @returns {Promise<Object>} A base 64 QR code
+     */
+    async setupAuthenticator() {
+        return this.request("get", "2fa/setup/");
+    }
+    
+    /**
+     * Verifies an authenticator app as two-factor authentication for the authenticated user.
+     * @param {string} otp - A one-time password.
+     * @returns {Promise<Object>} Success message
+     */
+    async verifyAuthenticatorSetup(otp) {
+        return this.request("post", "2fa/verify-setup/", {
+            otp: otp,
         });
     }
 
@@ -134,7 +163,7 @@ export class Api {
      * Retrieves a list of friend requests.
      * @returns {Promise<Object>} The response data.
      */
-    async getFriendRequests() {
+    async getFriendsRequests() {
         return this.request("get", "/friends-requests/");
     }
 
