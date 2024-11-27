@@ -58,7 +58,7 @@ export class Auth {
             console.log("Access token successfully refreshed");
             return true;
         } catch (error) {
-            console.error("Error refreshing access token", error);
+            console.error("Error refreshing access token, logging out", error);
             this.logout();
             return false;
         }

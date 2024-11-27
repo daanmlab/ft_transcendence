@@ -38,11 +38,12 @@
     <section id="Login">
         <div class="container col-xl-10 col-xxl-8 px-4 py-5">
             <div class="row align-items-center g-lg-5 py-5">
-              <div class="col-lg-7 text-center text-lg-start">
-                <h1 class="display-4 fw-bold lh-1 text-body-emphasis mb-3">Welcome to Pong</h1>
-                <p class="col-lg-10 fs-4">Join us for PvP, AI, and tournaments. Sign in or register to get started.</p>
-            </div> 
-              <div class="col-md-10 mx-auto col-lg-5 bg-body-tertiary p-5">
+                <div class="col-lg-7 text-center text-lg-start">
+                    <h1 class="display-4 fw-bold lh-1 text-body-emphasis mb-3">Welcome to Pong</h1>
+                    <p class="col-lg-10 fs-4">Join us for PvP, AI, and tournaments. Sign in or register to get started.
+                    </p>
+                </div>
+                <div class="col-md-10 mx-auto col-lg-5 bg-body-tertiary p-5">
                     <custom-form id="login-form">
                         <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
                         <div class="form-floating mb-3">
@@ -57,16 +58,16 @@
                         <button class="btn btn-primary w-100 py-2" type="submit">
                             Sign in
                         </button>
+                        <div class="d-flex justify-content-between mt-4">
+                            <button class="btn btn-primary w-100 text-white" id="oauth">
+                                <p class="text-white m-0">Sign in with 42</p>
+                            </button>
+                        </div>
+                        <a class="d-inline-block text-center w-100 mt-3" data-href="/register">Register</a>
                     </custom-form>
-                    <div class="d-flex justify-content-between mt-4">
-                        <button class="btn btn-primary w-100 text-white" id="oauth">
-                            <p class="text-white m-0">Sign in with 42</p>
-                        </button>
-                    </div>
-                    <a class="d-inline-block text-center w-100 mt-3" data-href="/register">Register</a>
-              </div>
+                </div>
             </div>
-          </div>
+        </div>
         </div>
     </section>
 
@@ -242,8 +243,9 @@
                                 Authenticator App
                             </label>
                         </div>
-                        <button class="btn btn-primary mt-3">Update 2FA Settings</button>
+                        <button class="btn btn-primary mt-3" id="update-2fa-settings">Update 2FA Settings</button>
                     </div>
+
                     <!-- Delete Account -->
                     <div class="tab-pane fade" id="delete-account" role="tabpanel" aria-labelledby="pills-settings-tab">
                         <h3>Delete Account</h3>
@@ -251,27 +253,57 @@
                         <button class="btn btn-danger" data-bs-toggle="modal"
                             data-bs-target="#deleteAccountModal">Delete My Account</button>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="deleteAccountModalLabel">Confirm Account Deletion</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                    <!-- Two-Factor Authentication Modal -->
+                    <div class="modal fade" id="authenticatorModal" tabindex="-1" aria-labelledby="authenticatorModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="authenticatorModalLabel">Authenticator Setup</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Scan the QR code below with your authenticator app. Once scanned, enter the OTP below to finish the setup.</p>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <img src="" id="QRCode" alt="QR Code" class="img-fluid">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <custom-form>
+                                                <div class="mb-3">
+                                                    <label for="otp-input" class="form-label">Enter OTP</label>
+                                                    <input type="text" class="form-control" id="otp-input" >
+                                                </div>
+                                                <button type="submit" class="btn btn-primary">Verify OTP</button>
+                                            </custom-form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="modal-body">
-                        Are you sure you want to delete your account? This action is irreversible.
+                    <!-- Delete Account Modal -->
+                    <div class="modal fade" id="deleteAccountModal" tabindex="-1"
+                        aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteAccountModalLabel">Confirm Account Deletion</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete your account? This action is irreversible.
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-danger"
+                                        id="confirmDeleteAccount">Delete</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" id="confirmDeleteAccount">Delete</button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </section>
 
     <section id="Home" class="container mt-5">

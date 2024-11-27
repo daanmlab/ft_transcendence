@@ -9,15 +9,17 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.generics import GenericAPIView
 from .services import generate_jwt_response
 from app.tokens.OTPToken import OTPToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 User = get_user_model()
+jwt_auth = JWTAuthentication()
 
 class TwoFactorAuthView(GenericAPIView):
     permission_classes = [AllowAny]
     
     def generate_otp(self, user):
         """
-        Generate a one-time password (OTP) for the user.
+        Generate a OTP based on the user's TOTP secret.
         """
         if not user.validation_secret:
             user.validation_secret = pyotp.random_base32()
@@ -25,7 +27,7 @@ class TwoFactorAuthView(GenericAPIView):
         
         totp = pyotp.TOTP(user.validation_secret, interval=30)
         otp = totp.now()
-        print(f"Generated OTP for {user.email}: {otp}")
+        print(f"Generated OTP for {user.email}: {otp}") # TODO: Remove this line once OTP is sent by email
         return otp
 
     def validate_otp(self, user, otp):
@@ -36,7 +38,6 @@ class TwoFactorAuthView(GenericAPIView):
             return False
 
         totp = pyotp.TOTP(user.validation_secret, interval=30)
-        
         return totp.verify(otp, valid_window=2)
     
 class AuthenticatorSetupView(TwoFactorAuthView):
@@ -78,7 +79,7 @@ class VerifyAuthenticatorSetupView(TwoFactorAuthView):
 
     def post(self, request):
         """
-        Verify the OTP provided by the user during authenticator setup.
+        Verify the OTP provided by the user and set the 2FA method to authenticator.
         """
         user = request.user
         if user.two_factor_method == 'authenticator':
@@ -92,7 +93,7 @@ class VerifyAuthenticatorSetupView(TwoFactorAuthView):
             user.save()
             return Response({
                 'success': True,
-                'message': 'Two-factor authentication setup successfully'
+                'message': 'Authenticator setup successfully'
             })
         
         return Response({
@@ -102,6 +103,9 @@ class VerifyAuthenticatorSetupView(TwoFactorAuthView):
 class VerifyOTPView(TwoFactorAuthView):
     
     def post(self, request):
+        """
+        Verify the OTP nd the OTP token and return a JWT if valid.
+        """
         otp = request.data.get('otp')
         otp_token = request.data.get('otp_token')
         
@@ -111,11 +115,10 @@ class VerifyOTPView(TwoFactorAuthView):
         try:
             # Validate token
             validated_token = OTPToken(otp_token)
-            validated_token.verify()
-            
-            # Get user from token
-            user_id = validated_token.payload.get('user_id')
-            user = User.objects.get(id=user_id)
+            user = jwt_auth.get_user(validated_token)
+            if user is None:
+                raise Exception('Invalid token')
+
         except Exception as e:
             return Response({'error': 'Invalid verification token'}, status=status.HTTP_401_UNAUTHORIZED)
         
