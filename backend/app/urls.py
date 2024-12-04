@@ -37,6 +37,6 @@ urlpatterns = [
 	path('friends/', FriendsListView.as_view(), name='friends-list'),
     path('verify-email/<str:token>/', VerifyEmailView.as_view(), name='verify-email'),
     path('oauth/42', OAuth42View.as_view(), name='oauth_42'),
-    path('oauth/42/callback', OAuth42CallbackView.as_view(), name='oauth_42_callback'),
+    path('oauth/42/callback/', OAuth42CallbackView.as_view(), name='oauth_42_callback'),
     path('verify-otp', VerifyOTPView.as_view(), name='verify-otp'),
 ]

@@ -30,48 +30,38 @@ class OAuth42CallbackView(APIView):
 
     def get(self, request):
         try:
-            self.validate_state(request)
-            code = self.get_code(request)
-            access_token = self.exchange_code_for_token(code)
-            user_info = self.fetch_user_info(access_token)
-            return self.handle_successful_login(user_info)
+            # Validate state to prevent CSRF
+            if request.GET.get('state') != request.session.get('oauth_state'):
+                raise ValueError("Invalid OAuth state")
+            
+            # Get authorization code
+            code = request.GET.get('code')
+            if not code:
+                raise ValueError("No authorization code")
+            
+            # Exchange code for token
+            token_response = requests.post("https://api.intra.42.fr/oauth/token", data={
+                'grant_type': 'authorization_code',
+                'client_id': settings.OAUTH_42_CLIENT_ID,
+                'client_secret': settings.OAUTH_42_CLIENT_SECRET,
+                'code': code,
+                'redirect_uri': settings.OAUTH_42_REDIRECT_URI,
+            }).json()
+            
+            # Fetch user info
+            user_info = requests.get("https://api.intra.42.fr/v2/me", 
+                headers={'Authorization': f'Bearer {token_response["access_token"]}'}
+            ).json()
+            
+            # Create user and response
+            tokens = get_or_create_user_from_oauth(user_info)
+            response = redirect(f"{settings.FRONTEND_URL}/oauth-result")
+            response.set_cookie(
+                'access_token', str(tokens['access_token']), httponly=False)
+            response.set_cookie(
+                'refresh_token', str(tokens['refresh_token']), httponly=False)
+            return response
+        
         except Exception as e:
-            logger.error(f"An error occurred: {str(e)}")
+            logger.error(f"OAuth Error: {str(e)}")
             return redirect(f"{settings.FRONTEND_URL}/oauth-result?error=true")
-
-    def validate_state(self, request):
-        if request.GET.get('state') != request.session.get('oauth_state'):
-            raise ValueError("Invalid OAuth state parameter detected.")
-
-    def get_code(self, request):
-        code = request.GET.get('code')
-        if not code:
-            raise ValueError("OAuth callback without code.")
-        return code
-
-    def exchange_code_for_token(self, code):
-        response = requests.post("https://api.intra.42.fr/oauth/token", data={
-            'grant_type': 'authorization_code',
-            'client_id': settings.OAUTH_42_CLIENT_ID,
-            'client_secret': settings.OAUTH_42_CLIENT_SECRET,
-            'code': code,
-            'redirect_uri': settings.OAUTH_42_REDIRECT_URI,
-        })
-        response.raise_for_status()
-        return response.json().get('access_token')
-
-    def fetch_user_info(self, access_token):
-        response = requests.get("https://api.intra.42.fr/v2/me", headers={
-            'Authorization': f'Bearer {access_token}'
-        })
-        response.raise_for_status()
-        return response.json()
-
-    def handle_successful_login(self, user_info):
-        refresh = get_or_create_user_from_oauth(user_info)
-        frontend_redirect_url = (f"{settings.FRONTEND_URL}/oauth-result")
-
-        response = redirect(frontend_redirect_url)
-        response.set_cookie('refresh_token', str(refresh), httponly=False)
-        response.set_cookie('access_token', str(refresh.access_token), httponly=False)
-        return response

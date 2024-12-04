@@ -176,34 +176,41 @@ export class Auth {
             return this.app.navigate("/home");
         }
 
-        if (this.oauthPopup) return; // CORS policy prevents checking if popup is open
-
         this.oauthPopup = window.open(
             `${API_URL}/oauth/42`,
             "OAuth Login",
             "width=600,height=600"
         );
+
         if (!this.oauthPopup) {
-            throw new Error("Popup blocked by browser, please unblock.");
+            alert("Popup blocked by browser. Please unblock and try again.");
+            return;
         }
 
-        let attempts = 0;
-        const maxAttempts = 30;
+        try {
+            await new Promise((resolve, reject) => {
+                let attempts = 0;
+                const maxAttempts = 30;
 
-        const checkForTokenCookie = () => {
-            // Automatically login if token is received
-            const token = Cookies.get("access_token");
-            if (token) {
-                this.oauthPopup = null;
-                return this.app.navigate("/home");
-            }
-            if (++attempts < maxAttempts) {
-                return setTimeout(checkForTokenCookie, 1000);
-            }
-            console.log("Token not received. Max attempts reached");
+                const checkForTokenCookie = () => {
+                    const token = Cookies.get("access_token");
+                    if (token) return resolve();
+                    if (++attempts >= maxAttempts) return reject("Token not received.");
+                    setTimeout(checkForTokenCookie, 1000);
+                };
+
+                checkForTokenCookie();
+            });
+
+            this.oauthPopup.close();
             this.oauthPopup = null;
-        };
-        checkForTokenCookie();
+            this.app.navigate("/home");
+        } catch (error) {
+            console.error(error);
+            alert("Login failed. Please try again.");
+            if (this.oauthPopup) this.oauthPopup.close();
+            this.oauthPopup = null;
+        }
     }
 
     /**
