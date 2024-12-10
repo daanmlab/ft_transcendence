@@ -116,7 +116,6 @@ export class Api {
 
     /**
      * Retrieves a list of users.
-     * @returns {Promise<Object>} The response data.
      */
     async getUsers() {
         return this.request("get", "/users/");
@@ -124,7 +123,6 @@ export class Api {
 
     /**
      * Retrieves a list of friends that can be invited.
-     * @returns {Promise<Object>} The response data.
      */
     async getFriendsInvitable() {
         return this.request("get", "/friends-invitable/");
@@ -132,7 +130,6 @@ export class Api {
 
     /**
      * Retrieves a list of friend requests.
-     * @returns {Promise<Object>} The response data.
      */
     async getFriendRequests() {
         return this.request("get", "/friends-requests/");
@@ -140,7 +137,6 @@ export class Api {
 
     /**
      * Retrieves a list of friends.
-     * @returns {Promise<Object>} The response data.
      */
     async getFriends() {
         return this.request("get", "/friends/");
@@ -151,7 +147,6 @@ export class Api {
     /**
      * Sends a friend request to a user.
      * @param {string} userId - The ID of the user to send a friend request to.
-     * @returns {Promise<Object>} The response data.
      */
     async friendRequest(userId) {
         return this.request("post", `/friend-request/${userId}`, {});
@@ -160,10 +155,44 @@ export class Api {
     /**
      * Accepts a friend request from a user.
      * @param {string} userId - The ID of the user whose friend request is being accepted.
-     * @returns {Promise<Object>} The response data.
      */
     async friendAccept(userId) {
         return this.request("post", `/friend-accept/${userId}`, {});
+    }
+
+
+    /* Games */
+
+    /**
+     * Invites user to a new game.
+     * @param {Object} userId - The ID of the user to send a game request to. 
+     * @returns {Promise<Object>} Game invitation id
+     */
+    async gameRequest(userId) {
+        return this.request("post", `/game-invitation/${userId}/`, {});
+    }
+
+    /**
+     * Accepts a game request from a user.
+     * @param {string} gameInviteId - The ID of the game invite to accept.
+     * @returns {Promise<Object>} Game url
+     */
+    async gameAccept(gameInviteId) {
+        return this.request("post", `/game-invitation/${gameInviteId}/accept/`, {});
+    }
+
+    /**
+     * Retrieves a list of invitations sent by the authenticated user.
+     */
+    async getSentGameInvites() {
+        return this.request("get", "/game-invitations/sent/");
+    }
+
+    /**
+     * Retrieves a list of invitations sent to the authenticated user.
+     */
+    async getReceivedGameInvites() {
+        return this.request("get", "/game-invitations/received/");
     }
 
     /* Media */
