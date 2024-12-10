@@ -81,6 +81,7 @@ class App {
      * Initializes the application, sets up event listeners, and handles initial navigation.
      */
     init() {
+        console.log("this.auth", this.auth);
         window.addEventListener("popstate", () => {
             this.navigate(window.location.pathname.toLowerCase());
         });
