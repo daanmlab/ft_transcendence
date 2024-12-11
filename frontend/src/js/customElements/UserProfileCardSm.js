@@ -75,7 +75,6 @@ class UserProfileCardSm extends HTMLElement {
             profile.shadowRoot.querySelector(".profile-container").classList.remove("selected");
         });
         this.shadowRoot.querySelector(".profile-container").classList.add("selected");
-        console.log("selected", this);
     }
 
     async setUser(user) {

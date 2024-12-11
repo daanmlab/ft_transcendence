@@ -55,8 +55,9 @@ class AcceptGameInvitationView(APIView):
         invitation.save()
 
         channel_layer = get_channel_layer()
+        print(f"game_invitation_{invitation.sender.id}")
         async_to_sync(channel_layer.group_send)(
-            f"game_invitation_{invitation_id}",
+            f"game_invitation_{invitation.sender.id}",
             {
                 "type": "game_accepted",
                 "game_url": f"/game/{game.id}"
@@ -64,7 +65,7 @@ class AcceptGameInvitationView(APIView):
         )
 
         return Response(
-            {"message": "Invitation accepted.", "game_url": f"/game/{game.id}"},
+            {"type": "game_accepted", "message": "Invitation accepted.", "game_url": f"/game/{game.id}"},
             status=status.HTTP_200_OK
         )
 
