@@ -1,4 +1,4 @@
-import Cookies from "js-cookie";
+import { parsePath } from "./utils.js";
 
 import {
     LoginPage,
@@ -49,73 +49,36 @@ class App {
             document.getElementById("noScript").remove();
     }
 
-    parsePath(path) {
-        const requestedPath = path.replace(/\/+$/, "");
-
-        return Object.values(this.pages).reduce((match, page) => {
-            if (match) return match; // If a match is found, skip further processing
-            const pagePath = page.url.replace(/\/+$/, "");
-            const pageParts = pagePath.split("/").filter(Boolean);
-            const requestedParts = requestedPath.split("/").filter(Boolean);
-
-            if (pageParts.length !== requestedParts.length) return null;
-
-            const params = {};
-            const isMatch = pageParts.every((part, i) => {
-                if (part.startsWith(":")) {
-                    params[part.slice(1)] = requestedParts[i];
-                    return true;
-                }
-                return part === requestedParts[i];
-            });
-
-            return isMatch ? { page, params } : null;
-        }, null);
-    }
-
     /**
      * Navigates to the specified path and updates the current page.
      * @param {string} path - The path to navigate to.
      */
-    navigate(path) {
-        console.log("path", path);
+    async navigate(path) {
         if (path === "/") {
             path = "/home";
         } else if (path === "/logout") {
             return this.auth.logout();
         }
 
-        const result = this.parsePath(path);
-        if (result === null) {
+        const parsedPath = parsePath(path, this.pages);
+        if (!parsedPath || !parsedPath.page) {
             console.error("No matching page found for path:", path);
+            if (path !== "/404") this.navigate("/404");
             return;
         }
-    
-        const { page, params } = result;
-        if (page) {
-            if (this.currentPage) {
-                this.currentPage.close();
-            }
-            this.mainElement.setAttribute("data-page", page.name);
-            this.currentPage = page;
-            if (this.currentPage.preserveParams) {
-                const queryParams = window.location.search
-                history.pushState({}, page.name, page.url + queryParams);
-            } else {
-                history.pushState({}, page.name, page.url);
-            }
-            console.log("Navigating to", page.name);
-            page.open(this);
-            this.initListeningToInvitations();
-        } else {
-            this.navigate("/404");
-        }
-    }
 
-    /**
-     * Starts listening to WebSocket invitations if authenticated.
-     */
-    initListeningToInvitations() {
+        const { page, params } = parsedPath;
+        const queryParams = window.location.search;
+        console.log("Navigating to:", path, page, params);
+        page.params = params;
+
+        if (this.currentPage) {
+            this.currentPage.close();
+        }
+        this.mainElement.setAttribute("data-page", page.name);
+        this.currentPage = page;
+        history.pushState({}, page.name, path + (queryParams || ''));
+        await page.open(this);
         if (this.auth.authenticated && !this.ws) {
             this.listenToInvitations();
         }
@@ -126,24 +89,43 @@ class App {
      */
     listenToInvitations() {
         if (!this.auth || !this.auth.user) {
-            console.log("Cannot establish WebSocket connection: User is not authenticated.");
+            console.warn("Cannot establish WebSocket connection: User is not authenticated.");
+            return;
+        }
+
+        if (this.ws) {
+            console.warn("WebSocket connection already established.");
             return;
         }
 
         const userId = this.auth.user.id;
         console.log("Establishing WebSocket connection for user:", userId);
-        this.ws = new WebSocket(`ws://localhost:8000/ws/game-invitation/${userId}/?token=${Cookies.get("access_token")}`);
+        this.ws = new WebSocket(`ws://localhost:8000/ws/game-invitation/${userId}/?token=${this.auth.accessToken}`);
 
         this.ws.addEventListener("open", () => {
             console.log("WebSocket connection established for user:", userId);
         });
 
-        this.ws.addEventListener("message", (event) => {
+        this.ws.addEventListener("message", async (event) => {
             const data = JSON.parse(event.data);
             if (data.type === "game_accepted") {
                 console.log("Game invitation accepted:", data);
                 console.log(`Redirecting to game: ${data.game_url}`);
                 this.navigate(data.game_url);
+            }
+    
+            if (data.type === "game_invited") {
+                console.log("Game invitation received:", data);
+                if (confirm(`You have been challenged by ${data.invitation.sender.username}. Do you accept?`)) {
+                    try {
+                        const response = await this.api.gameAccept(data.invitation.id);
+                        console.log(response);
+                        console.log("Starting game");
+                        this.navigate(response.game_url);
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }
             }
         });
 
@@ -176,7 +158,6 @@ class App {
         this.navigate(window.location.pathname.toLowerCase());
         window.addEventListener("load", () => {
             document.body.classList.remove("loading");
-            this.initListeningToInvitations();
         });
     }
 }

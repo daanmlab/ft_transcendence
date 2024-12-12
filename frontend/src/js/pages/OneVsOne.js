@@ -66,6 +66,7 @@ class OneVsOne extends Page {
                     inviteBtn.classList.add("d-none");
                     console.log(response);
                     console.log("Starting game");
+                    this.app.navigate(response.game_url);
                 } catch (error) {
                     console.error(error);
                 }

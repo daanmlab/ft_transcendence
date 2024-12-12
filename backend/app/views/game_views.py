@@ -34,6 +34,16 @@ class CreateGameInvitationView(APIView):
 
         invitation = GameInvitation.objects.create(sender=sender, receiver=receiver)
 
+        channel_layer = get_channel_layer()
+        print("Invitation sent. Sending message to", f"game_invitation_{receiver.id}")
+        async_to_sync(channel_layer.group_send)(
+            f"game_invitation_{receiver.id}",
+            {
+                "type": "game_invited",
+                "invitation": GameInvitationSerializer(invitation).data
+            }
+        )
+
         return Response(
             {"message": "Invitation sent successfully.", "invitation_id": invitation.id},
             status=status.HTTP_201_CREATED
@@ -55,7 +65,7 @@ class AcceptGameInvitationView(APIView):
         invitation.save()
 
         channel_layer = get_channel_layer()
-        print(f"game_invitation_{invitation.sender.id}")
+        print("Invitation accepted. Sending message to", f"game_invitation_{invitation.sender.id}")
         async_to_sync(channel_layer.group_send)(
             f"game_invitation_{invitation.sender.id}",
             {

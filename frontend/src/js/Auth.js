@@ -212,11 +212,11 @@ export class Auth {
      */
     logout() {
         console.log("Logging out");
-        console.log("Closing WebSocket connection");
-        console.log("this.app", this.app);
-        if (this.app.ws) this.app.ws.close();
-        this.app.ws = null;
-        this.app.invitationListenerStarted = false;
+        if (this.app.ws) {
+            console.log("Closing WebSocket connection");
+            this.app.ws.close();
+            this.app.ws = null;
+        }
         Cookies.remove("access_token");
         Cookies.remove("refresh_token");
         this.accessToken = null;

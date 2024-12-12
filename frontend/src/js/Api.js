@@ -85,6 +85,14 @@ export class Api {
     }
 
     /**
+     * Verifies the user's email address.
+     * @param {string} token - The email verification token.
+     */
+    async verifyEmail(token) {
+        return this.request("get", `/verify-email/${token}/`);
+    }
+
+    /**
      * Logs in a user.
      * @param {string} email - The user's email.
      * @param {string} password - The user's password.
