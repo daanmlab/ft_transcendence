@@ -35,3 +35,28 @@ GET  http://localhost:8000/api/game-invitations/received/ HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzODQ5MjM5LCJpYXQiOjE3MzM4NDU2MzksImp0aSI6ImJjZDM2M2FiYjYyZDRlMTE4NjRjZWRkN2E5MjIwYjEyIiwidXNlcl9pZCI6MX0._tCjuUziczV3kUOSP14_DbThG5wSGSZ13eavhoSCTRs
 
 ###
+
+GET  http://localhost:8000/api/2fa/setup/ HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMjk0OTc3LCJpYXQiOjE3MzIyOTEzNzcsImp0aSI6IjJmZjQ4Mjk1MGYwODQyNjJiYmM5ZWRhYzFhOGM5MDU0IiwidXNlcl9pZCI6M30.A8s3N6Ob8qGe87L6AXFINw9A0zoISd5FrtcLmn_IXq0
+
+###
+
+POST  http://localhost:8000/api/2fa/verify-setup/ HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMjk0OTc3LCJpYXQiOjE3MzIyOTEzNzcsImp0aSI6IjJmZjQ4Mjk1MGYwODQyNjJiYmM5ZWRhYzFhOGM5MDU0IiwidXNlcl9pZCI6M30.A8s3N6Ob8qGe87L6AXFINw9A0zoISd5FrtcLmn_IXq0
+Content-Type: application/json
+
+{
+	"otp": "772566"
+}
+
+###
+
+POST  http://localhost:8000/api/verify-otp HTTP/1.1
+Content-Type: application/json
+
+{
+	"otp": "503412",
+	"email": "michaelhall@example.com"
+}
+
+###

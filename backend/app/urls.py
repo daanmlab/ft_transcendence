@@ -13,7 +13,11 @@ from app.views.oauth_views import (
 
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from app.views.two_factor_auth_views import VerifyOTPView
+from app.views.two_factor_auth_views import (
+	VerifyOTPView,
+	AuthenticatorSetupView,
+	VerifyAuthenticatorSetupView,
+)
 
 from app.views.user_views import (
 	UserListView,

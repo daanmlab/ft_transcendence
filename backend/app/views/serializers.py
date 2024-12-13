@@ -65,6 +65,11 @@ class UserSerializer(serializers.ModelSerializer):
             raise ValidationError("File too large. Size should not exceed 5 MB.")
         return value
     
+    def validate_two_factor_method(self, value):
+        if value == 'authenticator':
+            raise serializers.ValidationError("Authenticator 2FA method can't be set through this view.")
+        return value
+    
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         if instance.avatar_upload:
