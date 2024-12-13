@@ -51,7 +51,7 @@ class HomePage extends Page {
             sendList.appendChild(friendItem);
         });
     
-        const friendsRequests = await api.getFriendRequests();
+        const friendsRequests = await api.getFriendsRequests();
         friendsRequests.forEach(invite => {
             const friendItem = setupFriendItem(invite, "Accept", async () => {
                 try {
