@@ -1,5 +1,4 @@
 import { parsePath } from "./utils.js";
-
 import {
     LoginPage,
     NotFoundPage,
@@ -44,6 +43,7 @@ class App {
         };
         this.currentPage = null;
         this.ws = null;
+        this.currentGame = null;
         this.init();
         if (document.getElementById("noScript"))
             document.getElementById("noScript").remove();
@@ -110,17 +110,26 @@ class App {
             const data = JSON.parse(event.data);
             if (data.type === "game_accepted") {
                 console.log("Game invitation accepted:", data);
+                if (this.currentGame) {
+                    console.log("Game already in progress, can not start new game now");
+                    return;
+                }
                 console.log(`Redirecting to game: ${data.game_url}`);
+                this.currentGame = true; // TODO: implement game state management
                 this.navigate(data.game_url);
             }
     
             if (data.type === "game_invited") {
                 console.log("Game invitation received:", data);
+                if (this.currentGame) {
+                    console.log("Game already in progress, can not start new game now");
+                    return;
+                }
                 if (confirm(`You have been challenged by ${data.invitation.sender.username}. Do you accept?`)) {
                     try {
                         const response = await this.api.gameAccept(data.invitation.id);
-                        console.log(response);
-                        console.log("Starting game");
+                        console.log("Starting game", response);
+                        this.currentGame = true; // TODO: implement game state management
                         this.navigate(response.game_url);
                     } catch (error) {
                         console.error(error);

@@ -73,7 +73,6 @@ class UserSerializer(serializers.ModelSerializer):
                 settings.MEDIA_ROOT
             )
         return representation
-    
 
 class GameInvitationSerializer(serializers.ModelSerializer):
     sender = UserSerializer(read_only=True)
