@@ -66,18 +66,17 @@ class App {
             if (path !== "/404") this.navigate("/404");
             return;
         }
-
         const { page, params } = parsedPath;
         const queryParams = window.location.search;
-        console.log("Navigating to:", path, page, params);
-        page.params = params;
+        console.log("Navigating to:", path, page, params, queryParams);
 
-        if (this.currentPage) {
-            this.currentPage.close();
-        }
+        page.params = params;
+        if (this.currentPage) this.currentPage.close();
         this.mainElement.setAttribute("data-page", page.name);
         this.currentPage = page;
+        
         history.pushState({}, page.name, path + (queryParams || ''));
+        
         await page.open(this);
         if (this.auth.authenticated && !this.ws) {
             this.listenToInvitations();
