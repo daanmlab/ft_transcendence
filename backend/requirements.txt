@@ -13,5 +13,4 @@ djangorestframework-simplejwt
 pillow
 django-silk
 faker
-requests
 qrcode

@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 class Pong extends HTMLElement {
     constructor({} = {}) {
         super();
-        this.init();
+        //this.init();
     }
 
     init() {

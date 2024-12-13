@@ -8,6 +8,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError, APIException
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from user.models import GameStats
+from app.models import GameInvitation
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -77,3 +78,11 @@ class UserSerializer(serializers.ModelSerializer):
                 settings.MEDIA_ROOT
             )
         return representation
+
+class GameInvitationSerializer(serializers.ModelSerializer):
+    sender = UserSerializer(read_only=True)
+    receiver = UserSerializer(read_only=True)
+
+    class Meta:
+        model = GameInvitation
+        fields = ['id', 'sender', 'receiver', 'status', 'game']

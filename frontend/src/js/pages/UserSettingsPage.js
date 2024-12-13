@@ -87,6 +87,9 @@ class UserSettingsPage extends Page {
             .then(() => {
                 this.showMessage("Account successfully deleted.", "success");
                 Modal.getInstance(document.getElementById('deleteAccountModal')).hide();
+                setTimeout(() => {
+                    return this.app.auth.logout();
+                }, 3000);
             })
             .catch(error => {
                 this.showMessage("An error occurred while deleting the account.", "error");

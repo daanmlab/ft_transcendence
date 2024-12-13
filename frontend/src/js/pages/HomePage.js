@@ -13,11 +13,8 @@ class HomePage extends Page {
     }
 
     async render() {
-        const { auth, api } = this.app;
+        const { api } = this.app;
         
-        const userInfo = auth.user;
-        console.log("userInfo", userInfo);
-
         const sendList = document.querySelector("#send-list");
         const receiveList = document.querySelector("#receive-list");
         const inviteBtn = document.querySelector("#action-friend");

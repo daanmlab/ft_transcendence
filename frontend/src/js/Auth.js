@@ -106,6 +106,7 @@ export class Auth {
                 Cookies.set("access_token", responseData.access);
                 Cookies.set("refresh_token", responseData.refresh);
                 this.accessToken = responseData.access;
+                this.authenticated = true;
                 this.app.navigate("/home");
                 return responseData;
             } else {
@@ -202,6 +203,11 @@ export class Auth {
      */
     logout() {
         console.log("Logging out");
+        if (this.app.ws) {
+            console.log("Closing WebSocket connection");
+            this.app.ws.close();
+            this.app.ws = null;
+        }
         Cookies.remove("access_token");
         Cookies.remove("refresh_token");
         this.accessToken = null;
