@@ -74,8 +74,8 @@ class Game :
 
     @database_sync_to_async
     def set_game_active(self):
-        self.socket.db_game.started = True # type: ignore
-        self.socket.db_game.save() # type: ignore
+        self.socket.db_game.status = "in_progress"
+        self.socket.db_game.save()
 
     def reset(self):
         self.ball = Ball(0.5 - 0.01, 0.5 - 0.01)
@@ -84,8 +84,10 @@ class Game :
 
     @database_sync_to_async
     def setWinner(self, winner: int):
-        #set player as winner
         self.socket.db_game.winner = self.socket.db_game.player1 if winner == 0 else self.socket.db_game.player2
+        self.socket.db_game.score_player1 = self.score[0]
+        self.socket.db_game.score_player2 = self.score[1]
+        self.socket.db_game.status = "completed"
         self.socket.db_game.save()
 
     async def handle_disconnect(self):
@@ -106,7 +108,6 @@ class Game :
                         "score": self.score
                     }
                 })
-
 
             if (self.score[0] >= 5 or self.score[1] >= 5):
                 print("Game Over")           

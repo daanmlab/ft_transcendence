@@ -19,14 +19,21 @@ export default class GamePage extends Page {
 
         const gameElement = mainElement.querySelector("pong-game");
         gameElement.page = this;
-        
+
         const gameResultElement = mainElement.querySelector("#game-result");
-        gameElement.startGame(gameId);
-        gameElement.addEventListener("gameOver", () => {
-            console.log("Game over from Pong component");
-            this.app.currentGame = false;
+        const gameInstance = await app.api.getGame(gameId);
+        console.log("Game instance:", gameInstance);
+        if (gameInstance.status === "not_started") {
+            gameElement.startGame(gameId);
+            gameElement.addEventListener("gameOver", () => {
+                console.log("Game over from Pong component");
+                this.app.currentGame = false;
+                gameElement.remove();
+                gameResultElement.classList.remove("d-none");
+            });
+        } else {
             gameElement.remove();
             gameResultElement.classList.remove("d-none");
-        });
+        }
     }
 }

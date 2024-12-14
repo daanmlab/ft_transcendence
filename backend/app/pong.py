@@ -5,7 +5,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from .Game import Game
 from .models import PongGame
 from channels.db import database_sync_to_async
-
+from django.utils import timezone
 
 def create_group_name(player_id: int, game_id: int) -> str:
     return f"{game_id}_{player_id}"
@@ -50,49 +50,49 @@ class PongConsumer(AsyncWebsocketConsumer):
             await self.close()
             return
         # check if game exists
-        game: PongGame = await database_sync_to_async(PongGame.objects.filter(id=self.scope["url_route"]["kwargs"]["game_id"]).first)()
-        if not game:
+        db_game: PongGame = await database_sync_to_async(PongGame.objects.filter(id=self.scope["url_route"]["kwargs"]["game_id"]).first)()
+        if not db_game:
             await self.send(text_data=json.dumps({"type": "error", "message": "Game not found"}))
             await self.close()
             return
         # check if user is player1 or player2
-        if (await self.get_player1(game)) != self.scope["user"] and (await self.get_player2(game)) != self.scope["user"]:
+        if (await self.get_player1(db_game)) != self.scope["user"] and (await self.get_player2(db_game)) != self.scope["user"]:
             await self.send(text_data=json.dumps({"type": "error", "message": "You are not a player in this game"}))
             await self.close()
             return
         # check if game is finished
-        if await self.game_has_winner(game):
+        if await self.game_has_winner(db_game):
             await self.send(text_data=json.dumps({"type": "error", "message": "Game is finished"}))
             await self.close()
             return
         # check if user is player1 or player2
-        if (await self.get_player1(game)) == self.scope["user"]:
+        if (await self.get_player1(db_game)) == self.scope["user"]:
             self.side = 0
         else:
             self.side = 1
 
-        # check if game has a channel
-        if not await self.get_channel_group_name(game):
-            game.channel_group_name = create_group_name(self.scope["user"].id, game.id)
-            print(f"Channel group name: {game.channel_group_name}")
+        # check or register channel group
+        if not await self.get_channel_group_name(db_game):
+            db_game.channel_group_name = create_group_name(self.scope["user"].id, db_game.id)
+            print(f"Channel group name: {db_game.channel_group_name}")
 
             await self.channel_layer.group_add(
-                game.channel_group_name,
+                db_game.channel_group_name,
                 self.channel_name
             )
-            await database_sync_to_async(game.save)()
+            await database_sync_to_async(db_game.save)()
         else:
-            print(f"Channel group name: {game.channel_group_name}")
+            print(f"Channel group name: {db_game.channel_group_name}")
 
             await self.channel_layer.group_add(
-                game.channel_group_name,
+                db_game.channel_group_name,
                 self.channel_name
             )
 
-        print(f"Connected to game {game.id} as {self.scope['user'].username}")
+        print(f"Connected to game {db_game.id} as {self.scope['user'].username}")
 
         await self.channel_layer.group_send(
-            game.channel_group_name,
+            db_game.channel_group_name,
             {
                 "type": "state_update",
                 "objects": {
@@ -102,8 +102,11 @@ class PongConsumer(AsyncWebsocketConsumer):
                 }
             }
         )
-        self.db_game = game
-        self.game_group_name = game.channel_group_name
+        db_game.match_date = timezone.now()
+        await database_sync_to_async(db_game.save)()
+
+        self.db_game = db_game
+        self.game_group_name = db_game.channel_group_name
         self.game = Game()
 
     async def disconnect(self, close_code):
@@ -114,14 +117,19 @@ class PongConsumer(AsyncWebsocketConsumer):
         if self.game:
             await self.game.handle_disconnect()
 
+        # Update game status to interrupted if no winner and game was in progress
+        if not self.db_game.winner and self.db_game.status == 'in_progress':
+            self.db_game.status = 'interrupted'
+            await database_sync_to_async(self.db_game.save)()
+
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message_type = text_data_json.get("type", "")
 
         print("Received message: ", message_type)
         if message_type == "start_game":
-            print(self.db_game.started)
-            if self.db_game.started:
+            print(self.db_game.status)
+            if self.db_game.status != "not_started":
                 return
             print("Starting game")
             print("Game group name", self.game_group_name)

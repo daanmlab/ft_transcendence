@@ -1,4 +1,4 @@
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -7,7 +7,7 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.contrib.auth import get_user_model
 from app.models import GameInvitation, PongGame
-from .serializers import GameInvitationSerializer
+from .serializers import GameInvitationSerializer, PongGameSerializer
 from django.db import transaction
 
 User = get_user_model()
@@ -96,3 +96,8 @@ class ReceivedGameInvitationsListView(ListAPIView):
 
     def get_queryset(self):
         return GameInvitation.objects.filter(receiver=self.request.user).select_related('sender').order_by('-created_at')
+
+class PongGameDetailView(RetrieveAPIView):
+    queryset = PongGame.objects.all()
+    serializer_class = PongGameSerializer
+    lookup_field = 'id'

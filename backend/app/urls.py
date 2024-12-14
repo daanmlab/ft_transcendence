@@ -32,7 +32,8 @@ from app.views.game_views import (
 	CreateGameInvitationView,
 	AcceptGameInvitationView,
 	SentGameInvitationsListView,
-	ReceivedGameInvitationsListView
+	ReceivedGameInvitationsListView,
+	PongGameDetailView
 )
 
 urlpatterns = [
@@ -59,4 +60,6 @@ urlpatterns = [
 	path('game-invitation/<int:invitation_id>/accept/', AcceptGameInvitationView.as_view(), name='accept-game-invitation'),
 	path('game-invitations/sent/', SentGameInvitationsListView.as_view(), name='sent-game-invitations'),
 	path('game-invitations/received/', ReceivedGameInvitationsListView.as_view(), name='received-game-invitations'),
+	# Game
+	path('games/<int:id>/', PongGameDetailView.as_view(), name='pong-game-detail'),
 ]
