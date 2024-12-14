@@ -3,9 +3,21 @@ import Cookies from "js-cookie";
 class Pong extends HTMLElement {
     constructor({} = {}) {
         super();
-        //this.init();
+        this.boundKeyDownHandler = this.keyDownHandler.bind(this);
+        this.boundKeyUpHandler = this.keyUpHandler.bind(this);
+        this.boundBeforeUnloadHandler = this.beforeUnloadHandler.bind(this);
+        this.init();
     }
 
+
+    set page(page) {
+        this._page = page;
+    }
+
+    get page() {
+        return this._page;
+    }
+    
     init() {
         this.ws = null;
         this.innerHTML = "";
@@ -25,74 +37,72 @@ class Pong extends HTMLElement {
             this.ball,
             this.scoreboard
         );
-        this.score = {
-            left: 0,
-            right: 0,
-        };
-        this.scoreboard.innerHTML = `${this.score.left} - ${this.score.right}`;
+        this.score = [0, 0];
+        this.scoreboard.innerHTML = `${this.score[0]} - ${this.score[1]}`;
         this.pressedKeys = [];
+        this.playersJoined = [];
     }
 
-    setWebsockets() {
+    setWebsocket(id) {
         this.setupEventListeners();
-        // ws with headers
         this.ws = new WebSocket(
-            `ws://localhost:8000/ws/?token=${Cookies.get("access_token")}`
+            `ws://localhost:8000/ws/${id}/?token=${Cookies.get("access_token")}`
         );
         this.ws.onopen = () => {
             console.log("Connected to server");
         };
+
         this.ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
             console.log(data);
-            // data = {
-            //     type: "state_update",
-            //     objects: {
-            //         type: "gameState",
-            //         ball: {
-            //             x: 0.49,
-            //             y: 0.49,
-            //             width: 0.02,
-            //             height: 0.02,
-            //             speed_x: 0.03,
-            //             speed_y: 0,
-            //         },
-            //         paddles: [
-            //             {
-            //                 x: 0.42,
-            //                 y: 0.42,
-            //                 width: 0.02,
-            //                 height: 0.15,
-            //             },
-            //             {
-            //                 x: 0.42,
-            //                 y: 0.42,
-            //                 width: 0.02,
-            //                 height: 0.15,
-            //             },
-            //         ],
-            //     },
-            // };
-            // const paddleHeight = 0.15;
-            if (data.type === "gameState") {
-                this.setPositions({
-                    leftPaddle: {
-                        top: `calc(${data.paddles[0].y * 100}%)`,
-                    },
-                    rightPaddle: {
-                        top: `calc(${data.paddles[1].y * 100}%)`,
-                    },
-                    ball: {
-                        top: `calc(${data.ball.y * 100}%)`,
-                        left: `calc(${data.ball.x * 100}%)`,
-                    },
-                });
+            switch (data.type) {
+                case "join":
+                    this.playersJoined.push(data.player);
+                    console.log("Players joined:", this.playersJoined);
+                    if (this.playersJoined.length === 2) {
+                        console.log("Starting game...");
+                        this.ws.send(JSON.stringify({ type: "start_game" }));
+                    }
+                    break;
+                case "gameState":
+                    this.setPositions({
+                        leftPaddle: {
+                            top: `calc(${data.paddles[0].y * 100}%)`,
+                        },
+                        rightPaddle: {
+                            top: `calc(${data.paddles[1].y * 100}%)`,
+                        },
+                        ball: {
+                            top: `calc(${data.ball.y * 100}%)`,
+                            left: `calc(${data.ball.x * 100}%)`,
+                        },
+                    });
+                    break;
+                case "score":
+                    this.score = data.score;
+                    this.setScore();
+                    break;
+                case "endGame":
+                    console.log("Game over");
+                    this.score = data.score;
+                    this.setScore();
+                    this.ws.close();
+                    break;
+                case "error":
+                    console.error(data.message);
+                    break;
             }
         };
         this.ws.onclose = () => {
             console.log("Disconnected from server");
+            this.removeEventListeners(); 
+            this.ws = null;
+            this.dispatchEvent(new CustomEvent("gameOver"));
         };
-        console.log(this.ws);
+    }
+
+    setScore() {
+        this.scoreboard.innerHTML = `${this.score[0]} - ${this.score[1]}`;
     }
 
     setPositions({
@@ -107,30 +117,61 @@ class Pong extends HTMLElement {
     }
 
     setupEventListeners() {
-        document.addEventListener("keydown", (event) => {
-            console.log("keydown", event.key);
-            if (event.key === "ArrowUp" || event.key === "ArrowDown") {
-                console.log("keydown", event.key);
+        document.addEventListener("keydown", this.boundKeyDownHandler);
+        document.addEventListener("keyup", this.boundKeyUpHandler);
+        window.addEventListener("beforeunload", this.boundBeforeUnloadHandler);
+    }
+
+    keyDownHandler(event) {
+        console.log("keydown", event.key);
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            if (event.key === "w" || event.key === "s") {
                 this.ws.send(
                     JSON.stringify({ type: "keydown", key: event.key })
                 );
             }
-        });
-        document.addEventListener("keyup", (event) => {
-            if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+        }
+    }
+
+    keyUpHandler(event) {
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            if (event.key === "w" || event.key === "s") {
                 console.log("keyup", event.key);
                 this.ws.send(JSON.stringify({ type: "keyup", key: event.key }));
             }
-        });
+        }
+    }
+
+    beforeUnloadHandler() {
+        if (this.ws) {
+            this.ws.close();
+        }
+    }
+
+    async startGame(gameId) {
+        this.setWebsocket(gameId);
+        try {
+            while (this.ws && this.ws.readyState !== WebSocket.OPEN) {
+                console.log("Waiting for connection...");
+                await new Promise((resolve) => setTimeout(resolve, 1000));
+            }
+        } catch (error) {
+            console.error("Error starting game:", error);
+        }
     }
 
     connectedCallback() {
         // Add event listeners and start the game loop here
     }
 
+    removeEventListeners() {
+        document.removeEventListener("keydown", this.boundKeyDownHandler);
+        document.removeEventListener("keyup", this.boundKeyUpHandler);
+        window.removeEventListener("beforeunload", this.boundBeforeUnloadHandler);
+    }
+
     disconnectedCallback() {
-        // Clean up resources and stop the game loop here
-        // document.removeEventListener("keydown", );
+        this.removeEventListeners();
     }
 }
 if (!customElements.get("pong-game")) customElements.define("pong-game", Pong);

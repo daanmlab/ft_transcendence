@@ -17,5 +17,16 @@ export default class GamePage extends Page {
         const gameId = params["id"];
         console.log("Game ID:", gameId);
 
+        const gameElement = mainElement.querySelector("pong-game");
+        gameElement.page = this;
+        
+        const gameResultElement = mainElement.querySelector("#game-result");
+        gameElement.startGame(gameId);
+        gameElement.addEventListener("gameOver", () => {
+            console.log("Game over from Pong component");
+            this.app.currentGame = false;
+            gameElement.remove();
+            gameResultElement.classList.remove("d-none");
+        });
     }
 }

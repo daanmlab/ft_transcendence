@@ -447,7 +447,31 @@
     <section id="Game">
         <p>this is the pong </p>
         <h1>NOW YOU PONG</h1>
-        <pong-game />
+        <pong-game></pong-game>
+        <div id="game-result" class="container text-center mt-5 d-none">
+            <div class="row bg-primary rounded py-3 mx-auto" style="max-width: 800px;">
+                <div class="col-12 mb-2">
+                    <h4 class="text-white">WELL PONGED</h4>
+                </div>
+                <div class="col-2 d-flex justify-content-center align-items-center">
+                    <div id="game-result-avatar-1" class="rounded-circle bg-light text-dark d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;"></div>
+                </div>
+                <div class="col-8 d-flex justify-content-between align-items-center">
+                    <div id="game-result-username-1">Player 1</div>
+                    <div id="game-result-score-1" class="fs-4">0</div>
+                    <div class="fs-4 text-danger">VS</div>
+                    <div id="game-result-score-1" class="fs-4">0</div>
+                    <div id="game-result-username-1">Player 2</div>
+                </div>
+                <div class="col-2 d-flex justify-content-center align-items-center">
+                    <div id="game-result-avatar-2" class="rounded-circle bg-light text-dark d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                    </div>
+                </div>
+                <div class="col-12 mt-3">
+                    <div class="bg-light text-dark p-2 rounded">Additional Match Information</div>
+                </div>
+            </div>
+        </div>
     </section>
 </body>
 

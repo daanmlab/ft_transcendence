@@ -100,12 +100,12 @@ class App {
         const userId = this.auth.user.id;
         console.log("Establishing WebSocket connection for user:", userId);
         this.ws = new WebSocket(`ws://localhost:8000/ws/game-invitation/${userId}/?token=${this.auth.accessToken}`);
-
-        this.ws.addEventListener("open", () => {
+        
+        this.ws.onopen = () => {
             console.log("WebSocket connection established for user:", userId);
-        });
-
-        this.ws.addEventListener("message", async (event) => {
+        };
+        
+        this.ws.onmessage = async (event) => {
             const data = JSON.parse(event.data);
             if (data.type === "game_accepted") {
                 console.log("Game invitation accepted:", data);
@@ -117,7 +117,7 @@ class App {
                 this.currentGame = true; // TODO: implement game state management
                 this.navigate(data.game_url);
             }
-    
+        
             if (data.type === "game_invited") {
                 console.log("Game invitation received:", data);
                 if (this.currentGame) {
@@ -135,17 +135,17 @@ class App {
                     }
                 }
             }
-        });
-
-        this.ws.addEventListener("error", (error) => {
+        };
+        
+        this.ws.onerror = (error) => {
             console.error("WebSocket error:", error);
             this.ws = null;
-        });
-
-        this.ws.addEventListener("close", () => {
+        };
+        
+        this.ws.onclose = () => {
             console.warn("WebSocket connection closed.");
             this.ws = null;
-        });
+        };
 
         // Clean up on page unload
         window.addEventListener("beforeunload", () => {

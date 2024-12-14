@@ -9,6 +9,7 @@ class PongGame(models.Model):
     channel_group_name = models.CharField(max_length=100, default='')
     winner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='won_games', default=None, null=True)
     date_played = models.DateTimeField(auto_now_add=True)
+    started = models.BooleanField(default=False)
 
     def __str__(self):
         if self.player2 is None:
