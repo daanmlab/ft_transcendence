@@ -104,13 +104,15 @@ class PongConsumer(AsyncWebsocketConsumer):
         )
         self.db_game = game
         self.game_group_name = game.channel_group_name
-        self.game = Game()  # Create a new Game instance for each connection
+        self.game = Game()
 
     async def disconnect(self, close_code):
         if self.game_group_name:
             await self.channel_layer.group_discard(
                 self.game_group_name, self.channel_name
             )
+        if self.game:
+            await self.game.handle_disconnect()
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)

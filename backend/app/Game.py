@@ -4,7 +4,6 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import PongGame
 from channels.db import database_sync_to_async
 
-
 def truncate(n, decimals=0) -> float:
     multiplier = 10 ** decimals
     return int(n * multiplier) / multiplier
@@ -15,6 +14,7 @@ class Hitbox :
         self.y: float = y
         self.width: float = width
         self.height: float = height
+        self.disconnected = False
 
     def printState(self, name: str):
         print(f"{name}: {self.x}, {self.y}, {self.width}, {self.height}")
@@ -70,6 +70,7 @@ class Game :
         ])
         self.socket: Union[AsyncWebsocketConsumer, None] = None
         self.score = [0, 0]
+        self.disconnected = False
 
     @database_sync_to_async
     def set_game_active(self):
@@ -86,12 +87,15 @@ class Game :
         #set player as winner
         self.socket.db_game.winner = self.socket.db_game.player1 if winner == 0 else self.socket.db_game.player2
         self.socket.db_game.save()
-        
+
+    async def handle_disconnect(self):
+        self.disconnected = True      
+    
     async def game_loop(self):
         if (self.socket is None):
             return
         counter = 0
-        while True:
+        while not self.disconnected:
             counter += 1
 
             if (counter % 10 == 0):
@@ -126,9 +130,6 @@ class Game :
                 self.ball.speed_y *= -1
 
             # Check if the ball collides with the paddles
-            # self.ball.printState("Ball")
-            # self.paddles[0].printState("Paddle 0")
-            # self.paddles[1].printState("Paddle 1")
             if self.ball.collides(self.paddles[0]) or self.ball.collides(self.paddles[1]):
                 print("Collided")
                 self.ball.speed_x *= -1
@@ -191,7 +192,13 @@ class Game :
                 }
             })
             # await asyncio.sleep(0.1)
-        pass
+        await self.socket.channel_layer.group_send(self.socket.db_game.channel_group_name, {
+            "type": "state_update",
+            "objects": {
+                "type": "endGame",
+                "message": "User disconnected"
+            }
+        })
 
     async def startGame(self, socket: AsyncWebsocketConsumer):
         self.socket = socket

@@ -12,7 +12,7 @@ export default class GamePage extends Page {
     }
 
     async render(app) {
-        const { auth, mainElement, params } = this;
+        const { mainElement, params } = this;
         console.log(params);
         const gameId = params["id"];
         console.log("Game ID:", gameId);

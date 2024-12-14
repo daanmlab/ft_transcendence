@@ -1,4 +1,5 @@
 import { parsePath } from "./utils.js";
+import { WS_URL } from "./constants.js";
 import {
     LoginPage,
     NotFoundPage,
@@ -99,7 +100,7 @@ class App {
 
         const userId = this.auth.user.id;
         console.log("Establishing WebSocket connection for user:", userId);
-        this.ws = new WebSocket(`ws://localhost:8000/ws/game-invitation/${userId}/?token=${this.auth.accessToken}`);
+        this.ws = new WebSocket(`${WS_URL}/game-invitation/${userId}/?token=${this.auth.accessToken}`);
         
         this.ws.onopen = () => {
             console.log("WebSocket connection established for user:", userId);
