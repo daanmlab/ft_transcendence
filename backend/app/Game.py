@@ -83,6 +83,32 @@ class Game :
         self.paddles[1].y = 0.5 - 0.075
 
     @database_sync_to_async
+    def setStats(self, winner: int):
+        # Get the players
+        player1 = self.socket.db_game.player1
+        player2 = self.socket.db_game.player2
+
+        # Update GameStats for both players
+        player1_stats = player1.game_stats  # Direct access via related name
+        player2_stats = player2.game_stats
+
+        # Increment total matches for both players
+        player1_stats.total_matches += 1
+        player2_stats.total_matches += 1
+
+        # Update wins and losses
+        if winner == 0:  # Player 1 wins
+            player1_stats.wins += 1
+            player2_stats.losses += 1
+        else:  # Player 2 wins
+            player2_stats.wins += 1
+            player1_stats.losses += 1
+
+        # Save the updated stats
+        player1_stats.save()
+        player2_stats.save()
+
+    @database_sync_to_async
     def setWinner(self, winner: int):
         self.socket.db_game.winner = self.socket.db_game.player1 if winner == 0 else self.socket.db_game.player2
         self.socket.db_game.score_player1 = self.score[0]
@@ -118,6 +144,7 @@ class Game :
                         "score": self.score
                     }
                 })
+                await self.setStats(0 if self.score[0] >= 5 else 1)
                 await self.setWinner(0 if self.score[0] >= 5 else 1)
                 return            
             # Update the ball's position
@@ -126,6 +153,7 @@ class Game :
             for paddle in self.paddles:
                 paddle.update()
             await asyncio.sleep(.1)
+            
             # Check if the ball collides with the top or bottom of the screen
             if self.ball.y <= 0 or self.ball.y + self.ball.height >= 1:
                 self.ball.speed_y *= -1
@@ -138,7 +166,7 @@ class Game :
             # Check if the ball got past left paddle
             if self.ball.x < self.paddles[0].x:
                 self.reset()
-                self.score[0] += 1
+                self.score[1] += 1
                 await self.socket.channel_layer.group_send(self.socket.db_game.channel_group_name, {
                     "type": "state_update",
                     "objects": {
@@ -152,7 +180,7 @@ class Game :
             # Check if the ball got past right paddle
             if self.ball.x + self.ball.width > self.paddles[1].x + self.paddles[1].width:
                 self.reset()
-                self.score[1] += 1
+                self.score[0] += 1
                 await self.socket.channel_layer.group_send(self.socket.db_game.channel_group_name, {
                     "type": "state_update",
                     "objects": {
@@ -162,7 +190,6 @@ class Game :
                 })
                 print("score: ", self.score)
                 pass
-
 
             await self.socket.channel_layer.group_send(self.socket.db_game.channel_group_name, {
                 "type": "state_update",
