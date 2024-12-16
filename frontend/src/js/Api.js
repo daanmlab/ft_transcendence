@@ -232,12 +232,20 @@ export class Api {
         return this.request("get", "/game-invitations/received/");
     }
 
+    /**
+     * Retrieves a game by ID.
+     * @param {string} gameId - The ID of the game.
+     * @returns {Promise<Object>} A game object.
+    */
+    async getGame(gameId) {
+        return this.request("get", `/games/${gameId}/`);
+    }
+
     /* Media */
 
     /**
      * Uploads an avatar image for the authenticated user.
      * @param {File} file - The avatar image file.
-     * @returns {Promise<Object>} The response data.
      */
     async uploadAvatar(file) {
         const formData = new FormData();
