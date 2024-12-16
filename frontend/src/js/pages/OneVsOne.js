@@ -1,7 +1,6 @@
 import Page from "./Page.js";
 import "../customElements/UserProfileCard.js";
 import "../customElements/UserProfileCardSm.js";
-import "../customElements/Pong.js";
 
 class OneVsOne extends Page {
     constructor(app) {
