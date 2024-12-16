@@ -70,14 +70,6 @@ class Navbar extends HTMLElement {
         `;
     }
 
-    set page(page) {
-        this._page = page;
-    }
-
-    get page() {
-        return this._page;
-    }
-
     setDisplay(elements, display) {
         elements.forEach(el => el.style.display = display);
     }

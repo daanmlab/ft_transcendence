@@ -97,7 +97,11 @@ class ReceivedGameInvitationsListView(ListAPIView):
     def get_queryset(self):
         return GameInvitation.objects.filter(receiver=self.request.user).select_related('sender').order_by('-created_at')
 
+from django.db import models
 class PongGameDetailView(RetrieveAPIView):
-    queryset = PongGame.objects.all()
     serializer_class = PongGameSerializer
     lookup_field = 'id'
+
+    def get_queryset(self):
+        user = self.request.user
+        return PongGame.objects.filter(models.Q(player1=user) | models.Q(player2=user))

@@ -69,7 +69,7 @@ class App {
         }
         const { page, params } = parsedPath;
         const queryParams = window.location.search;
-        console.log("Navigating to:", path, page, params, queryParams);
+        console.log("Navigating to:", path, "page: ", page, "params: ", params, "queryParams: ", queryParams);
 
         page.params = params;
         if (this.currentPage) this.currentPage.close();

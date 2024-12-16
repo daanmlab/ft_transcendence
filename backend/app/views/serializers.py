@@ -89,6 +89,9 @@ class GameInvitationSerializer(serializers.ModelSerializer):
 
 
 class PongGameSerializer(serializers.ModelSerializer):
+    player1 = UserSerializer(read_only=True)
+    player2 = UserSerializer(read_only=True)
+    
     class Meta:
         model = PongGame
         fields = '__all__'

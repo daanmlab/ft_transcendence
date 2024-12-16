@@ -1,4 +1,6 @@
 import Page from "./Page.js";
+import "../customElements/ScoreBoard.js";
+import "../customElements/Pong.js";
 
 export default class GamePage extends Page {
     constructor(app) {
@@ -13,27 +15,36 @@ export default class GamePage extends Page {
 
     async render(app) {
         const { mainElement, params } = this;
-        console.log(params);
         const gameId = params["id"];
-        console.log("Game ID:", gameId);
+        const gameEl = mainElement.querySelector("pong-game");
+        const scoreBoardEl = mainElement.querySelector("score-board");
 
-        const gameElement = mainElement.querySelector("pong-game");
-        gameElement.page = this;
+        gameEl.page = this;
+        scoreBoardEl.page = this;
 
-        const gameResultElement = mainElement.querySelector("#game-result");
-        const gameInstance = await app.api.getGame(gameId);
-        console.log("Game instance:", gameInstance);
-        if (gameInstance.status === "not_started") {
-            gameElement.startGame(gameId);
-            gameElement.addEventListener("gameOver", () => {
-                console.log("Game over from Pong component");
-                this.app.currentGame = false;
-                gameElement.remove();
-                gameResultElement.classList.remove("d-none");
-            });
-        } else {
-            gameElement.remove();
-            gameResultElement.classList.remove("d-none");
+        try {
+            const gameInstance = await app.api.getGame(gameId);
+            const showScoreBoard = () => {
+                scoreBoardEl.displayMatch();
+                gameEl.remove();
+                scoreBoardEl.classList.remove("d-none");
+            };
+
+            if (gameInstance.status === "not_started") {
+                gameEl.startGame(gameId);
+                gameEl.addEventListener("gameOver", async () => {
+                    console.log("Game over from Pong component");
+                    this.app.currentGame = false;
+                    showScoreBoard();
+                });
+            } else if (gameInstance.status === "completed") {
+                showScoreBoard();
+            } else {
+                gameEl.remove();
+            }
+        } catch (error) {
+            console.error("Error fetching game instance:", error);
+            gameEl.remove();
         }
     }
 }
