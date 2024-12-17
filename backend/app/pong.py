@@ -107,8 +107,12 @@ class PongConsumer(AsyncWebsocketConsumer):
 
         self.db_game = db_game
         self.game_group_name = db_game.channel_group_name
-        self.game = Game()
 
+        if not hasattr(self.channel_layer, "game_instance"):
+            self.channel_layer.game_instance = Game()
+
+        self.game = self.channel_layer.game_instance
+        
     async def disconnect(self, close_code):
         if self.game_group_name:
             await self.channel_layer.group_discard(
