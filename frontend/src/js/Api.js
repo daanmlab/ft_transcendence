@@ -152,7 +152,7 @@ export class Api {
     /* User lists */
 
     /**
-     * Retrieves a list of users.
+     * Retrieves a list with all users.
      */
     async getUsers() {
         return this.request("get", "/users/");
@@ -173,10 +173,10 @@ export class Api {
     }
 
     /**
-     * Retrieves a list of friends.
+     * Retrieves a list of friends of the user specified by userId.
      */
-    async getFriends() {
-        return this.request("get", "/friends/");
+    async getFriends(userId) {
+        return this.request("get", `/friends/${userId}/`);
     }
 
     /* Friends */
@@ -239,6 +239,15 @@ export class Api {
     */
     async getGame(gameId) {
         return this.request("get", `/games/${gameId}/`);
+    }
+
+    /**
+     * Retrieves a list of results of games played by the user specified by userId.
+     * @param {string} userId - The ID of the user.
+     * @returns {Promise<Object>} A list of game results.
+    */
+    async getMatchHistory(userId) {
+        return this.request("get", `/match-history/${userId}/`);
     }
 
     /* Media */
