@@ -119,9 +119,9 @@ class FriendsListView(ListAPIView):
     serializer_class = UserSerializer
 
     def get_queryset(self):
-        user = self.request.user
+        user_id = self.kwargs.get('user_id')
         friends = Friendship.objects.filter(
-            Q(user=user, status='accepted') | Q(friend=user, status='accepted')
+            Q(user_id=user_id, status='accepted') | Q(friend_id=user_id, status='accepted')
         ).values_list('user_id', 'friend_id')
-        friend_ids = [uid for pair in friends for uid in pair if uid != user.id]
+        friend_ids = [uid for pair in friends for uid in pair if uid != int(user_id)]
         return User.objects.filter(id__in=friend_ids)

@@ -92,3 +92,20 @@ class PongGameSerializer(serializers.ModelSerializer):
     class Meta:
         model = PongGame
         fields = '__all__'
+
+class MatchHistorySerializer(serializers.ModelSerializer):
+    opponent = serializers.SerializerMethodField()
+    result = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PongGame
+        fields = ['opponent', 'result', 'date_played']
+
+    def get_opponent(self, obj):
+        user_id = self.context['request'].parser_context['kwargs']['id']
+        opponent = obj.player2 if obj.player1.id == user_id else obj.player1
+        return UserSerializer(opponent).data
+
+    def get_result(self, obj):
+        user_id = self.context['request'].parser_context['kwargs']['id']
+        return 'win' if obj.winner.id == user_id else 'loss'

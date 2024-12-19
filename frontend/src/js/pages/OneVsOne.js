@@ -23,7 +23,7 @@ class OneVsOne extends Page {
         selectedFriend.page = this;
 
         const sentInvites = await api.getSentGameInvites();
-        const friends = await api.getFriends();
+        const friends = await api.getFriends(this.app.auth.user.id);
         const receivedInvites = await api.getReceivedGameInvites();
 
         this.createFriendList(friends, sentInvites, inviteBtn, selectedFriend, sendList);
