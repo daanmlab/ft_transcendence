@@ -21,6 +21,7 @@ class UserProfileCard extends HTMLElement {
                 .profile-info, .profile-stats {
                     margin-bottom: 1rem;
                     transition: opacity 0.3s;
+                    cursor: pointer;
                 }
                 p {
                     margin: 0;
@@ -58,6 +59,7 @@ class UserProfileCard extends HTMLElement {
     async setUser(user) {
         if (!user) return;
 
+        const infoEl = this.shadowRoot.getElementById("profile-info");
         const avatarEl = this.shadowRoot.getElementById("profile-avatar");
         const usernameEl = this.shadowRoot.getElementById("profile-username");
         const winsEl = this.shadowRoot.getElementById("profile-wins");
@@ -65,6 +67,11 @@ class UserProfileCard extends HTMLElement {
         const profileStats = this.shadowRoot.getElementById("profile-stats");
         const { api } = this.page.app;
         const avatar_upload = user.avatar_upload ? await api.fetchAvatarObjectUrl(user.avatar_upload): null;
+        infoEl.setAttribute('data-href', `/profile/${user.id}`);
+
+        this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
+            element.addEventListener("click", this.page.handleClick);
+        });
 
         avatarEl.style.opacity = 0;
         usernameEl.style.opacity = 0;
@@ -81,6 +88,12 @@ class UserProfileCard extends HTMLElement {
             usernameEl.style.opacity = 1;
             profileStats.style.opacity = 1;
         }, 300);
+    }
+
+    disconnectedCallback() {
+        this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
+            element.removeEventListener("click", this.page.handleClick);
+        });
     }
 }
 
