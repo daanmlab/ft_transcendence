@@ -6,14 +6,6 @@ class Pong extends HTMLElement {
         this.init();
     }
 
-    set page(page) {
-        this._page = page;
-    }
-
-    get page() {
-        return this._page;
-    }
-
     init() {
         this.ws = null;
         this.innerHTML = "";

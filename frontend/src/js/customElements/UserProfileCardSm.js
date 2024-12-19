@@ -62,14 +62,6 @@ class UserProfileCardSm extends HTMLElement {
         this.shadowRoot.querySelector('.profile-container').addEventListener('click', () => this.updateSelected());
     }
 
-    set page(page) {
-        this._page = page;
-    }
-
-    get page() {
-        return this._page;
-    }
-
     updateSelected() {
         document.querySelectorAll("user-profile-small").forEach((profile) => {
             profile.shadowRoot.querySelector(".profile-container").classList.remove("selected");

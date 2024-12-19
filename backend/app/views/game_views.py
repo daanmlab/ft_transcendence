@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from app.models import GameInvitation, PongGame
 from .serializers import GameInvitationSerializer, PongGameSerializer, MatchHistorySerializer
 from django.db import transaction
+from django.db import models
 
 User = get_user_model()
 
@@ -98,11 +99,14 @@ class ReceivedGameInvitationsListView(ListAPIView):
         return GameInvitation.objects.filter(receiver=self.request.user).select_related('sender').order_by('-created_at')
 
 class PongGameDetailView(RetrieveAPIView):
-    queryset = PongGame.objects.all()
     serializer_class = PongGameSerializer
     lookup_field = 'id'
 
-class MatchHistoryListView(ListAPIView):
+    def get_queryset(self):
+        user = self.request.user
+        return PongGame.objects.filter(models.Q(player1=user) | models.Q(player2=user))
+
+      class MatchHistoryListView(ListAPIView):
     serializer_class = MatchHistorySerializer
 
     def get_queryset(self):

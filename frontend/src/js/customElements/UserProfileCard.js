@@ -48,14 +48,6 @@ class UserProfileCard extends HTMLElement {
         `;
     }
 
-    set page(page) {
-        this._page = page;
-    }
-
-    get page() {
-        return this._page;
-    }
-
     async setUser(user) {
         if (!user) return;
 
