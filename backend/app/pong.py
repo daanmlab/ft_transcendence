@@ -12,6 +12,7 @@ def create_group_name(player_id: int, game_id: int) -> str:
 
 class PongConsumer(AsyncWebsocketConsumer):
 
+    game = Game()
     game_group_name = None
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -108,11 +109,6 @@ class PongConsumer(AsyncWebsocketConsumer):
         self.db_game = db_game
         self.game_group_name = db_game.channel_group_name
 
-        if not hasattr(self.channel_layer, "game_instance"):
-            self.channel_layer.game_instance = Game()
-
-        self.game = self.channel_layer.game_instance
-        
     async def disconnect(self, close_code):
         if self.game_group_name:
             await self.channel_layer.group_discard(
