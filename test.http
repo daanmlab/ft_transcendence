@@ -3,20 +3,14 @@ POST http://localhost:8000/api/token/ HTTP/1.1
 Content-Type: application/json
 
 {
-	"email": "fware@example.org",
+	"email": "debra58@example.net",
   	"password": "pass"
 }
-
 
 ###
 
-POST http://localhost:8000/api/token/ HTTP/1.1
-Content-Type: application/json
-
-{
-	"email": "facu@mail.com",
-  	"password": "pass"
-}
+GET http://localhost:8000/api/match-history/9/ HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0NjA2OTE2LCJpYXQiOjE3MzQ2MDMzMTYsImp0aSI6IjdhMGFjNTlhMzI5MTRlZTBhMjA4MzIzNTRlNzI0MTBmIiwidXNlcl9pZCI6NH0.Ohs8peDzZvl0LMnqJlM9V9RaV134u8HKurKN14dqDtY
 
 ###
 

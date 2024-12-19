@@ -33,7 +33,8 @@ from app.views.game_views import (
 	AcceptGameInvitationView,
 	SentGameInvitationsListView,
 	ReceivedGameInvitationsListView,
-	PongGameDetailView
+	PongGameDetailView,
+	MatchHistoryListView
 )
 
 urlpatterns = [
@@ -54,7 +55,7 @@ urlpatterns = [
 	path('friend-accept/<int:friend_id>', FriendAcceptView.as_view(), name='friend-accept'),
 	path('friends-invitable/', FriendInvitableUsersListView.as_view(), name='friend-invitable-users'),
 	path('friends-requests/', FriendRequestUsersListView.as_view(), name='friend-request-users'),
-	path('friends/', FriendsListView.as_view(), name='friends-list'),
+	path('friends/<int:user_id>/', FriendsListView.as_view(), name='friends-list'),
 	# Game invitations
 	path('game-invitation/<int:user_id>/', CreateGameInvitationView.as_view(), name='game-invitation'),
 	path('game-invitation/<int:invitation_id>/accept/', AcceptGameInvitationView.as_view(), name='accept-game-invitation'),
@@ -62,4 +63,6 @@ urlpatterns = [
 	path('game-invitations/received/', ReceivedGameInvitationsListView.as_view(), name='received-game-invitations'),
 	# Game
 	path('games/<int:id>/', PongGameDetailView.as_view(), name='pong-game-detail'),
+	# Match history
+	path('match-history/<int:id>/', MatchHistoryListView.as_view(), name='match-history'),
 ]

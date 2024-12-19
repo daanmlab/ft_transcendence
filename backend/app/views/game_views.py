@@ -7,7 +7,7 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.contrib.auth import get_user_model
 from app.models import GameInvitation, PongGame
-from .serializers import GameInvitationSerializer, PongGameSerializer
+from .serializers import GameInvitationSerializer, PongGameSerializer, MatchHistorySerializer
 from django.db import transaction
 
 User = get_user_model()
@@ -101,3 +101,10 @@ class PongGameDetailView(RetrieveAPIView):
     queryset = PongGame.objects.all()
     serializer_class = PongGameSerializer
     lookup_field = 'id'
+
+class MatchHistoryListView(ListAPIView):
+    serializer_class = MatchHistorySerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs.get('id')
+        return PongGame.objects.filter(player1_id=user_id, status="completed") | PongGame.objects.filter(player2_id=user_id, status="completed")
