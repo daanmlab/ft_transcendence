@@ -95,9 +95,10 @@ class Pong extends HTMLElement {
     }
 
     handleKey(event, type) {
-        if (this.ws?.readyState === WebSocket.OPEN && ["w", "s"].includes(event.key)) {
-            console.log("Sending key event:", event.key);
-            this.ws.send(JSON.stringify({ type, key: event.key }));
+        if (this.ws?.readyState === WebSocket.OPEN && ["w", "s", "W", "S"].includes(event.key)) {
+            const key = event.key.toLowerCase();
+            console.log("Sending key event:", key);
+            this.ws.send(JSON.stringify({ type, key }));
         }
     }
 

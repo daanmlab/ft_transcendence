@@ -48,6 +48,11 @@ class Paddle (Hitbox):
 
     def update(self):
         self.y = truncate(self.y + self.moving, 2)
+        if self.y < 0:
+            self.y = 0
+        elif self.y + self.height > 1:
+            self.y = 1 - self.height
+
 
 class Ball (Hitbox):
     def __init__(self, x, y):
