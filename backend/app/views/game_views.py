@@ -106,7 +106,7 @@ class PongGameDetailView(RetrieveAPIView):
         user = self.request.user
         return PongGame.objects.filter(models.Q(player1=user) | models.Q(player2=user))
 
-      class MatchHistoryListView(ListAPIView):
+class MatchHistoryListView(ListAPIView):
     serializer_class = MatchHistorySerializer
 
     def get_queryset(self):
