@@ -1,4 +1,6 @@
 import asyncio
+import random
+import math
 from typing import Union
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import PongGame
@@ -57,14 +59,31 @@ class Paddle (Hitbox):
 class Ball (Hitbox):
     def __init__(self, x, y):
         super().__init__(x, y, 0.02, 0.02)
-        self.speed_x = 0.03
-        self.speed_y = 0
-    pass
+        initial_speed = 0.03
+        initial_angle = random.uniform(-math.pi/4, math.pi/4)  # Angle between -45 and 45 degrees
+        self.speed_x = initial_speed * math.cos(initial_angle)
+        self.speed_y = initial_speed * math.sin(initial_angle)
+        # Ensure ball moves towards the other side
+        self.speed_x = abs(self.speed_x)  # Ensure initial movement to the right
+    
+    def calculate_angle(self, paddle):
+        # Calculate the point of impact on the paddle (normalized to -0.5 to 0.5)
+        impact_position = (self.y + self.height/2 - (paddle.y + paddle.height/2)) / (paddle.height/2)
+        
+        # Map impact position to an angle (-45 to 45 degrees)
+        max_angle = math.pi/4  # 45 degrees
+        angle = impact_position * max_angle
+        
+        # Maintain current speed
+        speed = math.sqrt(self.speed_x**2 + self.speed_y**2)
+        
+        # Adjust ball direction based on paddle hit
+        self.speed_x = speed * math.cos(angle) * (-1 if self.speed_x > 0 else 1)
+        self.speed_y = speed * math.sin(angle)
 
     def update(self):
         self.x = truncate(self.x + self.speed_x, 2)
         self.y = truncate(self.y + self.speed_y, 2)
-    pass
 
 class Game :
     def __init__(self):
@@ -166,7 +185,8 @@ class Game :
             # Check if the ball collides with the paddles
             if self.ball.collides(self.paddles[0]) or self.ball.collides(self.paddles[1]):
                 print("Collided")
-                self.ball.speed_x *= -1
+                hit_paddle = self.paddles[0] if self.ball.collides(self.paddles[0]) else self.paddles[1]
+                self.ball.calculate_angle(hit_paddle)
 
             # Check if the ball got past left paddle
             if self.ball.x < self.paddles[0].x:
